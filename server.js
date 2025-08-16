@@ -48,6 +48,33 @@ app.use(express.static('public'));
 // ENHANCED API ENDPOINTS
 // ========================================
 
+// Stats endpoint for admin dashboard
+app.get('/api/stats', async (req, res) => {
+    try {
+        const [suppliers, bases, oils, vessels] = await Promise.all([
+            pool.query('SELECT COUNT(*) as count FROM suppliers'),
+            pool.query('SELECT COUNT(*) as count FROM base_products'),
+            pool.query('SELECT COUNT(*) as count FROM fragrance_oils'),
+            pool.query('SELECT COUNT(*) as count FROM vessels')
+        ]);
+        
+        res.json({
+            suppliers: parseInt(suppliers.rows[0]?.count || 0),
+            bases: parseInt(bases.rows[0]?.count || 0),
+            oils: parseInt(oils.rows[0]?.count || 0),
+            vessels: parseInt(vessels.rows[0]?.count || 0)
+        });
+    } catch (error) {
+        console.error('Error fetching stats:', error);
+        res.status(500).json({ 
+            suppliers: 0,
+            bases: 0,
+            oils: 0,
+            vessels: 0
+        });
+    }
+});
+
 // Get all bases with enhanced fields
 app.get('/api/bases', async (req, res) => {
     try {
