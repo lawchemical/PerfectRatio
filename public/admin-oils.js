@@ -29,6 +29,7 @@
                             <th>NAME</th>
                             <th>SUPPLIER</th>
                             <th>SKU</th>
+                            <th>PRICE</th>
                             <th>FLASH POINT</th>
                             <th>IFRA VER</th>
                             <th>LIBRARY</th>
@@ -37,7 +38,7 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td colspan="8" style="text-align: center;">
+                            <td colspan="9" style="text-align: center;">
                                 <div class="loading"></div>
                             </td>
                         </tr>
@@ -106,6 +107,38 @@
                             <label>Solvent Note</label>
                             <input type="text" class="form-control" name="solvent_note" placeholder="e.g., DPG">
                         </div>
+                        
+                        <!-- Pricing Information -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Price per Unit ($)</label>
+                                <input type="number" class="form-control" name="price_per_unit" step="0.01" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label>Unit Size</label>
+                                <input type="text" class="form-control" name="unit_size" placeholder="e.g., 1 oz, 30 ml">
+                            </div>
+                        </div>
+                        
+                        <!-- Fragrance Notes -->
+                        <div style="margin-top: 20px;">
+                            <h4>Fragrance Notes</h4>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Top Notes</label>
+                                    <input type="text" class="form-control" name="top_notes" placeholder="e.g., Citrus, Bergamot">
+                                </div>
+                                <div class="form-group">
+                                    <label>Middle Notes</label>
+                                    <input type="text" class="form-control" name="middle_notes" placeholder="e.g., Rose, Jasmine">
+                                </div>
+                                <div class="form-group">
+                                    <label>Bottom Notes</label>
+                                    <input type="text" class="form-control" name="bottom_notes" placeholder="e.g., Vanilla, Musk">
+                                </div>
+                            </div>
+                        </div>
+                        
                         <div class="checkbox-group">
                             <input type="checkbox" id="oilInLibrary" name="is_in_library">
                             <label for="oilInLibrary">Add to Library</label>
