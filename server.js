@@ -137,6 +137,11 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
+// Root route - redirect to admin
+app.get('/', (req, res) => {
+    res.redirect('/admin.html');
+});
+
 // ========================================
 // ENHANCED API ENDPOINTS
 // ========================================
