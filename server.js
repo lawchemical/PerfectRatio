@@ -149,15 +149,15 @@ app.get('/', (req, res) => {
 // Simple auth setup
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 
-// Login endpoint
-app.post('/api/auth/login', async (req, res) => {
-    const { password } = req.body;
+// Login endpoint - handle both /api/auth/login and /admin/login
+const loginHandler = async (req, res) => {
+    const { username, password } = req.body;
     
     if (!password) {
         return res.status(400).json({ error: 'Password required' });
     }
     
-    // Simple password check
+    // Accept any username, only check password
     if (password === ADMIN_PASSWORD) {
         // Generate a simple token
         const token = Buffer.from(`admin:${Date.now()}`).toString('base64');
@@ -168,9 +168,12 @@ app.post('/api/auth/login', async (req, res) => {
             message: 'Login successful'
         });
     } else {
-        res.status(401).json({ error: 'Invalid password' });
+        res.status(401).json({ error: 'Invalid credentials' });
     }
-});
+};
+
+app.post('/api/auth/login', loginHandler);
+app.post('/admin/login', loginHandler);  // Support the old endpoint too
 
 // Verify endpoint
 app.post('/api/auth/verify', async (req, res) => {

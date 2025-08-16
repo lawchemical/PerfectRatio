@@ -2,14 +2,16 @@
 
 ## Default Login Credentials
 
+**Username:** `admin` (or any username)
 **Password:** `admin123`
 
 ## How to Access
 
 1. Go to your Railway app URL
 2. You'll be redirected to the login page
-3. Enter the password: `admin123`
-4. Click "Sign In"
+3. Enter any username (e.g., "admin")
+4. Enter the password: `admin123`
+5. Click "Sign In"
 
 ## To Change the Password
 
