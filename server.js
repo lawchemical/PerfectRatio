@@ -137,9 +137,47 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-// Root route - redirect to admin
+// Root route - redirect to login
 app.get('/', (req, res) => {
-    res.redirect('/admin.html');
+    res.redirect('/login.html');
+});
+
+// ========================================
+// AUTHENTICATION ENDPOINTS
+// ========================================
+
+// Simple auth setup
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
+
+// Login endpoint
+app.post('/api/auth/login', async (req, res) => {
+    const { password } = req.body;
+    
+    if (!password) {
+        return res.status(400).json({ error: 'Password required' });
+    }
+    
+    // Simple password check
+    if (password === ADMIN_PASSWORD) {
+        // Generate a simple token
+        const token = Buffer.from(`admin:${Date.now()}`).toString('base64');
+        
+        res.json({
+            success: true,
+            token: token,
+            message: 'Login successful'
+        });
+    } else {
+        res.status(401).json({ error: 'Invalid password' });
+    }
+});
+
+// Verify endpoint
+app.post('/api/auth/verify', async (req, res) => {
+    const authHeader = req.headers.authorization;
+    
+    // For development, allow access without strict verification
+    res.json({ valid: true });
 });
 
 // ========================================
