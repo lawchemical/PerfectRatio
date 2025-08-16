@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PerfectRatio Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .btn-logout {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ff4444;
+        }
+
+        .status-dot.connected {
+            background: #44ff44;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .stats {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            padding: 15px 25px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 20px 30px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            color: #6c757d;
+            transition: all 0.3s;
+            position: relative;
+            white-space: nowrap;
+        }
+
+        .tab:hover {
+            color: #495057;
+            background: rgba(0,0,0,0.02);
+        }
+
+        .tab.active {
+            color: #f5576c;
+            font-weight: 600;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #f5576c;
+            box-shadow: 0 0 0 3px rgba(245, 87, 108, 0.1);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(245, 87, 108, 0.3);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 15px;
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            animation: fadeIn 0.3s;
+        }
+
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideIn 0.3s;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #333;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.3s;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #f5576c;
+            box-shadow: 0 0 0 3px rgba(245, 87, 108, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .ifra-inputs {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state .icon {
+            font-size: 64px;
+            color: #dee2e6;
+            margin-bottom: 20px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #f5576c;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: #333;
+            color: white;
+            border-radius: 10px;
+            display: none;
+            animation: slideUp 0.3s;
+            z-index: 2000;
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        .toast.success {
+            background: #28a745;
+        }
+
+        .toast.error {
+            background: #dc3545;
+        }
+
+        .library-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 8px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .library-toggle.in-library {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .library-toggle:not(.in-library) {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .header-controls {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .stats {
+                justify-content: center;
+                width: 100%;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .ifra-inputs {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 14px;
+            }
+
+            th, td {
+                padding: 10px;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Authentication Check -->
+    <script>
+        (function() {
+            const token = localStorage.getItem('adminToken');
+            const expiry = localStorage.getItem('tokenExpiry');
+            
+            if (!token || token === 'undefined' || token === 'null' || !expiry) {
+                window.location.replace('/login.html');
+                throw new Error('Not authenticated');
+            }
+            
+            if (Date.now() > parseInt(expiry)) {
+                localStorage.removeItem('adminToken');
+                localStorage.removeItem('tokenExpiry');
+                window.location.replace('/login.html');
+                throw new Error('Token expired');
+            }
+            
+            const originalFetch = window.fetch;
+            window.fetch = function(...args) {
+                if (args[0].includes('/api')) {
+                    if (!args[1]) args[1] = {};
+                    if (!args[1].headers) args[1].headers = {};
+                    args[1].headers['Authorization'] = `Bearer ${token}`;
+                }
+                return originalFetch.apply(this, args);
+            };
+        })();
+        
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('adminToken');
+                localStorage.removeItem('tokenExpiry');
+                
+                fetch('/admin/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                    }
+                }).finally(() => {
+                    window.location.href = '/login.html';
+                });
+            }
+        }
+    </script>
+
+    <div class="container">
+        <div class="header">
+            <h1>
+                <span>🧪</span> PerfectRatio Admin Dashboard
+            </h1>
+            <div class="header-controls">
+                <div class="connection-status">
+                    <div class="status-dot" id="statusDot"></div>
+                    <span id="statusText">Connecting...</span>
+                </div>
+                <button onclick="logout()" class="btn-logout">
+                    <span>🚪</span> Logout
+                </button>
+            </div>
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="supplierCount">0</div>
+                    <div class="stat-label">SUPPLIERS</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="baseCount">0</div>
+                    <div class="stat-label">BASES</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="oilCount">0</div>
+                    <div class="stat-label">OILS</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="vesselCount">0</div>
+                    <div class="stat-label">VESSELS</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="suppliers">Suppliers</button>
+            <button class="tab" data-tab="bases">Base Products</button>
+            <button class="tab" data-tab="oils">Fragrance Oils</button>
+            <button class="tab" data-tab="vessels">Vessels</button>
+            <button class="tab" data-tab="import">Bulk Import</button>
+        </div>
+
+        <div class="content">
+            <!-- Tab Content Will Be Inserted Here -->
+            <div id="suppliers" class="tab-content active"></div>
+            <div id="bases" class="tab-content"></div>
+            <div id="oils" class="tab-content"></div>
+            <div id="vessels" class="tab-content"></div>
+            <div id="import" class="tab-content"></div>
+        </div>
+    </div>
+
+    <!-- Modals will be inserted here by modules -->
+    <div id="modals-container"></div>
+
+    <div class="toast" id="toast"></div>
+
+    <!-- Core Admin Script -->
+    <script>
+        // Global Configuration
+        const API_URL = window.location.origin + '/api';
+        
+        // Global State
+        let suppliers = [];
+        let bases = [];
+        let oils = [];
+        let vessels = [];
+
+        // Core DOM Elements
+        const elements = {
+            tabs: document.querySelectorAll('.tab'),
+            tabContents: document.querySelectorAll('.tab-content'),
+            statusDot: document.getElementById('statusDot'),
+            statusText: document.getElementById('statusText'),
+            toast: document.getElementById('toast'),
+            modalsContainer: document.getElementById('modals-container')
+        };
+
+        // Core Functions
+        async function checkConnection() {
+            try {
+                const response = await fetch(`${API_URL}/stats`);
+                if (response.ok) {
+                    elements.statusDot.classList.add('connected');
+                    elements.statusText.textContent = 'Connected';
+                    return true;
+                }
+            } catch (error) {
+                elements.statusDot.classList.remove('connected');
+                elements.statusText.textContent = 'Disconnected';
+                showToast('Failed to connect to server', 'error');
+                return false;
+            }
+        }
+
+        async function updateStats() {
+            try {
+                const response = await fetch(`${API_URL}/stats`);
+                const stats = await response.json();
+                document.getElementById('supplierCount').textContent = stats.suppliers;
+                document.getElementById('baseCount').textContent = stats.bases;
+                document.getElementById('oilCount').textContent = stats.oils;
+                document.getElementById('vesselCount').textContent = stats.vessels || 0;
+            } catch (error) {
+                console.error('Failed to update stats:', error);
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            elements.toast.textContent = message;
+            elements.toast.className = `toast show ${type}`;
+            
+            setTimeout(() => {
+                elements.toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Tab Switching
+        function setupTabs() {
+            elements.tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const targetTab = this.dataset.tab;
+                    
+                    elements.tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    elements.tabContents.forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    document.getElementById(targetTab).classList.add('active');
+                });
+            });
+        }
+
+        // Modal Management
+        function setupModalListeners() {
+            document.addEventListener('click', function(e) {
+                // Close button handler
+                if (e.target.classList.contains('close-btn')) {
+                    e.target.closest('.modal').classList.remove('active');
+                }
+                
+                // Background click handler
+                if (e.target.classList.contains('modal')) {
+                    e.target.classList.remove('active');
+                }
+            });
+        }
+
+        // Initialize Core
+        async function initCore() {
+            setupTabs();
+            setupModalListeners();
+            await checkConnection();
+            await updateStats();
+        }
+
+        // Export globals for modules
+        window.AdminCore = {
+            API_URL,
+            showToast,
+            updateStats,
+            getSuppliers: () => suppliers,
+            setSuppliers: (data) => { suppliers = data; },
+            getBases: () => bases,
+            setBases: (data) => { bases = data; },
+            getOils: () => oils,
+            setOils: (data) => { oils = data; },
+            getVessels: () => vessels,
+            setVessels: (data) => { vessels = data; }
+        };
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', initCore);
+    </script>
+
+    <!-- Load Module Scripts -->
+    <script src="admin-suppliers.js"></script>
+    <script src="admin-bases.js"></script>
+    <script src="admin-oils.js"></script>
+    <script src="admin-vessels.js"></script>
+    <script src="admin-import.js"></script>
+</body>
+</html>
