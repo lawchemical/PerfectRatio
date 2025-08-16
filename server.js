@@ -39,6 +39,99 @@ const pool = new Pool({
     }
 });
 
+// Database initialization function
+async function initializeDatabase() {
+    console.log('🔧 Initializing database tables...');
+    
+    try {
+        // Create vessels table if it doesn't exist
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS vessels (
+                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                supplier_id UUID,
+                name VARCHAR(255) NOT NULL,
+                sku VARCHAR(100),
+                vessel_type VARCHAR(50) DEFAULT 'bottle',
+                material VARCHAR(50),
+                color VARCHAR(50),
+                size DECIMAL(10,2) DEFAULT 0,
+                size_unit VARCHAR(10) DEFAULT 'oz',
+                neck_size VARCHAR(20),
+                shape VARCHAR(50),
+                price_per_unit DECIMAL(10,2) DEFAULT 0,
+                case_count INTEGER DEFAULT 1,
+                case_price DECIMAL(10,2),
+                minimum_order_quantity INTEGER DEFAULT 1,
+                weight_grams DECIMAL(10,2),
+                max_fill_volume DECIMAL(10,2),
+                is_in_library BOOLEAN DEFAULT FALSE,
+                notes TEXT,
+                product_url TEXT,
+                image_url TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        console.log('✅ Vessels table ready');
+        
+        // Ensure other tables exist with proper structure
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS suppliers (
+                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                name VARCHAR(255) NOT NULL,
+                email VARCHAR(255),
+                website_url TEXT,
+                phone VARCHAR(50),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS base_products (
+                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                supplier_id UUID,
+                name VARCHAR(255) NOT NULL,
+                max_load_pct DECIMAL(5,2) DEFAULT 0,
+                unit_mode VARCHAR(20) DEFAULT 'weight',
+                specific_gravity DECIMAL(5,3),
+                ifra_category VARCHAR(20),
+                ifra_category_2 VARCHAR(20),
+                is_dual_purpose BOOLEAN DEFAULT FALSE,
+                notes TEXT,
+                is_in_library BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS fragrance_oils (
+                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                supplier_id UUID,
+                product_name VARCHAR(255) NOT NULL,
+                sku VARCHAR(100),
+                flash_point_f INTEGER,
+                solvent_note VARCHAR(100),
+                ifra_version VARCHAR(100),
+                ifra_date DATE,
+                is_in_library BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        
+        console.log('✅ All core tables initialized');
+        
+    } catch (error) {
+        console.error('⚠️ Database initialization warning:', error.message);
+        // Don't throw - let the server continue
+    }
+}
+
+// Initialize database on startup
+initializeDatabase().catch(console.error);
+
 // Middleware
 app.use(cors());
 app.use(express.json());
