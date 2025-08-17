@@ -58,6 +58,7 @@ const authenticateAPIKey = (req, res, next) => {
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'healthy',
+    version: '1.0.1', // Version to track deployments
     timestamp: new Date().toISOString(),
     cache_stats: cache.getStats(),
     uptime: process.uptime()
