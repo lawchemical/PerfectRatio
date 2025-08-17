@@ -1,11 +1,13 @@
 {
-  "name": "perfectratio-cache-backend",
+  "name": "perfectratio-admin-panel",
   "version": "1.0.0",
-  "description": "Caching backend for PerfectRatio app",
-  "main": "server.js",
+  "description": "Admin panel for PerfectRatio app",
+  "main": "server-production.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
+    "start": "node server-production.js",
+    "start-admin": "node start-admin.js",
+    "start-cache": "node start-cache.js",
+    "dev": "nodemon server-production.js",
     "test": "node test-connection.js"
   },
   "dependencies": {
