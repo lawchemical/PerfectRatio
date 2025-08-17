@@ -1,0 +1,11 @@
+# Environment Variables for NEW Railway Project
+# Project: 06aaf29c-2ca0-4524-871f-bef4ba23c670
+# Copy ALL of this to Railway Dashboard > Variables > RAW Editor
+
+SUPABASE_URL=https://djffqywhousbhdmibuek.supabase.co
+SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRqZmZxeXdob3VzYmhkbWlidWVrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUzOTM2NDcsImV4cCI6MjA3MDk2OTY0N30.E_SDzNv6csQl_jvSGNspXzCgMdSjaC83wBsXGXSZQn8
+API_KEY=pr_live_7bbfqrKTfUZVnw00_kvsS9_UPRwiyKhoJ2xh9xLYoqM
+NODE_ENV=production
+CACHE_TTL=86400
+CACHE_CHECK_PERIOD=600
+PORT=3000
