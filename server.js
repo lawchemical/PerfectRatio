@@ -511,8 +511,8 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server
-app.listen(PORT, () => {
+// Start server - bind to 0.0.0.0 for Railway
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Cache server running on port ${PORT}`);
   console.log(`📦 Cache TTL: ${process.env.CACHE_TTL || 86400} seconds`);
   console.log(`🔄 Environment: ${process.env.NODE_ENV || 'development'}`);
