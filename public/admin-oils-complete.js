@@ -1,0 +1,877 @@
+// Complete Fragrance Oils Admin Module with All Fields
+(function() {
+    // Module initialization
+    async function initOilsModule() {
+        setupOilsTab();
+        setupOilModal();
+        await loadOils();
+        await loadSuppliers();
+    }
+
+    // Setup the oils tab content
+    function setupOilsTab() {
+        const oilsTab = document.getElementById('oils');
+        oilsTab.innerHTML = `
+            <div class="search-bar">
+                <input type="text" class="search-input" id="oilSearch" placeholder="Search fragrance oils...">
+                <select class="form-control" id="oilSupplierFilter" style="width: 200px;">
+                    <option value="">All Suppliers</option>
+                </select>
+                <button class="btn btn-primary" id="addOilBtn">
+                    ➕ Add Fragrance Oil
+                </button>
+            </div>
+            <div class="table-container">
+                <table id="oilsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>NAME</th>
+                            <th>SUPPLIER</th>
+                            <th>SKU</th>
+                            <th>FLASH PT</th>
+                            <th>NOTES</th>
+                            <th>IFRA</th>
+                            <th>RATING</th>
+                            <th>LIBRARY</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="10" style="text-align: center;">
+                                <div class="loading"></div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        // Add event listeners
+        document.getElementById('addOilBtn').addEventListener('click', () => openOilModal());
+        
+        // Search functionality
+        document.getElementById('oilSearch').addEventListener('input', (e) => {
+            filterOils();
+        });
+        
+        // Supplier filter
+        document.getElementById('oilSupplierFilter').addEventListener('change', (e) => {
+            filterOils();
+        });
+    }
+
+    // Setup comprehensive oil modal with all fields
+    function setupOilModal() {
+        const modalsContainer = document.getElementById('modals-container');
+        const modalHTML = `
+            <div id="oilModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 id="oilModalTitle" class="modal-title">Add Fragrance Oil</h2>
+                        <button class="close-btn">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div style="padding: 20px; border-bottom: 1px solid #D9D3CC;">
+                            <button onclick="showTab('basic')" id="tab-basic" style="padding: 8px 12px; margin-right: 8px; background: #F1AD88; color: #101114; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">Basic Info</button>
+                            <button onclick="showTab('technical')" id="tab-technical" style="padding: 8px 12px; margin-right: 8px; background: #EDEAE6; color: #2E3033; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">Technical</button>
+                            <button onclick="showTab('fragrance')" id="tab-fragrance" style="padding: 8px 12px; margin-right: 8px; background: #EDEAE6; color: #2E3033; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">Fragrance Notes</button>
+                            <button onclick="showTab('pricing')" id="tab-pricing" style="padding: 8px 12px; margin-right: 8px; background: #EDEAE6; color: #2E3033; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">Pricing</button>
+                            <button onclick="showTab('ifra')" id="tab-ifra" style="padding: 8px 12px; margin-right: 8px; background: #EDEAE6; color: #2E3033; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">IFRA</button>
+                            <button onclick="showTab('ratings')" id="tab-ratings" style="padding: 8px 12px; margin-right: 8px; background: #EDEAE6; color: #2E3033; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">Ratings</button>
+                        </div>
+                        
+                        <form id="oilForm" style="padding: 20px;">
+                            <input type="hidden" name="id" id="oilId">
+                            
+                            <div id="tab-content-basic" style="display: block;">
+                                <h3 style="color: #101114; margin-bottom: 20px;">Basic Information</h3>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Supplier *</label>
+                                    <select name="supplier_id" id="oilSupplierSelect" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; background: white;">
+                                        <option value="">Select supplier...</option>
+                                    </select>
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Product Name *</label>
+                                    <input type="text" name="product_name" required style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Display Name (for iOS app) *</label>
+                                    <input type="text" name="name" required style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;" placeholder="How this appears in the iOS app">
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">SKU</label>
+                                    <input type="text" name="sku" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Categories</label>
+                                    <input type="text" name="categories" placeholder="e.g., Floral, Fresh, Woody" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Scent Description</label>
+                                    <textarea name="scent_description" rows="3" maxlength="500" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; resize: vertical;"></textarea>
+                                </div>
+                            </div>
+                            
+                            <div id="tab-content-technical" style="display: none;">
+                                <h3 style="color: #101114; margin-bottom: 20px;">Technical Properties</h3>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Flash Point (°F)</label>
+                                    <input type="number" name="flash_point_f" min="0" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Specific Gravity</label>
+                                    <input type="number" name="specific_gravity" step="0.001" min="0" max="2" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Vanillin %</label>
+                                    <input type="number" name="vanillin_pct" step="0.01" min="0" max="100" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Solvent Note</label>
+                                    <input type="text" name="solvent_note" placeholder="e.g., DPG, IPM" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Soap Acceleration</label>
+                                    <select name="soap_acceleration" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; background: white;">
+                                        <option value="">Not Specified</option>
+                                        <option value="none">No Acceleration</option>
+                                        <option value="slight">Slight Acceleration</option>
+                                        <option value="moderate">Moderate Acceleration</option>
+                                        <option value="severe">Severe Acceleration</option>
+                                    </select>
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Product URL</label>
+                                    <input type="url" name="product_url" placeholder="https://..." style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                            </div>
+                            
+                            <div id="tab-content-fragrance" style="display: none;">
+                                <h3 style="color: #101114; margin-bottom: 20px;">Fragrance Notes & Profile</h3>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Theme Family *</label>
+                                    <select name="theme_family" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; background: white;">
+                                        <option value="">Select theme family...</option>
+                                        <option value="Fresh">Fresh</option>
+                                        <option value="Floral">Floral</option>
+                                        <option value="Oriental">Oriental</option>
+                                        <option value="Woody">Woody</option>
+                                        <option value="Gourmand">Gourmand</option>
+                                        <option value="Citrus">Citrus</option>
+                                        <option value="Green">Green</option>
+                                        <option value="Aquatic">Aquatic</option>
+                                        <option value="Spicy">Spicy</option>
+                                        <option value="Fruity">Fruity</option>
+                                        <option value="Herbal">Herbal</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Top Notes</label>
+                                    <textarea name="fragrance_notes_top" rows="2" placeholder="e.g., Bergamot, Lemon, Orange" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; resize: vertical;"></textarea>
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Middle Notes</label>
+                                    <textarea name="fragrance_notes_middle" rows="2" placeholder="e.g., Rose, Jasmine, Lavender" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; resize: vertical;"></textarea>
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Base Notes</label>
+                                    <textarea name="fragrance_notes_base" rows="2" placeholder="e.g., Vanilla, Musk, Sandalwood" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; resize: vertical;"></textarea>
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Blending Notes</label>
+                                    <textarea name="blending_notes" rows="3" placeholder="Tips for blending this fragrance..." style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; resize: vertical;"></textarea>
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Usage Notes</label>
+                                    <textarea name="usage_notes" rows="3" placeholder="Special instructions, warnings, curing time, performance tips..." style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; resize: vertical;"></textarea>
+                                </div>
+                            </div>
+                            
+                            <div id="tab-content-pricing" style="display: none;">
+                                <h3 style="color: #101114; margin-bottom: 20px;">Pricing Tiers</h3>
+                                
+                                <!-- Tier 1 -->
+                                <div style="background: #FAFAF8; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+                                    <h4 style="color: #2E3033; margin: 0 0 12px 0;">Tier 1</h4>
+                                    <div style="margin-bottom: 12px;">
+                                        <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Display Name (e.g., "Sample Size", "1 oz")</label>
+                                        <input type="text" name="tier1_name" placeholder="e.g., Sample Size" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                    </div>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px;">
+                                        <div>
+                                            <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Size</label>
+                                            <input type="number" name="tier1_size" step="0.01" min="0" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                        </div>
+                                        <div>
+                                            <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Unit</label>
+                                            <select name="tier1_unit" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; background: white;">
+                                                <option value="oz">oz</option>
+                                                <option value="ml">ml</option>
+                                                <option value="lb">lb</option>
+                                                <option value="kg">kg</option>
+                                                <option value="g">g</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Price ($)</label>
+                                            <input type="number" name="tier1_price" step="0.01" min="0" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                        </div>
+                                        <div>
+                                            <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">SKU</label>
+                                            <input type="text" name="tier1_sku" placeholder="Supplier SKU" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Tier 2 -->
+                                <div style="background: #FAFAF8; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+                                    <h4 style="color: #2E3033; margin: 0 0 12px 0;">Tier 2</h4>
+                                    <div style="margin-bottom: 12px;">
+                                        <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Display Name (e.g., "16 oz", "1 Pound")</label>
+                                        <input type="text" name="tier2_name" placeholder="e.g., 16 oz" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                    </div>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px;">
+                                        <div>
+                                            <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Size</label>
+                                            <input type="number" name="tier2_size" step="0.01" min="0" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                        </div>
+                                        <div>
+                                            <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Unit</label>
+                                            <select name="tier2_unit" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; background: white;">
+                                                <option value="oz">oz</option>
+                                                <option value="ml">ml</option>
+                                                <option value="lb">lb</option>
+                                                <option value="kg">kg</option>
+                                                <option value="g">g</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Price ($)</label>
+                                            <input type="number" name="tier2_price" step="0.01" min="0" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                        </div>
+                                        <div>
+                                            <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">SKU</label>
+                                            <input type="text" name="tier2_sku" placeholder="Supplier SKU" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Tier 3 -->
+                                <div style="background: #FAFAF8; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+                                    <h4 style="color: #2E3033; margin: 0 0 12px 0;">Tier 3</h4>
+                                    <div style="margin-bottom: 12px;">
+                                        <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Display Name (e.g., "1 Gallon", "5 Pounds")</label>
+                                        <input type="text" name="tier3_name" placeholder="e.g., 1 Gallon" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                    </div>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px;">
+                                        <div>
+                                            <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Size</label>
+                                            <input type="number" name="tier3_size" step="0.01" min="0" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                        </div>
+                                        <div>
+                                            <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Unit</label>
+                                            <select name="tier3_unit" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; background: white;">
+                                                <option value="oz">oz</option>
+                                                <option value="ml">ml</option>
+                                                <option value="lb">lb</option>
+                                                <option value="kg">kg</option>
+                                                <option value="g">g</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Price ($)</label>
+                                            <input type="number" name="tier3_price" step="0.01" min="0" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                        </div>
+                                        <div>
+                                            <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">SKU</label>
+                                            <input type="text" name="tier3_sku" placeholder="Supplier SKU" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="tab-content-ifra" style="display: none;">
+                                <h3 style="color: #101114; margin-bottom: 20px;">IFRA Information</h3>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">IFRA Version</label>
+                                    <input type="text" name="ifra_version" placeholder="e.g., Amendment 51" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">IFRA Date</label>
+                                    <input type="date" name="ifra_date" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                                <h4 style="color: #2E3033; margin: 16px 0 8px 0;">Maximum Percentages by Product Type</h4>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Candles (Cat 12)</label>
+                                    <input type="number" name="ifra_candles" step="0.01" min="0" max="100" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Body Lotion (Cat 5A)</label>
+                                    <input type="number" name="ifra_body_lotion" step="0.01" min="0" max="100" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Room Spray (Cat 10A)</label>
+                                    <input type="number" name="ifra_room_spray" step="0.01" min="0" max="100" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                            </div>
+                            
+                            <div id="tab-content-ratings" style="display: none;">
+                                <h3 style="color: #101114; margin-bottom: 20px;">Ratings & Analytics</h3>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Intensity Rating (0-5)</label>
+                                    <input type="number" name="intensity_rating" step="0.1" min="0" max="5" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Overall Rating (0-5)</label>
+                                    <input type="number" name="overall_rating" step="0.1" min="0" max="5" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Total Ratings</label>
+                                    <input type="number" name="total_ratings" min="0" readonly style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; background: #FAFAF8;">
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Batch Count</label>
+                                    <input type="number" name="batch_count" min="0" readonly style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; background: #FAFAF8;">
+                                </div>
+                            </div>
+                        </form>
+                        
+                        <div style="padding: 20px; border-top: 1px solid #D9D3CC; text-align: right;">
+                            <button onclick="closeOilModal()" class="btn btn-secondary">Cancel</button>
+                            <button onclick="saveOil()" class="btn btn-primary">Save Fragrance Oil</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        modalsContainer.insertAdjacentHTML('beforeend', modalHTML);
+
+        // Form submission
+        document.getElementById('oilForm').addEventListener('submit', handleOilSubmit);
+        
+        // Close modal handlers
+        document.querySelector('#oilModal .close-btn').addEventListener('click', () => {
+            document.getElementById('oilModal').classList.remove('show');
+        });
+        
+        // Tab switching function
+        window.showTab = function(tabName) {
+            // Hide all tabs
+            const allTabs = ['basic', 'technical', 'fragrance', 'pricing', 'ifra', 'ratings'];
+            allTabs.forEach(tab => {
+                const content = document.getElementById('tab-content-' + tab);
+                const button = document.getElementById('tab-' + tab);
+                if (content) {
+                    content.style.display = 'none';
+                }
+                if (button) {
+                    button.style.background = '#EDEAE6';
+                    button.style.color = '#2E3033';
+                }
+            });
+            
+            // Show selected tab
+            const selectedContent = document.getElementById('tab-content-' + tabName);
+            const selectedButton = document.getElementById('tab-' + tabName);
+            if (selectedContent) {
+                selectedContent.style.display = 'block';
+            }
+            if (selectedButton) {
+                selectedButton.style.background = '#F1AD88';
+                selectedButton.style.color = '#101114';
+            }
+        };
+    }
+
+    // Load oils
+    async function loadOils() {
+        try {
+            const data = await AdminCore.apiRequest("/api/admin/oils");
+            const oils = data;
+            AdminCore.setOils(oils);
+            renderOils();
+            updateSupplierFilter();
+        } catch (error) {
+            AdminCore.showToast('Failed to load fragrance oils', 'error');
+        }
+    }
+
+    // Load suppliers for dropdown
+    async function loadSuppliers() {
+        try {
+            const data = await AdminCore.apiRequest("/api/admin/suppliers");
+            const suppliers = data;
+            AdminCore.setSuppliers(suppliers);
+            updateSupplierSelect();
+            updateSupplierFilter();
+        } catch (error) {
+            console.error('Failed to load suppliers:', error);
+        }
+    }
+
+    // Update supplier select
+    function updateSupplierSelect() {
+        const suppliers = AdminCore.getSuppliers();
+        const select = document.getElementById('oilSupplierSelect');
+        if (select) {
+            select.innerHTML = '<option value="">Select supplier...</option>' + 
+                suppliers.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+        }
+    }
+
+    // Update supplier filter
+    function updateSupplierFilter() {
+        const suppliers = AdminCore.getSuppliers();
+        const filter = document.getElementById('oilSupplierFilter');
+        if (filter) {
+            filter.innerHTML = '<option value="">All Suppliers</option>' + 
+                suppliers.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+        }
+    }
+
+    // Render oils table with more information
+    function renderOils(oilsToRender = null) {
+        const oils = oilsToRender || AdminCore.getOils();
+        const tbody = document.querySelector('#oilsTable tbody');
+        
+        if (oils.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="10" style="text-align: center;">No fragrance oils found</td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = oils.map(oil => {
+            const oilId = typeof oil.id === 'string' ? `'${oil.id}'` : oil.id;
+            const fragranceNotes = [];
+            if (oil.fragrance_notes_top) fragranceNotes.push('T');
+            if (oil.fragrance_notes_middle) fragranceNotes.push('M');
+            if (oil.fragrance_notes_base) fragranceNotes.push('B');
+            
+            return `
+                <tr>
+                    <td>${oil.id}</td>
+                    <td>${oil.product_name || oil.name || '-'}</td>
+                    <td>${oil.supplier_name || '-'}</td>
+                    <td>${oil.sku || '-'}</td>
+                    <td>${oil.flash_point_f ? oil.flash_point_f + '°F' : '-'}</td>
+                    <td>${fragranceNotes.length > 0 ? fragranceNotes.join(',') : '-'}</td>
+                    <td>${oil.ifra_version || '-'}</td>
+                    <td>${oil.overall_rating ? parseFloat(oil.overall_rating).toFixed(1) : '-'}</td>
+                    <td>
+                        <span class="library-toggle ${oil.is_in_library ? 'in-library' : ''}" 
+                              onclick="toggleOilLibrary(${oilId}, ${!oil.is_in_library})">
+                            ${oil.is_in_library ? '✓ In Library' : '✗ Not in Library'}
+                        </span>
+                    </td>
+                    <td class="actions">
+                        <button class="btn-small" onclick="editOil(${oilId})">✏️</button>
+                        <button class="btn-small btn-danger" onclick="deleteOil(${oilId})">🗑️</button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    // Filter oils
+    function filterOils() {
+        const searchTerm = document.getElementById('oilSearch').value.toLowerCase();
+        const supplierId = document.getElementById('oilSupplierFilter').value;
+        
+        const oils = AdminCore.getOils();
+        const filtered = oils.filter(oil => {
+            const matchesSearch = !searchTerm || 
+                (oil.product_name || oil.name || '').toLowerCase().includes(searchTerm) ||
+                (oil.sku && oil.sku.toLowerCase().includes(searchTerm));
+            const matchesSupplier = !supplierId || oil.supplier_id == supplierId;
+            return matchesSearch && matchesSupplier;
+        });
+        
+        renderOils(filtered);
+    }
+
+    // Open oil modal
+    window.openOilModal = function(oil = null) {
+        const modal = document.getElementById('oilModal');
+        const form = document.getElementById('oilForm');
+        const title = document.getElementById('oilModalTitle');
+        
+        // Reset form
+        form.reset();
+        
+        // Reset to first tab
+        showTab('basic');
+        
+        if (oil) {
+            title.textContent = 'Edit Fragrance Oil';
+            form.elements['id'].value = oil.id;
+            form.elements['supplier_id'].value = oil.supplier_id;
+            form.elements['product_name'].value = oil.product_name;
+            if (oil.name) form.elements['name'].value = oil.name;
+            form.elements['sku'].value = oil.sku || '';
+            form.elements['flash_point_f'].value = oil.flash_point_f || '';
+            form.elements['ifra_version'].value = oil.ifra_version || '';
+            form.elements['ifra_date'].value = oil.ifra_date || '';
+            form.elements['solvent_note'].value = oil.solvent_note || '';
+            
+            // Load additional fields if they exist
+            if (oil.specific_gravity) form.elements['specific_gravity'].value = oil.specific_gravity;
+            if (oil.vanillin_pct) form.elements['vanillin_pct'].value = oil.vanillin_pct;
+            if (oil.categories) form.elements['categories'].value = oil.categories;
+            if (oil.scent_description) form.elements['scent_description'].value = oil.scent_description;
+            if (oil.theme_family) form.elements['theme_family'].value = oil.theme_family;
+            if (oil.fragrance_notes_top) form.elements['fragrance_notes_top'].value = oil.fragrance_notes_top;
+            if (oil.fragrance_notes_middle) form.elements['fragrance_notes_middle'].value = oil.fragrance_notes_middle;
+            if (oil.fragrance_notes_base) form.elements['fragrance_notes_base'].value = oil.fragrance_notes_base;
+            if (oil.soap_acceleration) form.elements['soap_acceleration'].value = oil.soap_acceleration;
+            if (oil.product_url) form.elements['product_url'].value = oil.product_url;
+            if (oil.blending_notes) form.elements['blending_notes'].value = oil.blending_notes;
+            if (oil.usage_notes) form.elements['usage_notes'].value = oil.usage_notes;
+            
+            // Load pricing tiers
+            if (oil.price_tiers && oil.price_tiers.length > 0) {
+                const tier = oil.price_tiers[0];
+                // Tier 1
+                if (tier.tier1_size) {
+                    if (tier.tier1_name) form.elements['tier1_name'].value = tier.tier1_name;
+                    form.elements['tier1_size'].value = tier.tier1_size;
+                    form.elements['tier1_unit'].value = tier.tier1_unit || 'oz';
+                    form.elements['tier1_price'].value = tier.tier1_price;
+                    if (tier.tier1_sku) form.elements['tier1_sku'].value = tier.tier1_sku;
+                }
+                // Tier 2
+                if (tier.tier2_size) {
+                    if (tier.tier2_name) form.elements['tier2_name'].value = tier.tier2_name;
+                    form.elements['tier2_size'].value = tier.tier2_size;
+                    form.elements['tier2_unit'].value = tier.tier2_unit || 'oz';
+                    form.elements['tier2_price'].value = tier.tier2_price;
+                    if (tier.tier2_sku) form.elements['tier2_sku'].value = tier.tier2_sku;
+                }
+                // Tier 3
+                if (tier.tier3_size) {
+                    if (tier.tier3_name) form.elements['tier3_name'].value = tier.tier3_name;
+                    form.elements['tier3_size'].value = tier.tier3_size;
+                    form.elements['tier3_unit'].value = tier.tier3_unit || 'oz';
+                    form.elements['tier3_price'].value = tier.tier3_price;
+                    if (tier.tier3_sku) form.elements['tier3_sku'].value = tier.tier3_sku;
+                }
+                // Tier 4
+                if (tier.tier4_size) {
+                    if (tier.tier4_name) form.elements['tier4_name'].value = tier.tier4_name;
+                    form.elements['tier4_size'].value = tier.tier4_size;
+                    form.elements['tier4_unit'].value = tier.tier4_unit || 'oz';
+                    form.elements['tier4_price'].value = tier.tier4_price;
+                }
+                // Tier 5
+                if (tier.tier5_size) {
+                    if (tier.tier5_name) form.elements['tier5_name'].value = tier.tier5_name;
+                    form.elements['tier5_size'].value = tier.tier5_size;
+                    form.elements['tier5_unit'].value = tier.tier5_unit || 'oz';
+                    form.elements['tier5_price'].value = tier.tier5_price;
+                }
+            }
+            
+            // Load IFRA percentages
+            if (oil.ifra_entries) {
+                oil.ifra_entries.forEach(entry => {
+                    const inputName = `ifra_${entry.product_type_key.replace(/_/g, '_')}`;
+                    const input = form.querySelector(`[name="${inputName}"]`);
+                    if (input) input.value = entry.max_pct;
+                });
+            }
+            
+            // Load ratings
+            if (oil.intensity_rating) form.elements['intensity_rating'].value = oil.intensity_rating;
+            if (oil.overall_rating) form.elements['overall_rating'].value = oil.overall_rating;
+            if (oil.total_ratings) form.elements['total_ratings'].value = oil.total_ratings;
+            if (oil.batch_count) form.elements['batch_count'].value = oil.batch_count;
+        } else {
+            title.textContent = 'Add Fragrance Oil';
+        }
+        
+        modal.classList.add('show');
+    };
+
+    // Close oil modal
+    window.closeOilModal = function() {
+        const modal = document.getElementById('oilModal');
+        if (modal) {
+            modal.classList.remove('show');
+        }
+    };
+    
+    // Edit oil
+    window.editOil = async function(id) {
+        const oils = AdminCore.getOils();
+        const oil = oils.find(o => o.id == id);
+        if (oil) {
+            openOilModal(oil);
+        }
+    };
+
+    // Delete oil
+    window.deleteOil = async function(id) {
+        if (!confirm('Are you sure you want to delete this fragrance oil?')) return;
+        
+        try {
+            await AdminCore.apiRequest(`/api/admin/oils/${id}`, {
+                method: 'DELETE'
+            });
+            
+            AdminCore.showToast('Fragrance oil deleted successfully', 'success');
+            await loadOils();
+        } catch (error) {
+            AdminCore.showToast('Failed to delete fragrance oil', 'error');
+        }
+    };
+
+    // Toggle library status
+    window.toggleOilLibrary = async function(id, newStatus) {
+        try {
+            await AdminCore.apiRequest(`/api/admin/oils/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ is_in_library: newStatus })
+            });
+            
+            AdminCore.showToast('Library status updated', 'success');
+            await loadOils();
+        } catch (error) {
+            AdminCore.showToast('Failed to update library status', 'error');
+        }
+    };
+
+    // Handle form submission
+    async function handleOilSubmit(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData);
+        
+        // Convert checkboxes
+        data.is_in_library = formData.get('is_in_library') ? true : false;
+        data.is_favorite = formData.get('is_favorite') ? true : false;
+        data.is_custom = formData.get('is_custom') ? true : false;
+        
+        // Prepare IFRA entries
+        const ifraEntries = [];
+        const ifraFields = [
+            'foaming_hand_soap', 'liquid_hand_soap', 'body_wash', 'body_lotion',
+            'room_spray', 'fabric_spray', 'candles', 'air_freshener',
+            'reed_diffuser', 'wax_melts'
+        ];
+        
+        ifraFields.forEach(field => {
+            const value = formData.get(`ifra_${field}`);
+            if (value) {
+                ifraEntries.push({
+                    product_type_key: field,
+                    max_pct: parseFloat(value)
+                });
+            }
+        });
+        
+        if (ifraEntries.length > 0) {
+            data.ifra_entries = ifraEntries;
+        }
+        
+        // Prepare price tiers
+        const priceTiers = {};
+        ['tier1', 'tier2', 'tier3', 'tier4', 'tier5'].forEach(tier => {
+            const name = formData.get(`${tier}_name`);
+            const size = formData.get(`${tier}_size`);
+            const unit = formData.get(`${tier}_unit`);
+            const price = formData.get(`${tier}_price`);
+            const sku = formData.get(`${tier}_sku`);
+            
+            if (size && price) {
+                priceTiers[`${tier}_name`] = name || '';
+                priceTiers[`${tier}_size`] = parseFloat(size);
+                priceTiers[`${tier}_unit`] = unit;
+                priceTiers[`${tier}_price`] = parseFloat(price);
+                priceTiers[`${tier}_sku`] = sku || '';
+            }
+        });
+        
+        if (Object.keys(priceTiers).length > 0) {
+            data.price_tiers = priceTiers;
+        }
+        
+        // Clean up fields not directly in fragrance_oils table
+        const fieldsToMove = [
+            'fragrance_notes_top', 'fragrance_notes_middle', 'fragrance_notes_base',
+            'theme_family', 'scent_description', 'soap_acceleration',
+            'product_url', 'blending_notes', 'usage_notes'
+        ];
+        
+        const productDetails = {};
+        fieldsToMove.forEach(field => {
+            if (data[field]) {
+                productDetails[field] = data[field];
+                delete data[field];
+            }
+        });
+        
+        if (Object.keys(productDetails).length > 0) {
+            data.product_details = productDetails;
+        }
+        
+        try {
+            const isEdit = !!data.id;
+            const url = isEdit ? 
+                `/api/admin/oils/${data.id}` : 
+                `/api/admin/oils`;
+            
+            await AdminCore.apiRequest(url, {
+                method: isEdit ? 'PUT' : 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            
+            AdminCore.showToast('Fragrance oil saved successfully', 'success');
+            closeOilModal();
+            await loadOils();
+        } catch (error) {
+            AdminCore.showToast(`Failed to save fragrance oil: ${error.message}`, 'error');
+        }
+    }
+
+    // Save Oil Function (called by modal button)
+    window.saveOil = async function() {
+        console.log('saveOil function called');
+        const form = document.getElementById('oilForm');
+        if (!form) {
+            console.error('Oil form not found');
+            return;
+        }
+
+        // Validate required fields
+        const requiredFields = [
+            { name: 'supplier_id', label: 'Supplier' },
+            { name: 'product_name', label: 'Product Name' },
+            { name: 'name', label: 'Display Name' },
+            { name: 'theme_family', label: 'Theme Family' }
+        ];
+
+        const missingFields = [];
+        for (const field of requiredFields) {
+            const input = form.querySelector(`[name="${field.name}"]`);
+            if (!input || !input.value || input.value.trim() === '') {
+                missingFields.push(field.label);
+            }
+        }
+
+        if (missingFields.length > 0) {
+            AdminCore.showToast(`Please fill in required fields: ${missingFields.join(', ')}`, 'error');
+            return;
+        }
+
+        const formData = new FormData(form);
+        const rawData = Object.fromEntries(formData);
+        
+        console.log('Raw form data:', rawData);
+
+        // Map form fields to database schema and filter out unsupported fields
+        const data = {};
+        
+        // Basic fields that exist in the database schema
+        if (rawData.supplier_id && rawData.supplier_id !== '') data.supplier_id = rawData.supplier_id;
+        if (rawData.product_name && rawData.product_name !== '') data.product_name = rawData.product_name;
+        if (rawData.name && rawData.name !== '') data.name = rawData.name;
+        if (rawData.sku && rawData.sku !== '') data.sku = rawData.sku;
+        
+        // Map scent_description to scent_profile (database field name)
+        if (rawData.scent_description && rawData.scent_description !== '') {
+            data.scent_profile = rawData.scent_description;
+        }
+        
+        // Convert numeric fields
+        if (rawData.flash_point_f && rawData.flash_point_f !== '') {
+            data.flash_point_f = parseFloat(rawData.flash_point_f);
+        }
+        if (rawData.specific_gravity && rawData.specific_gravity !== '') {
+            data.specific_gravity = parseFloat(rawData.specific_gravity);
+        }
+        if (rawData.vanillin_pct && rawData.vanillin_pct !== '') {
+            data.vanilla_content = parseFloat(rawData.vanillin_pct);
+        }
+        if (rawData.recommended_load_pct && rawData.recommended_load_pct !== '') {
+            data.recommended_load_pct = parseFloat(rawData.recommended_load_pct);
+        }
+        if (rawData.max_load_pct && rawData.max_load_pct !== '') {
+            data.max_load_pct = parseFloat(rawData.max_load_pct);
+        }
+        
+        // Convert boolean fields (only include fields that exist in database)
+        data.is_natural = rawData.is_natural === 'on' || rawData.is_natural === true;
+        data.has_restrictions = rawData.has_restrictions === 'on' || rawData.has_restrictions === true;
+        
+        // Text fields
+        if (rawData.restriction_notes && rawData.restriction_notes !== '') {
+            data.restriction_notes = rawData.restriction_notes;
+        }
+        if (rawData.notes && rawData.notes !== '') {
+            data.notes = rawData.notes;
+        }
+        
+        // Rating fields
+        if (rawData.price_rating && rawData.price_rating !== '') {
+            data.price_rating = parseInt(rawData.price_rating);
+        }
+        if (rawData.potency_rating && rawData.potency_rating !== '') {
+            data.potency_rating = parseFloat(rawData.potency_rating);
+        }
+        if (rawData.performance_rating && rawData.performance_rating !== '') {
+            data.performance_rating = parseFloat(rawData.performance_rating);
+        }
+        if (rawData.total_ratings && rawData.total_ratings !== '') {
+            data.total_ratings = parseInt(rawData.total_ratings);
+        }
+        
+        // Note: Additional fields for iOS app (theme_family, fragrance_notes, etc.) 
+        // will need to be saved to the ProductDetails table separately
+        // For now, we're only saving core fragrance_oils table fields
+
+        console.log('Cleaned data for database:', data);
+
+        try {
+            const isEdit = !!(rawData.id && rawData.id !== '');
+            const url = isEdit ? 
+                `/api/admin/oils/${rawData.id}` : 
+                `/api/admin/oils`;
+            
+            const response = await AdminCore.apiRequest(url, {
+                method: isEdit ? 'PUT' : 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            console.log('Save response:', response);
+            AdminCore.showToast('Fragrance oil saved successfully', 'success');
+            closeOilModal();
+            await loadOils();
+        } catch (error) {
+            console.error('Error saving oil:', error);
+            AdminCore.showToast(`Failed to save fragrance oil: ${error.message}`, 'error');
+        }
+    };
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initOilsModule);
+    } else {
+        initOilsModule();
+    }
+})();

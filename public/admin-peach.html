@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PerfectRatio Admin Panel</title>
+    <style>
+        /* PerfectRatio App Design System - Exact Match */
+        :root {
+            /* Brand Colors - Exact from DesignSystem.swift */
+            --peach-coral: #F1AD88;
+            --peach-coral-pressed: #E6996D;
+            --peach-coral-soft: #F7C3A6;
+            
+            /* Neutrals */
+            --ink-900: #101114;
+            --ink-700: #2E3033;
+            --porcelain: #FAFAF8;
+            --clay: #EDEAE6;
+            --driftwood: #D9D3CC;
+            
+            /* Accent Colors */
+            --sage: #CEDCC8;
+            --lilac: #DCD6E8;
+            --warm-sand: #F6EDE3;
+            
+            /* Feedback Colors */
+            --success-green: #2F8F5B;
+            --warning-orange: #B57200;
+            --danger-red: #B83A3A;
+            
+            /* Spacing */
+            --spacing-xs: 4px;
+            --spacing-s: 8px;
+            --spacing-m: 12px;
+            --spacing-l: 16px;
+            --spacing-xl: 24px;
+            --spacing-xxl: 32px;
+            --spacing-xxxl: 48px;
+            
+            /* Radii */
+            --radius-s: 8px;
+            --radius-m: 16px;
+            --radius-l: 24px;
+            
+            /* Shadows - Exact from DesignSystem.swift */
+            --shadow-level-1: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --shadow-level-2: 0 4px 16px rgba(0, 0, 0, 0.12);
+            --shadow-level-3: 0 8px 32px rgba(0, 0, 0, 0.16);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+            font-weight: 500;
+            font-variant-numeric: tabular-nums;
+            background: var(--porcelain);
+            color: var(--ink-900);
+            line-height: 1.4;
+        }
+        
+        /* Navigation Bar - PerfectRatio style */
+        .main-nav {
+            background: white;
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--driftwood);
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--ink-900);
+            box-shadow: var(--shadow-level-1);
+        }
+        
+        .nav-left {
+            display: flex;
+            align-items: center;
+        }
+        
+        .admin-title {
+            margin-left: var(--spacing-xl);
+            font-size: 28px;
+            font-weight: 500;
+            color: var(--ink-900);
+            letter-spacing: -0.02em;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            gap: var(--spacing-s);
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            margin-left: var(--spacing-xxl);
+        }
+        
+        .nav-tab {
+            padding: var(--spacing-m) var(--spacing-l);
+            cursor: pointer;
+            border-radius: var(--radius-s);
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--ink-700);
+            transition: all 0.2s ease-out;
+            border: none;
+            background: transparent;
+        }
+        
+        .nav-tab:hover {
+            background: var(--clay);
+            color: var(--ink-900);
+        }
+        
+        .nav-tab.active {
+            background: var(--peach-coral);
+            color: var(--ink-900);
+            font-weight: 500;
+            opacity: 0.88;
+        }
+        
+        .logout-btn {
+            background: white;
+            color: var(--danger-red);
+            border: 1px solid var(--driftwood);
+            padding: var(--spacing-m) var(--spacing-l);
+            border-radius: var(--radius-s);
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-right: var(--spacing-xl);
+            transition: all 0.2s ease-out;
+            box-shadow: var(--shadow-level-1);
+        }
+        
+        .logout-btn:hover {
+            background: var(--danger-red);
+            color: white;
+            transform: scale(0.98);
+        }
+        
+        /* Main content */
+        .tab-content {
+            display: none;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--spacing-xl);
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Search and controls */
+        .search-bar {
+            display: flex;
+            gap: var(--spacing-m);
+            margin-bottom: var(--spacing-xl);
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+            padding: var(--spacing-m);
+            border: 1px solid var(--driftwood);
+            background: white;
+            border-radius: var(--radius-s);
+            font-size: 16px;
+            color: var(--ink-900);
+            transition: border-color 0.2s ease-out;
+        }
+        
+        .search-input::placeholder {
+            color: var(--ink-700);
+            opacity: 0.5;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--peach-coral);
+        }
+        
+        /* Buttons - Exact PerfectRatio style */
+        .btn {
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease-out;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-s);
+            border: none;
+            frame: max-width: infinity;
+        }
+        
+        .btn-primary {
+            background: var(--peach-coral);
+            color: var(--ink-900);
+            opacity: 0.88;
+            padding: var(--spacing-l) var(--spacing-xl);
+            border-radius: var(--radius-m);
+            box-shadow: var(--shadow-level-1);
+        }
+        
+        .btn-primary:hover {
+            background: var(--peach-coral-pressed);
+            box-shadow: none;
+            transform: scale(0.98);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--ink-900);
+            border: 1px solid var(--driftwood);
+            padding: var(--spacing-m) var(--spacing-l);
+            border-radius: var(--radius-m);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--porcelain);
+            opacity: 0.7;
+            transform: scale(0.98);
+        }
+        
+        .btn-danger {
+            background: var(--danger-red);
+            color: white;
+            padding: var(--spacing-m) var(--spacing-l);
+            border-radius: var(--radius-m);
+            box-shadow: var(--shadow-level-1);
+        }
+        
+        .btn-danger:hover {
+            opacity: 0.9;
+            transform: scale(0.98);
+        }
+        
+        .btn-success {
+            background: var(--success-green);
+            color: white;
+            padding: var(--spacing-m) var(--spacing-l);
+            border-radius: var(--radius-m);
+            box-shadow: var(--shadow-level-1);
+        }
+        
+        .btn-success:hover {
+            opacity: 0.9;
+            transform: scale(0.98);
+        }
+        
+        .btn-small {
+            padding: var(--spacing-s) var(--spacing-m);
+            font-size: 14px;
+        }
+        
+        /* Table - PerfectRatio card style */
+        .table-container {
+            background: white;
+            border-radius: var(--radius-m);
+            overflow: hidden;
+            box-shadow: var(--shadow-level-1);
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: var(--clay);
+            padding: var(--spacing-l);
+            text-align: left;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--ink-700);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            border-bottom: 1px solid var(--driftwood);
+        }
+        
+        td {
+            padding: var(--spacing-l);
+            border-bottom: 1px solid var(--driftwood);
+            font-size: 16px;
+            color: var(--ink-900);
+            background: white;
+            transition: background-color 0.2s ease-out;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        tr:hover td {
+            background: var(--porcelain);
+        }
+        
+        /* Modal - PerfectRatio style */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+        
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-xl);
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: var(--radius-l);
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: var(--shadow-level-3);
+        }
+        
+        .modal-header {
+            padding: var(--spacing-xl);
+            border-bottom: 1px solid var(--driftwood);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .modal-title {
+            font-size: 22px;
+            font-weight: 500;
+            color: var(--ink-900);
+        }
+        
+        .close-btn {
+            background: var(--clay);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-s);
+            font-size: 18px;
+            color: var(--ink-700);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease-out;
+        }
+        
+        .close-btn:hover {
+            background: var(--driftwood);
+            color: var(--ink-900);
+        }
+        
+        .modal-body {
+            padding: var(--spacing-xl);
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        /* Form tabs - PerfectRatio style */
+        .form-tabs {
+            display: flex;
+            background: var(--clay);
+            border-radius: var(--radius-s);
+            padding: var(--spacing-xs);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .tab-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            padding: var(--spacing-s) var(--spacing-m);
+            border-radius: var(--spacing-xs);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--ink-700);
+            cursor: pointer;
+            transition: all 0.2s ease-out;
+        }
+        
+        .tab-btn.active {
+            background: white;
+            color: var(--peach-coral);
+            box-shadow: var(--shadow-level-1);
+        }
+        
+        .tab-btn:hover:not(.active) {
+            background: var(--driftwood);
+            color: var(--ink-900);
+        }
+        
+        .form-tab-content {
+            display: none;
+            padding: var(--spacing-l);
+        }
+        
+        .form-tab-content.active {
+            display: block;
+        }
+        
+        /* Base Modal Specific Styles */
+        #baseForm {
+            padding: 0;
+        }
+        
+        #baseForm .form-tabs {
+            margin: var(--spacing-l);
+            margin-bottom: 0;
+        }
+        
+        #baseForm .form-group {
+            margin-bottom: var(--spacing-l);
+        }
+        
+        #baseForm .form-group label {
+            display: block;
+            margin-bottom: var(--spacing-s);
+            color: var(--ink-700);
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        #baseForm .form-control {
+            width: 100%;
+            padding: var(--spacing-m);
+            border: 1px solid var(--driftwood);
+            border-radius: var(--radius-s);
+            font-size: 16px;
+            background: white;
+            color: var(--ink-900);
+            transition: border-color 0.2s;
+        }
+        
+        #baseForm .form-control:focus {
+            outline: none;
+            border-color: var(--peach-coral);
+        }
+        
+        #baseForm h3 {
+            margin-bottom: var(--spacing-l);
+            color: var(--ink-900);
+            font-size: 18px;
+        }
+        
+        /* Modal Footer Buttons */
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--spacing-m);
+            padding: var(--spacing-l);
+            border-top: 1px solid var(--driftwood);
+            background: var(--porcelain);
+        }
+        
+        .btn-secondary {
+            padding: var(--spacing-m) var(--spacing-xl);
+            background: white;
+            color: var(--ink-700);
+            border: 1px solid var(--driftwood);
+            border-radius: var(--radius-s);
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-secondary:hover {
+            background: var(--porcelain);
+            border-color: var(--ink-500);
+        }
+        
+        /* Form elements - Exact PerfectRatio style */
+        .form-section {
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .form-section-title {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--ink-700);
+            margin-bottom: var(--spacing-m);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-l);
+            margin-bottom: var(--spacing-l);
+        }
+        
+        .form-group {
+            margin-bottom: var(--spacing-l);
+        }
+        
+        .form-label, .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--ink-700);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: var(--spacing-m);
+            border: 1px solid var(--driftwood);
+            border-radius: var(--radius-s);
+            font-size: 16px;
+            background: white;
+            color: var(--ink-900);
+            transition: border-color 0.2s ease-out;
+        }
+        
+        .form-control::placeholder {
+            color: var(--ink-700);
+            opacity: 0.5;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--peach-coral);
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-s);
+        }
+        
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--peach-coral);
+        }
+        
+        /* Loading spinner */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--driftwood);
+            border-top: 2px solid var(--peach-coral);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 0;
+            border-radius: var(--radius-m);
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-level-3);
+            position: relative;
+            margin: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-l);
+            border-bottom: 1px solid var(--driftwood);
+            background: var(--porcelain);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .modal-header h2 {
+            margin: 0;
+            font-size: 20px;
+            color: var(--ink-900);
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: var(--ink-500);
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+        
+        .close-btn:hover {
+            color: var(--ink-900);
+        }
+        
+        /* Stats grid - PerfectRatio card style */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-l);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: var(--radius-l);
+            padding: var(--spacing-l);
+            box-shadow: var(--shadow-level-1);
+            text-align: center;
+            transition: transform 0.2s ease-out;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-level-2);
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: 300;
+            color: var(--ink-900);
+            margin-bottom: var(--spacing-xs);
+            font-family: Georgia, serif;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: var(--ink-700);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .nav-left {
+                flex-direction: column;
+                gap: 12px;
+                padding: 16px 20px;
+            }
+            
+            .nav-tabs {
+                overflow-x: auto;
+                padding-bottom: 4px;
+                margin-left: 0;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-input {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Main Navigation -->
+    <nav class="main-nav">
+        <div class="nav-left">
+            <div class="admin-title">PerfectRatio Admin Panel</div>
+            <ul class="nav-tabs">
+                <li class="nav-tab active" data-tab="dashboard">📊 Dashboard</li>
+                <li class="nav-tab" data-tab="suppliers">🏢 Suppliers</li>
+                <li class="nav-tab" data-tab="bases">🕯️ Base Products</li>
+                <li class="nav-tab" data-tab="oils">🌸 Fragrance Oils</li>
+                <li class="nav-tab" data-tab="vessels">🏺 Vessels</li>
+                <li class="nav-tab" data-tab="import">📥 Import</li>
+                <li class="nav-tab" data-tab="users">👥 Users</li>
+            </ul>
+        </div>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </nav>
+
+    <!-- Tab Contents -->
+    <div id="dashboard" class="tab-content active">
+        <h2>Dashboard</h2>
+        <div id="stats-container">
+            <div class="loading"></div>
+        </div>
+    </div>
+
+    <div id="suppliers" class="tab-content">
+        <!-- Suppliers content will be loaded by admin-suppliers.js -->
+    </div>
+
+    <div id="bases" class="tab-content">
+        <!-- Bases content will be loaded by admin-bases-complete.js -->
+    </div>
+
+    <div id="oils" class="tab-content">
+        <!-- Oils content will be loaded by admin-oils-complete.js -->
+    </div>
+
+    <div id="vessels" class="tab-content">
+        <!-- Vessels content will be loaded by admin-vessels.js -->
+    </div>
+
+    <div id="import" class="tab-content">
+        <!-- Import content will be loaded by admin-import.js -->
+    </div>
+
+    <div id="users" class="tab-content">
+        <h2>Users</h2>
+        <div id="users-container">
+            <div class="loading"></div>
+        </div>
+    </div>
+
+    <!-- Modals Container -->
+    <div id="modals-container"></div>
+
+    <!-- Include core and modular admin scripts -->
+    <script src="/admin-core.js"></script>
+    <script src="/admin-suppliers.js"></script>
+    <script src="/admin-bases-complete.js"></script>
+    <script src="/admin-oils-complete.js"></script>
+    <script src="/admin-vessels.js"></script>
+    <script src="/admin-import.js"></script>
+
+    <script>
+        // Check authentication
+        if (!AdminCore.isAuthenticated()) {
+            window.location.href = '/login.html';
+        }
+        
+        // Main admin functionality
+        
+        // Tab switching
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => switchToTab(tab.dataset.tab));
+        });
+        
+        function switchToTab(tabName) {
+            // Update nav tabs
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            
+            // Update content
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            
+            // Load tab content if needed
+            if (tabName === 'dashboard') {
+                loadDashboard();
+            } else if (tabName === 'users') {
+                loadUsers();
+            }
+        }
+        
+        // Dashboard functionality
+        async function loadDashboard() {
+            try {
+                const stats = await AdminCore.apiRequest('/api/admin/stats');
+                displayStats(stats);
+            } catch (error) {
+                console.error('Failed to load dashboard:', error);
+            }
+        }
+        
+        function displayStats(stats) {
+            const container = document.getElementById('stats-container');
+            container.innerHTML = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.users?.total || 0}</div>
+                        <div class="stat-label">Total Users</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.users?.formulas || 0}</div>
+                        <div class="stat-label">Formulas</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.catalog?.suppliers || 0}</div>
+                        <div class="stat-label">Suppliers</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.catalog?.bases || 0}</div>
+                        <div class="stat-label">Base Products</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.catalog?.oils || 0}</div>
+                        <div class="stat-label">Fragrance Oils</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.catalog?.vessels || 0}</div>
+                        <div class="stat-label">Vessels</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Users functionality
+        async function loadUsers() {
+            try {
+                const users = await AdminCore.apiRequest('/api/admin/users');
+                displayUsers(users);
+            } catch (error) {
+                console.error('Failed to load users:', error);
+            }
+        }
+        
+        function displayUsers(users) {
+            const container = document.getElementById('users-container');
+            if (!users || users.length === 0) {
+                container.innerHTML = '<p>No users found</p>';
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>Name</th>
+                                <th>Joined</th>
+                                <th>Last Active</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${users.map(user => `
+                                <tr>
+                                    <td>${user.email || 'N/A'}</td>
+                                    <td>${user.full_name || 'N/A'}</td>
+                                    <td>${AdminCore.formatDate(user.created_at)}</td>
+                                    <td>${AdminCore.formatDate(user.last_sign_in_at) || 'Never'}</td>
+                                    <td>Active</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+        
+        // Logout functionality
+        async function logout() {
+            await AdminCore.logout();
+        }
+        
+        // Initialize
+        loadDashboard();
+    </script>
+</body>
+</html>
