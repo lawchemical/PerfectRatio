@@ -11,16 +11,23 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Initialize Supabase client (with validation)
+let supabase = null;
+
 if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
   console.error('❌ Missing required environment variables: SUPABASE_URL and/or SUPABASE_ANON_KEY');
   console.error('Please set these in Railway environment variables');
-  process.exit(1);
+  // Don't exit immediately - allow health endpoint to work for debugging
+} else {
+  try {
+    supabase = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_ANON_KEY
+    );
+    console.log('✅ Supabase client initialized successfully');
+  } catch (error) {
+    console.error('❌ Failed to initialize Supabase client:', error);
+  }
 }
-
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
-);
 
 // Initialize node-cache with TTL
 const cache = new NodeCache({ 
@@ -62,17 +69,37 @@ const authenticateAPIKey = (req, res, next) => {
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'healthy',
-    version: '1.0.1', // Version to track deployments
-    timestamp: new Date().toISOString(),
-    cache_stats: cache.getStats(),
-    uptime: process.uptime()
-  });
+  try {
+    res.json({ 
+      status: 'healthy',
+      version: '1.0.2', // Version to track deployments
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      env: {
+        has_supabase_url: !!process.env.SUPABASE_URL,
+        has_supabase_key: !!process.env.SUPABASE_ANON_KEY,
+        has_api_key: !!process.env.API_KEY,
+        node_env: process.env.NODE_ENV || 'development'
+      }
+    });
+  } catch (error) {
+    console.error('Health check error:', error);
+    res.status(500).json({ 
+      status: 'error',
+      error: error.message 
+    });
+  }
 });
 
 // Get all suppliers (with caching)
 app.get('/api/suppliers', authenticateAPIKey, async (req, res) => {
+  if (!supabase) {
+    return res.status(503).json({ 
+      error: 'Database connection not available',
+      message: 'Supabase client not initialized. Check server logs.' 
+    });
+  }
+
   const cacheKey = 'suppliers';
   const forceRefresh = req.query.refresh === 'true';
   
@@ -117,6 +144,13 @@ app.get('/api/suppliers', authenticateAPIKey, async (req, res) => {
 
 // Get all base products (with caching)
 app.get('/api/base-products', authenticateAPIKey, async (req, res) => {
+  if (!supabase) {
+    return res.status(503).json({ 
+      error: 'Database connection not available',
+      message: 'Supabase client not initialized. Check server logs.' 
+    });
+  }
+
   const cacheKey = 'base_products';
   const forceRefresh = req.query.refresh === 'true';
   const since = req.query.since; // For incremental updates
@@ -174,6 +208,13 @@ app.get('/api/base-products', authenticateAPIKey, async (req, res) => {
 
 // Get fragrance oils with pagination (with caching)
 app.get('/api/fragrance-oils', authenticateAPIKey, async (req, res) => {
+  if (!supabase) {
+    return res.status(503).json({ 
+      error: 'Database connection not available',
+      message: 'Supabase client not initialized. Check server logs.' 
+    });
+  }
+
   const page = parseInt(req.query.page) || 1;
   const pageSize = parseInt(req.query.pageSize) || 50;
   const forceRefresh = req.query.refresh === 'true';
@@ -250,6 +291,13 @@ app.get('/api/fragrance-oils', authenticateAPIKey, async (req, res) => {
 
 // Get vessels (with caching)
 app.get('/api/vessels', authenticateAPIKey, async (req, res) => {
+  if (!supabase) {
+    return res.status(503).json({ 
+      error: 'Database connection not available',
+      message: 'Supabase client not initialized. Check server logs.' 
+    });
+  }
+
   const cacheKey = 'vessels';
   const forceRefresh = req.query.refresh === 'true';
   const since = req.query.since;
@@ -306,6 +354,13 @@ app.get('/api/vessels', authenticateAPIKey, async (req, res) => {
 
 // Bulk sync endpoint - get all catalog data
 app.get('/api/sync/catalog', authenticateAPIKey, heavyLimiter, async (req, res) => {
+  if (!supabase) {
+    return res.status(503).json({ 
+      error: 'Database connection not available',
+      message: 'Supabase client not initialized. Check server logs.' 
+    });
+  }
+
   const forceRefresh = req.query.refresh === 'true';
   const since = req.query.since;
   const cacheKey = `full_catalog${since ? '_incremental' : ''}`;
