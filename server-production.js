@@ -35,7 +35,13 @@ const userDB = createClient(USER_INFO.url, USER_INFO.anonKey);
 const userDBAdmin = createClient(USER_INFO.url, USER_INFO.serviceKey);
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
+
+// Log incoming requests for debugging
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+    next();
+});
 
 // Middleware
 app.use(cors({
@@ -1234,11 +1240,23 @@ app.use((err, req, res, next) => {
     });
 });
 
+// Handle process errors
+process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception:', err);
+    process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    process.exit(1);
+});
+
 // Start server - bind to 0.0.0.0 for Railway
-app.listen(PORT, '0.0.0.0', () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
     console.log('🚀 PerfectRatio Production Server Running');
     console.log(`📊 Port: ${PORT}`);
     console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🔗 Server listening on 0.0.0.0:${PORT}`);
     console.log('\nDatabase Status:');
     console.log(`✅ Product Data: ${PRODUCT_DATA.url}`);
     console.log(`✅ User Info: ${USER_INFO.url}`);
@@ -1248,4 +1266,9 @@ app.listen(PORT, '0.0.0.0', () => {
     console.log(`- User API: /api/user/*`);
     console.log(`- Admin Panel: /admin`);
     console.log(`- Status: /api/status`);
+});
+
+server.on('error', (err) => {
+    console.error('Server error:', err);
+    process.exit(1);
 });
