@@ -7,6 +7,7 @@
     "start": "node server-production.js",
     "start-admin": "node start-admin.js",
     "start-cache": "node start-cache.js",
+    "test-admin": "node test-admin-server.js",
     "dev": "nodemon server-production.js",
     "test": "node test-connection.js"
   },

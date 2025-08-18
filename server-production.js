@@ -49,7 +49,15 @@ app.use(cors({
     credentials: true
 }));
 app.use(express.json());
-app.use(express.static('public'));
+
+// Static files - check if directory exists
+const publicPath = path.join(__dirname, 'public');
+if (require('fs').existsSync(publicPath)) {
+    app.use(express.static(publicPath));
+    console.log(`Static files serving from: ${publicPath}`);
+} else {
+    console.log('Warning: public directory not found');
+}
 
 // =====================================================
 // HEALTH CHECK & ROOT
@@ -63,10 +71,8 @@ app.get('/', (req, res) => {
 
 app.get('/health', (req, res) => {
     console.log('Health check received, sending response...');
-    res.status(200).json({ 
-        status: 'healthy',
-        timestamp: new Date().toISOString()
-    });
+    // Try simple text response first
+    res.status(200).send('OK');
     console.log('Health check response sent');
 });
 
