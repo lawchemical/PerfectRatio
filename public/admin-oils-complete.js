@@ -692,6 +692,8 @@
             const price = formData.get(`${tier}_price`);
             const sku = formData.get(`${tier}_sku`);
             
+            console.log(`${tier}: name=${name}, size=${size}, unit=${unit}, price=${price}, sku=${sku}`);
+            
             if (size && price) {
                 priceTiers[`${tier}_name`] = name || '';
                 priceTiers[`${tier}_size`] = parseFloat(size);
@@ -701,9 +703,13 @@
             }
         });
         
+        console.log('Collected price tiers:', priceTiers);
+        
         if (Object.keys(priceTiers).length > 0) {
             data.price_tiers = priceTiers;
         }
+        
+        console.log('Final data being sent:', data);
         
         // Clean up fields not directly in fragrance_oils table
         const fieldsToMove = [
