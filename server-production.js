@@ -939,14 +939,18 @@ app.post('/api/admin/oils', async (req, res) => {
             
             // Extract tier data and build column-based row
             for (let i = 1; i <= 5; i++) {
+                const tierName = price_tiers[`tier${i}_name`];
                 const tierSize = price_tiers[`tier${i}_size`];
                 const tierUnit = price_tiers[`tier${i}_unit`];
                 const tierPrice = price_tiers[`tier${i}_price`];
+                const tierSku = price_tiers[`tier${i}_sku`];
                 
                 if (tierSize && tierPrice) {
+                    if (tierName) tierData[`tier${i}_name`] = tierName;
                     tierData[`tier${i}_size`] = parseFloat(tierSize);
                     tierData[`tier${i}_unit`] = tierUnit || 'oz';
                     tierData[`tier${i}_price`] = parseFloat(tierPrice);
+                    if (tierSku) tierData[`tier${i}_sku`] = tierSku;
                 }
             }
             
@@ -1022,14 +1026,18 @@ app.put('/api/admin/oils/:id', async (req, res) => {
             
             // Extract tier data and build column-based row
             for (let i = 1; i <= 5; i++) {
+                const tierName = price_tiers[`tier${i}_name`];
                 const tierSize = price_tiers[`tier${i}_size`];
                 const tierUnit = price_tiers[`tier${i}_unit`];
                 const tierPrice = price_tiers[`tier${i}_price`];
+                const tierSku = price_tiers[`tier${i}_sku`];
                 
                 if (tierSize && tierPrice) {
+                    if (tierName) tierData[`tier${i}_name`] = tierName;
                     tierData[`tier${i}_size`] = parseFloat(tierSize);
                     tierData[`tier${i}_unit`] = tierUnit || 'oz';
                     tierData[`tier${i}_price`] = parseFloat(tierPrice);
+                    if (tierSku) tierData[`tier${i}_sku`] = tierSku;
                 }
             }
             
