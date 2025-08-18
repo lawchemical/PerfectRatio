@@ -936,14 +936,70 @@ app.post('/api/admin/bases', async (req, res) => {
 // Admin: Update base
 app.put('/api/admin/bases/:id', async (req, res) => {
     try {
+        const { price_tiers, ...baseData } = req.body;
+        
+        // Update the base product
         const { data, error } = await productDBAdmin
             .from('base_products')
-            .update(req.body)
+            .update(baseData)
             .eq('id', req.params.id)
             .select()
             .single();
         
         if (error) throw error;
+        
+        // Handle price tiers if provided
+        if (price_tiers) {
+            // First check if price tiers exist for this base
+            const { data: existingTiers } = await productDBAdmin
+                .from('base_price_tiers')
+                .select('*')
+                .eq('base_product_id', req.params.id)
+                .single();
+            
+            const tierData = { base_product_id: req.params.id };
+            
+            // Extract tier data for all 5 tiers
+            for (let i = 1; i <= 5; i++) {
+                const tierName = price_tiers[`tier${i}_name`];
+                const tierSize = price_tiers[`tier${i}_size`];
+                const tierUnit = price_tiers[`tier${i}_unit`];
+                const tierPrice = price_tiers[`tier${i}_price`];
+                const tierSku = price_tiers[`tier${i}_sku`];
+                
+                if (tierSize && tierPrice) {
+                    if (tierName) tierData[`tier${i}_name`] = tierName;
+                    tierData[`tier${i}_size`] = parseFloat(tierSize);
+                    tierData[`tier${i}_unit`] = tierUnit || 'lb';
+                    tierData[`tier${i}_price`] = parseFloat(tierPrice);
+                    if (tierSku) tierData[`tier${i}_sku`] = tierSku;
+                }
+            }
+            
+            if (Object.keys(tierData).length > 1) {
+                if (existingTiers) {
+                    // Update existing tiers
+                    const { error: tierError } = await productDBAdmin
+                        .from('base_price_tiers')
+                        .update(tierData)
+                        .eq('base_product_id', req.params.id);
+                    
+                    if (tierError) {
+                        console.error('Error updating base price tiers:', tierError);
+                    }
+                } else {
+                    // Insert new tiers
+                    const { error: tierError } = await productDBAdmin
+                        .from('base_price_tiers')
+                        .insert(tierData);
+                    
+                    if (tierError) {
+                        console.error('Error creating base price tiers:', tierError);
+                    }
+                }
+            }
+        }
+        
         res.json(data);
     } catch (error) {
         console.error('Error updating base:', error);
@@ -1215,14 +1271,74 @@ app.post('/api/admin/vessels', async (req, res) => {
 // Admin: Update vessel
 app.put('/api/admin/vessels/:id', async (req, res) => {
     try {
+        const { price_tiers, ...vesselData } = req.body;
+        
+        // Update the vessel
         const { data, error } = await productDBAdmin
             .from('vessels')
-            .update(req.body)
+            .update(vesselData)
             .eq('id', req.params.id)
             .select()
             .single();
         
         if (error) throw error;
+        
+        // Handle price tiers if provided
+        if (price_tiers) {
+            try {
+                // First check if price tiers exist for this vessel
+                const { data: existingTiers } = await productDBAdmin
+                    .from('vessel_price_tiers')
+                    .select('*')
+                    .eq('vessel_id', req.params.id)
+                    .single();
+                
+                const tierData = { vessel_id: req.params.id };
+                
+                // Extract tier data for all 5 tiers
+                for (let i = 1; i <= 5; i++) {
+                    const tierName = price_tiers[`tier${i}_name`];
+                    const tierSize = price_tiers[`tier${i}_size`];
+                    const tierUnit = price_tiers[`tier${i}_unit`];
+                    const tierPrice = price_tiers[`tier${i}_price`];
+                    const tierSku = price_tiers[`tier${i}_sku`];
+                    
+                    if (tierSize && tierPrice) {
+                        if (tierName) tierData[`tier${i}_name`] = tierName;
+                        tierData[`tier${i}_size`] = parseFloat(tierSize);
+                        tierData[`tier${i}_unit`] = tierUnit || 'units';
+                        tierData[`tier${i}_price`] = parseFloat(tierPrice);
+                        if (tierSku) tierData[`tier${i}_sku`] = tierSku;
+                    }
+                }
+                
+                if (Object.keys(tierData).length > 1) {
+                    if (existingTiers) {
+                        // Update existing tiers
+                        const { error: tierError } = await productDBAdmin
+                            .from('vessel_price_tiers')
+                            .update(tierData)
+                            .eq('vessel_id', req.params.id);
+                        
+                        if (tierError) {
+                            console.error('Error updating vessel price tiers:', tierError);
+                        }
+                    } else {
+                        // Insert new tiers
+                        const { error: tierError } = await productDBAdmin
+                            .from('vessel_price_tiers')
+                            .insert(tierData);
+                        
+                        if (tierError) {
+                            console.error('Error creating vessel price tiers:', tierError);
+                        }
+                    }
+                }
+            } catch (tierErr) {
+                console.error('Vessel price tiers not implemented yet');
+            }
+        }
+        
         res.json(data);
     } catch (error) {
         console.error('Error updating vessel:', error);
