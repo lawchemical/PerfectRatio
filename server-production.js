@@ -52,14 +52,22 @@ app.use(express.json());
 app.use(express.static('public'));
 
 // =====================================================
-// HEALTH CHECK
+// HEALTH CHECK & ROOT
 // =====================================================
 
+// Root endpoint
+app.get('/', (req, res) => {
+    console.log('Root request received');
+    res.send('PerfectRatio Admin Server Running');
+});
+
 app.get('/health', (req, res) => {
-    res.json({ 
+    console.log('Health check received, sending response...');
+    res.status(200).json({ 
         status: 'healthy',
         timestamp: new Date().toISOString()
     });
+    console.log('Health check response sent');
 });
 
 // =====================================================
