@@ -397,11 +397,6 @@
                                     </div>
                                 </div>
                                 
-                                <h3 style="color: #101114; margin-bottom: 20px; margin-top: 30px;">Additional Settings</h3>
-                                <div style="margin-bottom: 16px;">
-                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Minimum Order Qty</label>
-                                    <input type="number" name="minimum_order_quantity" min="1" value="1" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
-                                </div>
                             </div>
                         </form>
                         
@@ -575,7 +570,6 @@
             form.elements['weight_pounds'].value = vessel.weight_pounds || '';
             form.elements['recommended_fill_volume'].value = vessel.recommended_fill_volume || '';
             form.elements['max_fill_volume'].value = vessel.max_fill_volume || '';
-            form.elements['minimum_order_quantity'].value = vessel.minimum_order_quantity || 1;
             form.elements['product_url'].value = vessel.product_url || '';
             form.elements['notes'].value = vessel.notes || '';
             form.elements['is_active'].checked = vessel.is_active !== false;
@@ -628,7 +622,6 @@
         } else {
             title.textContent = 'Add Vessel';
             form.reset();
-            form.elements['minimum_order_quantity'].value = 1;
             form.elements['is_active'].checked = true;
             form.elements['is_discontinued'].checked = false;
         }
@@ -652,7 +645,6 @@
         
         // Convert numbers
         data.size = parseFloat(data.size);
-        data.minimum_order_quantity = parseInt(data.minimum_order_quantity) || 1;
         data.weight_pounds = data.weight_pounds ? parseFloat(data.weight_pounds) : null;
         data.max_fill_volume = data.max_fill_volume ? parseFloat(data.max_fill_volume) : null;
         data.recommended_fill_volume = data.recommended_fill_volume ? parseFloat(data.recommended_fill_volume) : null;
