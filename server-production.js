@@ -45,6 +45,23 @@ try {
 const app = express();
 const PORT = process.env.PORT || 8080;
 
+// =====================================================
+// HEALTH CHECK & ROOT - BEFORE ANY MIDDLEWARE
+// =====================================================
+
+// Health check - handle before any middleware
+app.get('/health', (req, res) => {
+    console.log('Health check received, sending response...');
+    res.status(200).send('OK');
+    console.log('Health check response sent successfully');
+});
+
+// Root endpoint
+app.get('/', (req, res) => {
+    console.log('Root request received');
+    res.send('PerfectRatio Admin Server Running');
+});
+
 // Log incoming requests for debugging
 app.use((req, res, next) => {
     console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
@@ -66,27 +83,6 @@ if (require('fs').existsSync(publicPath)) {
 } else {
     console.log('Warning: public directory not found');
 }
-
-// =====================================================
-// HEALTH CHECK & ROOT
-// =====================================================
-
-// Root endpoint
-app.get('/', (req, res) => {
-    console.log('Root request received');
-    res.send('PerfectRatio Admin Server Running');
-});
-
-app.get('/health', (req, res) => {
-    console.log('Health check received, sending response...');
-    try {
-        res.writeHead(200, { 'Content-Type': 'text/plain' });
-        res.end('OK');
-        console.log('Health check response sent successfully');
-    } catch (error) {
-        console.error('Error sending health check response:', error);
-    }
-});
 
 // =====================================================
 // PRODUCT DATA ENDPOINTS (Public Catalog)
