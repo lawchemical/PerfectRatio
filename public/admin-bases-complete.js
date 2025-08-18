@@ -107,28 +107,9 @@
                                 <label>Product Name *</label>
                                 <input type="text" class="form-control" name="name" required>
                             </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>SKU</label>
-                                    <input type="text" class="form-control" name="sku">
-                                </div>
-                                <div class="form-group">
-                                    <label>Base Type</label>
-                                    <select class="form-control" name="base_type">
-                                        <option value="">Select type...</option>
-                                        <option value="soap_foaming">Foaming Hand Soap</option>
-                                        <option value="soap_liquid">Liquid Hand Soap</option>
-                                        <option value="body_wash">Body Wash</option>
-                                        <option value="lotion">Lotion</option>
-                                        <option value="candle_soy">Soy Wax</option>
-                                        <option value="candle_paraffin">Paraffin Wax</option>
-                                        <option value="candle_coconut">Coconut Wax</option>
-                                        <option value="candle_blend">Wax Blend</option>
-                                        <option value="spray">Spray Base</option>
-                                        <option value="diffuser">Diffuser Base</option>
-                                        <option value="other">Other</option>
-                                    </select>
-                                </div>
+                            <div class="form-group">
+                                <label>SKU</label>
+                                <input type="text" class="form-control" name="sku">
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
@@ -152,11 +133,11 @@
                                 <textarea class="form-control" name="notes" rows="3"></textarea>
                             </div>
                             <div class="checkbox-group">
-                                <input type="checkbox" id="baseInLibrary" name="is_in_library">
-                                <label for="baseInLibrary">Add to Library</label>
+                                <input type="checkbox" id="baseIsActive" name="is_active" checked>
+                                <label for="baseIsActive">Is Active (appears in app)</label>
                                 
-                                <input type="checkbox" id="baseIsCustom" name="is_custom">
-                                <label for="baseIsCustom">Custom Item</label>
+                                <input type="checkbox" id="baseIsDiscontinued" name="is_discontinued">
+                                <label for="baseIsDiscontinued">Is Discontinued</label>
                             </div>
                         </div>
                         
@@ -174,48 +155,98 @@
                                     <label>Primary IFRA Category</label>
                                     <select class="form-control" name="ifra_category">
                                         <option value="">Select category...</option>
-                                        <option value="1">Category 1 - Lip Products</option>
-                                        <option value="2">Category 2 - Deodorants/Antiperspirants</option>
-                                        <option value="3">Category 3 - Eye Products</option>
-                                        <option value="4">Category 4 - Perfumes</option>
-                                        <option value="5A">Category 5A - Body Creams</option>
-                                        <option value="5B">Category 5B - Face Creams</option>
-                                        <option value="5C">Category 5C - Hand Creams</option>
-                                        <option value="5D">Category 5D - Baby Creams</option>
-                                        <option value="6">Category 6 - Mouthwash/Toothpaste</option>
-                                        <option value="7A">Category 7A - Hair Styling Aids</option>
-                                        <option value="7B">Category 7B - Hair Sprays</option>
-                                        <option value="8">Category 8 - Intimate Wipes</option>
-                                        <option value="9">Category 9 - Rinse-off Products</option>
-                                        <option value="10A">Category 10A - Air Fresheners</option>
-                                        <option value="10B">Category 10B - Fabric Fresheners</option>
-                                        <option value="11A">Category 11A - Diapers</option>
-                                        <option value="11B">Category 11B - Feminine Hygiene</option>
-                                        <option value="12">Category 12 - Candles</option>
+                                        <option value="Air Freshener Sprays - Category 10B">Air Freshener Sprays - Category 10B</option>
+                                        <option value="Air Freshening Crystals - Category 12">Air Freshening Crystals - Category 12</option>
+                                        <option value="Antiperspirant - Category 2">Antiperspirant - Category 2</option>
+                                        <option value="Baby Creams - Category 5D">Baby Creams - Category 5D</option>
+                                        <option value="Baby Oils - Category 5D">Baby Oils - Category 5D</option>
+                                        <option value="Baby Products - Category 5D">Baby Products - Category 5D</option>
+                                        <option value="Baby Wipes - Category 8">Baby Wipes - Category 8</option>
+                                        <option value="Beard Oil - Category 5B">Beard Oil - Category 5B</option>
+                                        <option value="Body Creams - Category 5A">Body Creams - Category 5A</option>
+                                        <option value="Body Mist - Category 2">Body Mist - Category 2</option>
+                                        <option value="Body Spray - Category 2">Body Spray - Category 2</option>
+                                        <option value="Breath Spray - Category 6">Breath Spray - Category 6</option>
+                                        <option value="Candles - Category 12">Candles - Category 12</option>
+                                        <option value="Deodorant - Category 2">Deodorant - Category 2</option>
+                                        <option value="Diapers - Category 11A">Diapers - Category 11A</option>
+                                        <option value="Eye Products - Category 3">Eye Products - Category 3</option>
+                                        <option value="Face Creams - Category 5B">Face Creams - Category 5B</option>
+                                        <option value="Facial Treatment Masks - Category 3">Facial Treatment Masks - Category 3</option>
+                                        <option value="Fragranced Bracelets - Category 4">Fragranced Bracelets - Category 4</option>
+                                        <option value="Hand Creams - Category 5C">Hand Creams - Category 5C</option>
+                                        <option value="Hand Sanitizers - Category 5C">Hand Sanitizers - Category 5C</option>
+                                        <option value="Household Cleaning Products - Category 10A">Household Cleaning Products - Category 10A</option>
+                                        <option value="Incense - Category 12">Incense - Category 12</option>
+                                        <option value="Intimate Wipes - Category 8">Intimate Wipes - Category 8</option>
+                                        <option value="Leave on Hair Treatments - Category 7B">Leave on Hair Treatments - Category 7B</option>
+                                        <option value="Leave on Hand Products - Category 5C">Leave on Hand Products - Category 5C</option>
+                                        <option value="Leave-on Body Products - Category 5A">Leave-on Body Products - Category 5A</option>
+                                        <option value="Leave-on Face Products - Category 5B">Leave-on Face Products - Category 5B</option>
+                                        <option value="Lip Products - Category 1">Lip Products - Category 1</option>
+                                        <option value="Liquids - Category 12">Liquids - Category 12</option>
+                                        <option value="Make-up - Category 3">Make-up - Category 3</option>
+                                        <option value="Mouthwash - Category 6">Mouthwash - Category 6</option>
+                                        <option value="Perfume - Category 4">Perfume - Category 4</option>
+                                        <option value="Reed Diffusers - Category 10A">Reed Diffusers - Category 10A</option>
+                                        <option value="Rinse Off and Bathwater Products - Category 9">Rinse Off and Bathwater Products - Category 9</option>
+                                        <option value="Rinse off Hair Treatments - Category 7A">Rinse off Hair Treatments - Category 7A</option>
+                                        <option value="Scented Clothing - Category 11B">Scented Clothing - Category 11B</option>
+                                        <option value="Shampoo - Category 9">Shampoo - Category 9</option>
+                                        <option value="Soap - Category 9">Soap - Category 9</option>
+                                        <option value="Solid Perfume - Category 4">Solid Perfume - Category 4</option>
+                                        <option value="Solids - Category 12">Solids - Category 12</option>
+                                        <option value="Toothpaste - Category 6">Toothpaste - Category 6</option>
+                                        <option value="Toys - Category 1">Toys - Category 1</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
                                     <label>Secondary IFRA Category (Dual Purpose)</label>
                                     <select class="form-control" name="ifra_category_2">
                                         <option value="">Select category...</option>
-                                        <option value="1">Category 1 - Lip Products</option>
-                                        <option value="2">Category 2 - Deodorants/Antiperspirants</option>
-                                        <option value="3">Category 3 - Eye Products</option>
-                                        <option value="4">Category 4 - Perfumes</option>
-                                        <option value="5A">Category 5A - Body Creams</option>
-                                        <option value="5B">Category 5B - Face Creams</option>
-                                        <option value="5C">Category 5C - Hand Creams</option>
-                                        <option value="5D">Category 5D - Baby Creams</option>
-                                        <option value="6">Category 6 - Mouthwash/Toothpaste</option>
-                                        <option value="7A">Category 7A - Hair Styling Aids</option>
-                                        <option value="7B">Category 7B - Hair Sprays</option>
-                                        <option value="8">Category 8 - Intimate Wipes</option>
-                                        <option value="9">Category 9 - Rinse-off Products</option>
-                                        <option value="10A">Category 10A - Air Fresheners</option>
-                                        <option value="10B">Category 10B - Fabric Fresheners</option>
-                                        <option value="11A">Category 11A - Diapers</option>
-                                        <option value="11B">Category 11B - Feminine Hygiene</option>
-                                        <option value="12">Category 12 - Candles</option>
+                                        <option value="Air Freshener Sprays - Category 10B">Air Freshener Sprays - Category 10B</option>
+                                        <option value="Air Freshening Crystals - Category 12">Air Freshening Crystals - Category 12</option>
+                                        <option value="Antiperspirant - Category 2">Antiperspirant - Category 2</option>
+                                        <option value="Baby Creams - Category 5D">Baby Creams - Category 5D</option>
+                                        <option value="Baby Oils - Category 5D">Baby Oils - Category 5D</option>
+                                        <option value="Baby Products - Category 5D">Baby Products - Category 5D</option>
+                                        <option value="Baby Wipes - Category 8">Baby Wipes - Category 8</option>
+                                        <option value="Beard Oil - Category 5B">Beard Oil - Category 5B</option>
+                                        <option value="Body Creams - Category 5A">Body Creams - Category 5A</option>
+                                        <option value="Body Mist - Category 2">Body Mist - Category 2</option>
+                                        <option value="Body Spray - Category 2">Body Spray - Category 2</option>
+                                        <option value="Breath Spray - Category 6">Breath Spray - Category 6</option>
+                                        <option value="Candles - Category 12">Candles - Category 12</option>
+                                        <option value="Deodorant - Category 2">Deodorant - Category 2</option>
+                                        <option value="Diapers - Category 11A">Diapers - Category 11A</option>
+                                        <option value="Eye Products - Category 3">Eye Products - Category 3</option>
+                                        <option value="Face Creams - Category 5B">Face Creams - Category 5B</option>
+                                        <option value="Facial Treatment Masks - Category 3">Facial Treatment Masks - Category 3</option>
+                                        <option value="Fragranced Bracelets - Category 4">Fragranced Bracelets - Category 4</option>
+                                        <option value="Hand Creams - Category 5C">Hand Creams - Category 5C</option>
+                                        <option value="Hand Sanitizers - Category 5C">Hand Sanitizers - Category 5C</option>
+                                        <option value="Household Cleaning Products - Category 10A">Household Cleaning Products - Category 10A</option>
+                                        <option value="Incense - Category 12">Incense - Category 12</option>
+                                        <option value="Intimate Wipes - Category 8">Intimate Wipes - Category 8</option>
+                                        <option value="Leave on Hair Treatments - Category 7B">Leave on Hair Treatments - Category 7B</option>
+                                        <option value="Leave on Hand Products - Category 5C">Leave on Hand Products - Category 5C</option>
+                                        <option value="Leave-on Body Products - Category 5A">Leave-on Body Products - Category 5A</option>
+                                        <option value="Leave-on Face Products - Category 5B">Leave-on Face Products - Category 5B</option>
+                                        <option value="Lip Products - Category 1">Lip Products - Category 1</option>
+                                        <option value="Liquids - Category 12">Liquids - Category 12</option>
+                                        <option value="Make-up - Category 3">Make-up - Category 3</option>
+                                        <option value="Mouthwash - Category 6">Mouthwash - Category 6</option>
+                                        <option value="Perfume - Category 4">Perfume - Category 4</option>
+                                        <option value="Reed Diffusers - Category 10A">Reed Diffusers - Category 10A</option>
+                                        <option value="Rinse Off and Bathwater Products - Category 9">Rinse Off and Bathwater Products - Category 9</option>
+                                        <option value="Rinse off Hair Treatments - Category 7A">Rinse off Hair Treatments - Category 7A</option>
+                                        <option value="Scented Clothing - Category 11B">Scented Clothing - Category 11B</option>
+                                        <option value="Shampoo - Category 9">Shampoo - Category 9</option>
+                                        <option value="Soap - Category 9">Soap - Category 9</option>
+                                        <option value="Solid Perfume - Category 4">Solid Perfume - Category 4</option>
+                                        <option value="Solids - Category 12">Solids - Category 12</option>
+                                        <option value="Toothpaste - Category 6">Toothpaste - Category 6</option>
+                                        <option value="Toys - Category 1">Toys - Category 1</option>
                                     </select>
                                 </div>
                             </div>

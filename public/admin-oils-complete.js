@@ -106,10 +106,6 @@
                                     <input type="text" name="sku" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
                                 </div>
                                 <div style="margin-bottom: 16px;">
-                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Categories</label>
-                                    <input type="text" name="categories" placeholder="e.g., Floral, Fresh, Woody" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
-                                </div>
-                                <div style="margin-bottom: 16px;">
                                     <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Scent Description</label>
                                     <textarea name="scent_description" rows="3" maxlength="500" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; resize: vertical;"></textarea>
                                 </div>
@@ -186,8 +182,8 @@
                                     <textarea name="blending_notes" rows="3" placeholder="Tips for blending this fragrance..." style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; resize: vertical;"></textarea>
                                 </div>
                                 <div style="margin-bottom: 16px;">
-                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Usage Notes</label>
-                                    <textarea name="usage_notes" rows="3" placeholder="Special instructions, warnings, curing time, performance tips..." style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; resize: vertical;"></textarea>
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Soap Notes</label>
+                                    <textarea name="usage_notes" rows="3" placeholder="How this oil performs in soap making..." style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; resize: vertical;"></textarea>
                                 </div>
                             </div>
                             
@@ -304,18 +300,82 @@
                                     <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">IFRA Date</label>
                                     <input type="date" name="ifra_date" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
                                 </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">IFRA Certificate URL</label>
+                                    <input type="url" name="ifra_url" placeholder="https://..." style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
                                 <h4 style="color: #2E3033; margin: 16px 0 8px 0;">Maximum Percentages by Product Type</h4>
                                 <div style="margin-bottom: 16px;">
-                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Candles (Cat 12)</label>
-                                    <input type="number" name="ifra_candles" step="0.01" min="0" max="100" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Category 1: Lip Products, Toys</label>
+                                    <input type="number" name="ifra_category_1" step="0.01" min="0" max="100" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
                                 </div>
                                 <div style="margin-bottom: 16px;">
-                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Body Lotion (Cat 5A)</label>
-                                    <input type="number" name="ifra_body_lotion" step="0.01" min="0" max="100" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Category 2: Deodorant, Antiperspirant, Body Spray, Body Mist</label>
+                                    <input type="number" name="ifra_category_2" step="0.01" min="0" max="100" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
                                 </div>
                                 <div style="margin-bottom: 16px;">
-                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Room Spray (Cat 10A)</label>
-                                    <input type="number" name="ifra_room_spray" step="0.01" min="0" max="100" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Category 3: Eye Products, Make-up, Facial Treatment Masks</label>
+                                    <input type="number" name="ifra_category_3" step="0.01" min="0" max="100" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Category 4: Perfume, Solid Perfume, Fragranced Bracelets</label>
+                                    <input type="number" name="ifra_category_4" step="0.01" min="0" max="100" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Category 5A: Body Creams, Leave-on Body Products</label>
+                                    <input type="number" name="ifra_category_5a" step="0.01" min="0" max="100" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Category 5B: Face Creams, Beard Oil, Leave-on Face Products</label>
+                                    <input type="number" name="ifra_category_5b" step="0.01" min="0" max="100" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Category 5C: Hand Creams, Hand Sanitizers, Leave on Hand Products</label>
+                                    <input type="number" name="ifra_category_5c" step="0.01" min="0" max="100" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Category 5D: Baby Creams, Baby Oils, Baby Products</label>
+                                    <input type="number" name="ifra_category_5d" step="0.01" min="0" max="100" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Category 6: Mouthwash, Toothpaste, Breath Spray</label>
+                                    <input type="number" name="ifra_category_6" step="0.01" min="0" max="100" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Category 7A: Rinse off Hair Treatments</label>
+                                    <input type="number" name="ifra_category_7a" step="0.01" min="0" max="100" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Category 7B: Leave on Hair Treatments</label>
+                                    <input type="number" name="ifra_category_7b" step="0.01" min="0" max="100" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Category 8: Intimate Wipes, Baby Wipes</label>
+                                    <input type="number" name="ifra_category_8" step="0.01" min="0" max="100" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Category 9: Rinse Off and Bathwater Products, Soap, Shampoo</label>
+                                    <input type="number" name="ifra_category_9" step="0.01" min="0" max="100" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Category 10A: Household Cleaning Products, Reed Diffusers</label>
+                                    <input type="number" name="ifra_category_10a" step="0.01" min="0" max="100" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Category 10B: Air Freshener Sprays</label>
+                                    <input type="number" name="ifra_category_10b" step="0.01" min="0" max="100" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Category 11A: Diapers</label>
+                                    <input type="number" name="ifra_category_11a" step="0.01" min="0" max="100" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Category 11B: Scented Clothing</label>
+                                    <input type="number" name="ifra_category_11b" step="0.01" min="0" max="100" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Category 12: Candles, Incense, Air Freshening Crystals, Liquids, Solids</label>
+                                    <input type="number" name="ifra_category_12" step="0.01" min="0" max="100" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
                                 </div>
                             </div>
                             
@@ -523,7 +583,6 @@
             // Load additional fields if they exist
             if (oil.specific_gravity) form.elements['specific_gravity'].value = oil.specific_gravity;
             if (oil.vanillin_pct) form.elements['vanillin_pct'].value = oil.vanillin_pct;
-            if (oil.categories) form.elements['categories'].value = oil.categories;
             if (oil.scent_description) form.elements['scent_description'].value = oil.scent_description;
             if (oil.theme_family) form.elements['theme_family'].value = oil.theme_family;
             if (oil.fragrance_notes_top) form.elements['fragrance_notes_top'].value = oil.fragrance_notes_top;
