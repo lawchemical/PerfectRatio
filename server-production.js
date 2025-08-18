@@ -83,6 +83,47 @@ if (require('fs').existsSync(publicPath)) {
 }
 
 // =====================================================
+// DATABASE TEST ENDPOINT
+// =====================================================
+
+app.get('/api/test-db', async (req, res) => {
+    try {
+        console.log('Testing database connection...');
+        console.log('Product DB URL:', PRODUCT_DATA.url);
+        console.log('Anon Key length:', PRODUCT_DATA.anonKey ? PRODUCT_DATA.anonKey.length : 0);
+        console.log('Service Key length:', PRODUCT_DATA.serviceKey ? PRODUCT_DATA.serviceKey.length : 0);
+        
+        // Test basic connection
+        const { data, error } = await productDB
+            .from('suppliers')
+            .select('count')
+            .limit(1);
+        
+        if (error) {
+            console.error('Database test error:', error);
+            return res.status(500).json({ 
+                error: 'Database connection failed',
+                details: error.message,
+                hint: error.hint,
+                code: error.code
+            });
+        }
+        
+        res.json({ 
+            status: 'Database connected',
+            test: 'success',
+            data
+        });
+    } catch (error) {
+        console.error('Test endpoint error:', error);
+        res.status(500).json({ 
+            error: 'Test failed',
+            message: error.message
+        });
+    }
+});
+
+// =====================================================
 // PRODUCT DATA ENDPOINTS (Public Catalog)
 // =====================================================
 
@@ -95,11 +136,17 @@ app.get('/api/suppliers', async (req, res) => {
             .eq('is_active', true)
             .order('name');
         
-        if (error) throw error;
+        if (error) {
+            console.error('Supabase error:', error);
+            throw error;
+        }
         res.json(data);
     } catch (error) {
-        console.error('Error fetching suppliers:', error);
-        res.status(500).json({ error: 'Database error' });
+        console.error('Error fetching suppliers:', error.message || error);
+        res.status(500).json({ 
+            error: 'Database error',
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
 });
 
