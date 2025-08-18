@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Database Field Testing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .test-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .test-card h2 {
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .test-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            width: 100%;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+        
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .field-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+            margin-top: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .field-status {
+            display: flex;
+            align-items: center;
+            padding: 5px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .field-status.pass {
+            background: #d4edda;
+        }
+        
+        .field-status.fail {
+            background: #f8d7da;
+        }
+        
+        .field-status.warning {
+            background: #fff3cd;
+        }
+        
+        .status-icon {
+            margin-right: 5px;
+        }
+        
+        .summary-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e9ecef;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+            width: 0%;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0,0,0,.1);
+            border-radius: 50%;
+            border-top-color: #667eea;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .result-detail {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔬 Complete Database Field Testing</h1>
+        
+        <div class="test-grid">
+            <!-- Fragrance Oils Complete Test -->
+            <div class="test-card">
+                <h2>🌸 Fragrance Oils (43 Fields)</h2>
+                <button class="test-button" onclick="testFragranceOilComplete()">
+                    Test All Fragrance Oil Fields
+                </button>
+                <div id="oil-fields" class="field-grid"></div>
+                <div id="oil-detail" class="result-detail" style="display:none;"></div>
+            </div>
+            
+            <!-- Base Products Complete Test -->
+            <div class="test-card">
+                <h2>🧼 Base Products (20 Fields)</h2>
+                <button class="test-button" onclick="testBaseProductComplete()">
+                    Test All Base Product Fields
+                </button>
+                <div id="base-fields" class="field-grid"></div>
+                <div id="base-detail" class="result-detail" style="display:none;"></div>
+            </div>
+            
+            <!-- Vessels Complete Test -->
+            <div class="test-card">
+                <h2>🏺 Vessels (19 Fields)</h2>
+                <button class="test-button" onclick="testVesselComplete()">
+                    Test All Vessel Fields
+                </button>
+                <div id="vessel-fields" class="field-grid"></div>
+                <div id="vessel-detail" class="result-detail" style="display:none;"></div>
+            </div>
+            
+            <!-- Price Tiers Test -->
+            <div class="test-card">
+                <h2>💰 Price Tiers (All Tables)</h2>
+                <button class="test-button" onclick="testAllPriceTiers()">
+                    Test All Price Tier Tables
+                </button>
+                <div id="tier-fields" class="field-grid"></div>
+                <div id="tier-detail" class="result-detail" style="display:none;"></div>
+            </div>
+            
+            <!-- Vessel Specifications Test -->
+            <div class="test-card">
+                <h2>📏 Vessel Specifications</h2>
+                <button class="test-button" onclick="testVesselSpecifications()">
+                    Test Vessel Specifications Table
+                </button>
+                <div id="spec-fields" class="field-grid"></div>
+                <div id="spec-detail" class="result-detail" style="display:none;"></div>
+            </div>
+            
+            <!-- Suppliers Test -->
+            <div class="test-card">
+                <h2>🏢 Suppliers (14 Fields)</h2>
+                <button class="test-button" onclick="testSupplierComplete()">
+                    Test All Supplier Fields
+                </button>
+                <div id="supplier-fields" class="field-grid"></div>
+                <div id="supplier-detail" class="result-detail" style="display:none;"></div>
+            </div>
+        </div>
+        
+        <!-- Summary Section -->
+        <div class="summary-section">
+            <h2>📊 Complete Test Summary</h2>
+            <button class="test-button" onclick="runCompleteTestSuite()">
+                🚀 Run Complete Test Suite
+            </button>
+            <div class="progress-bar">
+                <div id="progress-fill" class="progress-fill">0%</div>
+            </div>
+            <div id="summary-results"></div>
+        </div>
+    </div>
+    
+    <script>
+        // API base URL
+        const API_BASE = window.location.origin + '/api/admin';
+        const timestamp = Date.now();
+        
+        // Complete field definitions based on your database schema
+        const FRAGRANCE_OIL_FIELDS = {
+            // Basic Info
+            name: `Test Oil ${timestamp}`,
+            product_name: 'Premium Test Product',
+            sku: `TEST-SKU-${timestamp}`,
+            scent_profile: 'Floral fresh with citrus notes',
+            scent_description: 'A complex blend of lavender and bergamot',
+            
+            // Technical Properties
+            flash_point_f: 165.5,
+            specific_gravity: 0.892,
+            vanilla_content: 1.5,
+            vanillin_pct: 0.8,
+            
+            // Characteristics
+            is_natural: false,
+            has_restrictions: true,
+            restriction_notes: 'Not for use in lip products',
+            solvent_note: 'DPG based',
+            soap_acceleration: 'none',
+            
+            // Load Percentages
+            recommended_load_pct: 5.0,
+            max_load_pct: 10.0,
+            
+            // Fragrance Notes
+            fragrance_notes_top: 'Bergamot, Lemon',
+            fragrance_notes_middle: 'Lavender, Geranium',
+            fragrance_notes_base: 'Sandalwood, Musk',
+            theme_family: 'Fresh Floral',
+            
+            // Ratings
+            price_rating: 4,
+            potency_rating: 4.5,
+            performance_rating: 4.8,
+            intensity_rating: 4.2,
+            overall_rating: 4.6,
+            
+            // Usage Info
+            usage_notes: 'Safe for cold process soap, excellent throw',
+            blending_notes: 'Blends well with citrus and woody scents',
+            product_url: 'https://supplier.com/test-oil',
+            
+            // Status
+            is_active: true,
+            is_discontinued: false,
+            
+            // IFRA Info
+            ifra_url: 'https://supplier.com/ifra/test.pdf',
+            ifra_version: 'Amendment 51',
+            ifra_date: '2024-01-15',
+            
+            // All 18 IFRA Categories
+            ifra_category_1: 0.5,
+            ifra_category_2: 2.5,
+            ifra_category_3: 5.0,
+            ifra_category_4: 10.0,
+            ifra_category_5a: 3.5,
+            ifra_category_5b: 3.5,
+            ifra_category_5c: 3.5,
+            ifra_category_5d: 2.0,
+            ifra_category_6: 1.0,
+            ifra_category_7a: 5.0,
+            ifra_category_7b: 3.0,
+            ifra_category_8: 2.5,
+            ifra_category_9: 8.0,
+            ifra_category_10a: 15.0,
+            ifra_category_10b: 20.0,
+            ifra_category_11a: 1.5,
+            ifra_category_11b: 2.0,
+            ifra_category_12: 100.0,
+            
+            // Pricing
+            price_per_unit: 24.99,
+            
+            // Counts (usually 0 for new items)
+            total_ratings: 0,
+            library_add_count: 0,
+            recent_add_count: 0,
+            unique_user_count: 0,
+            batch_count: 0
+        };
+        
+        const BASE_PRODUCT_FIELDS = {
+            name: `Test Base ${timestamp}`,
+            sku: `BASE-${timestamp}`,
+            max_load_pct: 10.0,
+            unit_mode: 'weight',
+            wax_type: 'Shea Butter Melt & Pour',
+            specific_gravity: 1.05,
+            ifra_category: 'Soap - Category 9',
+            ifra_category_2: 'Rinse Off Products - Category 9',
+            is_dual_purpose: true,
+            notes: 'Premium quality soap base',
+            ease_of_use_rating: 4.5,
+            performance_rating: 4.8,
+            total_ratings: 0,
+            price_per_unit: 4.99,
+            product_url: 'https://supplier.com/test-base',
+            is_active: true,
+            is_discontinued: false
+        };
+        
+        const VESSEL_FIELDS = {
+            name: `Test Vessel ${timestamp}`,
+            sku: `VESSEL-${timestamp}`,
+            vessel_type: 'jar',
+            size: 4.0,
+            size_unit: 'oz',
+            material: 'glass',
+            color: 'amber',
+            shape: 'round',
+            neck_size: '70-400',
+            notes: 'Premium amber glass jar',
+            max_fill_volume: 3.8,
+            recommended_fill_volume: 3.5,
+            weight_pounds: 0.25,
+            product_url: 'https://supplier.com/test-vessel',
+            is_active: true,
+            is_discontinued: false
+        };
+        
+        const SUPPLIER_FIELDS = {
+            name: `Test Supplier ${timestamp}`,
+            website_url: 'https://testsupplier.com',
+            contact_email: 'test@supplier.com',
+            contact_phone: '555-0123',
+            address: '123 Test Street',
+            city: 'Test City',
+            state: 'TC',
+            country: 'USA',
+            postal_code: '12345',
+            notes: 'Test supplier for field validation',
+            is_active: true
+        };
+        
+        const VESSEL_SPEC_FIELDS = {
+            diameter_mm: 65.5,
+            height_mm: 85.0,
+            opening_diameter_mm: 58.0,
+            wall_thickness_mm: 3.5,
+            weight_g: 113.0,
+            is_food_safe: true,
+            is_leak_proof: true,
+            is_child_resistant: false,
+            uv_protection: true
+        };
+        
+        // Helper function to check field status
+        function checkFieldStatus(data, fieldName, expectedValue) {
+            const actualValue = data[fieldName];
+            const exists = actualValue !== undefined && actualValue !== null;
+            const matches = expectedValue !== undefined ? 
+                actualValue === expectedValue || 
+                (typeof expectedValue === 'number' && Math.abs(actualValue - expectedValue) < 0.01) : 
+                exists;
+            
+            return {
+                exists,
+                matches,
+                actualValue,
+                expectedValue,
+                status: matches ? 'pass' : exists ? 'warning' : 'fail'
+            };
+        }
+        
+        // Display field results
+        function displayFieldResults(containerId, results) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            let passCount = 0;
+            let warningCount = 0;
+            let failCount = 0;
+            
+            Object.entries(results).forEach(([field, result]) => {
+                const div = document.createElement('div');
+                div.className = `field-status ${result.status}`;
+                
+                let icon = '❌';
+                if (result.status === 'pass') {
+                    icon = '✅';
+                    passCount++;
+                } else if (result.status === 'warning') {
+                    icon = '⚠️';
+                    warningCount++;
+                } else {
+                    failCount++;
+                }
+                
+                div.innerHTML = `
+                    <span class="status-icon">${icon}</span>
+                    <span>${field}</span>
+                `;
+                div.title = `Expected: ${result.expectedValue}, Got: ${result.actualValue}`;
+                container.appendChild(div);
+            });
+            
+            // Show summary
+            const detailDiv = document.getElementById(containerId.replace('-fields', '-detail'));
+            detailDiv.style.display = 'block';
+            detailDiv.textContent = `✅ Pass: ${passCount} | ⚠️ Warning: ${warningCount} | ❌ Fail: ${failCount}`;
+        }
+        
+        // Test Fragrance Oil
+        async function testFragranceOilComplete() {
+            const container = document.getElementById('oil-fields');
+            container.innerHTML = '<div class="loading"></div> Testing...';
+            
+            try {
+                // Create supplier first
+                const supplierRes = await fetch(`${API_BASE}/suppliers`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(SUPPLIER_FIELDS)
+                });
+                const supplier = await supplierRes.json();
+                
+                // Create fragrance oil with all fields
+                const oilData = {
+                    ...FRAGRANCE_OIL_FIELDS,
+                    supplier_id: supplier.id
+                };
+                
+                const oilRes = await fetch(`${API_BASE}/oils`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(oilData)
+                });
+                const oil = await oilRes.json();
+                
+                // Check all fields
+                const results = {};
+                Object.keys(FRAGRANCE_OIL_FIELDS).forEach(field => {
+                    results[field] = checkFieldStatus(oil, field, FRAGRANCE_OIL_FIELDS[field]);
+                });
+                
+                displayFieldResults('oil-fields', results);
+                
+            } catch (error) {
+                container.innerHTML = `<div class="field-status fail">Error: ${error.message}</div>`;
+            }
+        }
+        
+        // Test Base Product
+        async function testBaseProductComplete() {
+            const container = document.getElementById('base-fields');
+            container.innerHTML = '<div class="loading"></div> Testing...';
+            
+            try {
+                // Create supplier
+                const supplierRes = await fetch(`${API_BASE}/suppliers`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(SUPPLIER_FIELDS)
+                });
+                const supplier = await supplierRes.json();
+                
+                // Create base product
+                const baseData = {
+                    ...BASE_PRODUCT_FIELDS,
+                    supplier_id: supplier.id
+                };
+                
+                const baseRes = await fetch(`${API_BASE}/bases`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(baseData)
+                });
+                const base = await baseRes.json();
+                
+                // Check all fields
+                const results = {};
+                Object.keys(BASE_PRODUCT_FIELDS).forEach(field => {
+                    results[field] = checkFieldStatus(base, field, BASE_PRODUCT_FIELDS[field]);
+                });
+                
+                displayFieldResults('base-fields', results);
+                
+            } catch (error) {
+                container.innerHTML = `<div class="field-status fail">Error: ${error.message}</div>`;
+            }
+        }
+        
+        // Test Vessel
+        async function testVesselComplete() {
+            const container = document.getElementById('vessel-fields');
+            container.innerHTML = '<div class="loading"></div> Testing...';
+            
+            try {
+                // Create supplier
+                const supplierRes = await fetch(`${API_BASE}/suppliers`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(SUPPLIER_FIELDS)
+                });
+                const supplier = await supplierRes.json();
+                
+                // Create vessel
+                const vesselData = {
+                    ...VESSEL_FIELDS,
+                    supplier_id: supplier.id
+                };
+                
+                const vesselRes = await fetch(`${API_BASE}/vessels`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(vesselData)
+                });
+                const vessel = await vesselRes.json();
+                
+                // Check all fields
+                const results = {};
+                Object.keys(VESSEL_FIELDS).forEach(field => {
+                    results[field] = checkFieldStatus(vessel, field, VESSEL_FIELDS[field]);
+                });
+                
+                displayFieldResults('vessel-fields', results);
+                
+            } catch (error) {
+                container.innerHTML = `<div class="field-status fail">Error: ${error.message}</div>`;
+            }
+        }
+        
+        // Test All Price Tiers
+        async function testAllPriceTiers() {
+            const container = document.getElementById('tier-fields');
+            container.innerHTML = '<div class="loading"></div> Testing...';
+            
+            try {
+                const results = {};
+                
+                // Get existing products
+                const [oilsRes, basesRes, vesselsRes] = await Promise.all([
+                    fetch(`${API_BASE}/oils`),
+                    fetch(`${API_BASE}/bases`),
+                    fetch(`${API_BASE}/vessels`)
+                ]);
+                
+                const oils = await oilsRes.json();
+                const bases = await basesRes.json();
+                const vessels = await vesselsRes.json();
+                
+                // Check oil price tiers
+                if (oils.length > 0 && oils[0].price_tiers) {
+                    const tier = oils[0].price_tiers[0] || {};
+                    ['tier1_name', 'tier1_sku', 'tier2_name', 'tier2_sku', 'tier3_name', 'tier3_sku', 
+                     'tier4_name', 'tier4_sku', 'tier5_name', 'tier5_sku'].forEach(field => {
+                        results[`oil_${field}`] = {
+                            exists: tier[field] !== undefined,
+                            status: tier[field] ? 'pass' : 'fail',
+                            actualValue: tier[field] || 'missing'
+                        };
+                    });
+                }
+                
+                // Check base price tiers
+                if (bases.length > 0 && bases[0].price_tiers) {
+                    const tier = bases[0].price_tiers[0] || {};
+                    ['tier1_name', 'tier1_sku', 'tier2_name', 'tier2_sku', 'tier3_name', 'tier3_sku',
+                     'tier4_name', 'tier4_sku', 'tier5_name', 'tier5_sku'].forEach(field => {
+                        results[`base_${field}`] = {
+                            exists: tier[field] !== undefined,
+                            status: tier[field] ? 'pass' : 'fail',
+                            actualValue: tier[field] || 'missing'
+                        };
+                    });
+                }
+                
+                // Check vessel price tiers (if table exists)
+                results['vessel_price_tiers_table'] = {
+                    exists: false,
+                    status: 'fail',
+                    actualValue: 'Table needs to be created'
+                };
+                
+                displayFieldResults('tier-fields', results);
+                
+            } catch (error) {
+                container.innerHTML = `<div class="field-status fail">Error: ${error.message}</div>`;
+            }
+        }
+        
+        // Test Vessel Specifications
+        async function testVesselSpecifications() {
+            const container = document.getElementById('spec-fields');
+            container.innerHTML = '<div class="loading"></div> Testing...';
+            
+            try {
+                // Get a vessel first
+                const vesselsRes = await fetch(`${API_BASE}/vessels`);
+                const vessels = await vesselsRes.json();
+                
+                if (vessels.length === 0) {
+                    container.innerHTML = '<div class="field-status warning">Create a vessel first</div>';
+                    return;
+                }
+                
+                const vessel = vessels[0];
+                
+                // Try to create vessel specifications
+                const specData = {
+                    ...VESSEL_SPEC_FIELDS,
+                    vessel_id: vessel.id
+                };
+                
+                // Note: This endpoint might not exist yet
+                const results = {};
+                Object.keys(VESSEL_SPEC_FIELDS).forEach(field => {
+                    results[field] = {
+                        exists: false,
+                        status: 'fail',
+                        actualValue: 'Endpoint needs implementation',
+                        expectedValue: VESSEL_SPEC_FIELDS[field]
+                    };
+                });
+                
+                displayFieldResults('spec-fields', results);
+                
+            } catch (error) {
+                container.innerHTML = `<div class="field-status fail">Error: ${error.message}</div>`;
+            }
+        }
+        
+        // Test Supplier
+        async function testSupplierComplete() {
+            const container = document.getElementById('supplier-fields');
+            container.innerHTML = '<div class="loading"></div> Testing...';
+            
+            try {
+                const supplierRes = await fetch(`${API_BASE}/suppliers`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(SUPPLIER_FIELDS)
+                });
+                const supplier = await supplierRes.json();
+                
+                // Check all fields
+                const results = {};
+                Object.keys(SUPPLIER_FIELDS).forEach(field => {
+                    results[field] = checkFieldStatus(supplier, field, SUPPLIER_FIELDS[field]);
+                });
+                
+                displayFieldResults('supplier-fields', results);
+                
+            } catch (error) {
+                container.innerHTML = `<div class="field-status fail">Error: ${error.message}</div>`;
+            }
+        }
+        
+        // Run Complete Test Suite
+        async function runCompleteTestSuite() {
+            const progressFill = document.getElementById('progress-fill');
+            const summaryDiv = document.getElementById('summary-results');
+            
+            const tests = [
+                { name: 'Suppliers', func: testSupplierComplete },
+                { name: 'Fragrance Oils', func: testFragranceOilComplete },
+                { name: 'Base Products', func: testBaseProductComplete },
+                { name: 'Vessels', func: testVesselComplete },
+                { name: 'Price Tiers', func: testAllPriceTiers },
+                { name: 'Vessel Specifications', func: testVesselSpecifications }
+            ];
+            
+            let completed = 0;
+            summaryDiv.innerHTML = '<h3>Running tests...</h3>';
+            
+            for (const test of tests) {
+                await test.func();
+                completed++;
+                const progress = Math.round((completed / tests.length) * 100);
+                progressFill.style.width = `${progress}%`;
+                progressFill.textContent = `${progress}%`;
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            
+            // Calculate totals
+            const allContainers = ['oil-fields', 'base-fields', 'vessel-fields', 'tier-fields', 'spec-fields', 'supplier-fields'];
+            let totalPass = 0;
+            let totalWarning = 0;
+            let totalFail = 0;
+            
+            allContainers.forEach(containerId => {
+                const container = document.getElementById(containerId);
+                totalPass += container.querySelectorAll('.field-status.pass').length;
+                totalWarning += container.querySelectorAll('.field-status.warning').length;
+                totalFail += container.querySelectorAll('.field-status.fail').length;
+            });
+            
+            const total = totalPass + totalWarning + totalFail;
+            const passRate = Math.round((totalPass / total) * 100);
+            
+            summaryDiv.innerHTML = `
+                <h3>Test Complete!</h3>
+                <p style="font-size: 24px; margin: 20px 0;">
+                    <span style="color: #28a745;">✅ ${totalPass} Pass</span> | 
+                    <span style="color: #ffc107;">⚠️ ${totalWarning} Warning</span> | 
+                    <span style="color: #dc3545;">❌ ${totalFail} Fail</span>
+                </p>
+                <p style="font-size: 20px;">Success Rate: ${passRate}%</p>
+                ${totalFail > 0 ? '<p style="color: #dc3545;">Some fields are not persisting. Check individual test results above.</p>' : ''}
+                ${passRate === 100 ? '<p style="color: #28a745; font-size: 20px;">🎉 All fields are working perfectly!</p>' : ''}
+            `;
+        }
+    </script>
+</body>
+</html>
