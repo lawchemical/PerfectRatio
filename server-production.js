@@ -888,14 +888,69 @@ app.delete('/api/admin/bases/:id', async (req, res) => {
 // Admin: Add oil
 app.post('/api/admin/oils', async (req, res) => {
     try {
-        const { data, error } = await productDBAdmin
+        const { price_tiers, ifra_entries, ...oilData } = req.body;
+        
+        // Insert the oil itself (without price_tiers and ifra_entries)
+        const { data: newOil, error: oilError } = await productDBAdmin
             .from('fragrance_oils')
-            .insert(req.body)
+            .insert(oilData)
             .select()
             .single();
         
-        if (error) throw error;
-        res.json(data);
+        if (oilError) throw oilError;
+        
+        // Handle price tiers if provided
+        if (price_tiers && newOil) {
+            const tierEntries = [];
+            for (let i = 1; i <= 5; i++) {
+                const tierName = price_tiers[`tier${i}_name`];
+                const tierSize = price_tiers[`tier${i}_size`];
+                const tierUnit = price_tiers[`tier${i}_unit`];
+                const tierPrice = price_tiers[`tier${i}_price`];
+                const tierSku = price_tiers[`tier${i}_sku`];
+                
+                if (tierSize && tierPrice) {
+                    tierEntries.push({
+                        fragrance_oil_id: newOil.id,
+                        tier_name: tierName || `Tier ${i}`,
+                        size: tierSize,
+                        unit: tierUnit || 'oz',
+                        price: tierPrice,
+                        supplier_sku: tierSku || null
+                    });
+                }
+            }
+            
+            if (tierEntries.length > 0) {
+                const { error: tierError } = await productDBAdmin
+                    .from('oil_price_tiers')
+                    .insert(tierEntries);
+                
+                if (tierError) {
+                    console.error('Error saving price tiers:', tierError);
+                }
+            }
+        }
+        
+        // Handle IFRA entries if provided
+        if (ifra_entries && Array.isArray(ifra_entries) && newOil) {
+            const ifraData = ifra_entries.map(entry => ({
+                fragrance_oil_id: newOil.id,
+                ...entry
+            }));
+            
+            if (ifraData.length > 0) {
+                const { error: ifraError } = await productDBAdmin
+                    .from('ifra_entries')
+                    .insert(ifraData);
+                
+                if (ifraError) {
+                    console.error('Error saving IFRA entries:', ifraError);
+                }
+            }
+        }
+        
+        res.json(newOil);
     } catch (error) {
         console.error('Error creating oil:', error);
         res.status(500).json({ error: 'Database error' });
@@ -905,15 +960,84 @@ app.post('/api/admin/oils', async (req, res) => {
 // Admin: Update oil
 app.put('/api/admin/oils/:id', async (req, res) => {
     try {
-        const { data, error } = await productDBAdmin
+        const { price_tiers, ifra_entries, ...oilData } = req.body;
+        
+        // Update the oil itself (without price_tiers and ifra_entries)
+        const { data: updatedOil, error: oilError } = await productDBAdmin
             .from('fragrance_oils')
-            .update(req.body)
+            .update(oilData)
             .eq('id', req.params.id)
             .select()
             .single();
         
-        if (error) throw error;
-        res.json(data);
+        if (oilError) throw oilError;
+        
+        // Handle price tiers if provided
+        if (price_tiers) {
+            // Delete existing price tiers
+            await productDBAdmin
+                .from('oil_price_tiers')
+                .delete()
+                .eq('fragrance_oil_id', req.params.id);
+            
+            // Add new price tiers
+            const tierEntries = [];
+            for (let i = 1; i <= 5; i++) {
+                const tierName = price_tiers[`tier${i}_name`];
+                const tierSize = price_tiers[`tier${i}_size`];
+                const tierUnit = price_tiers[`tier${i}_unit`];
+                const tierPrice = price_tiers[`tier${i}_price`];
+                const tierSku = price_tiers[`tier${i}_sku`];
+                
+                if (tierSize && tierPrice) {
+                    tierEntries.push({
+                        fragrance_oil_id: req.params.id,
+                        tier_name: tierName || `Tier ${i}`,
+                        size: tierSize,
+                        unit: tierUnit || 'oz',
+                        price: tierPrice,
+                        supplier_sku: tierSku || null
+                    });
+                }
+            }
+            
+            if (tierEntries.length > 0) {
+                const { error: tierError } = await productDBAdmin
+                    .from('oil_price_tiers')
+                    .insert(tierEntries);
+                
+                if (tierError) {
+                    console.error('Error saving price tiers:', tierError);
+                }
+            }
+        }
+        
+        // Handle IFRA entries if provided
+        if (ifra_entries && Array.isArray(ifra_entries)) {
+            // Delete existing IFRA entries
+            await productDBAdmin
+                .from('ifra_entries')
+                .delete()
+                .eq('fragrance_oil_id', req.params.id);
+            
+            // Add new IFRA entries
+            const ifraData = ifra_entries.map(entry => ({
+                fragrance_oil_id: req.params.id,
+                ...entry
+            }));
+            
+            if (ifraData.length > 0) {
+                const { error: ifraError } = await productDBAdmin
+                    .from('ifra_entries')
+                    .insert(ifraData);
+                
+                if (ifraError) {
+                    console.error('Error saving IFRA entries:', ifraError);
+                }
+            }
+        }
+        
+        res.json(updatedOil);
     } catch (error) {
         console.error('Error updating oil:', error);
         res.status(500).json({ error: 'Database error' });
