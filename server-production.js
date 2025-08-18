@@ -87,19 +87,20 @@ if (require('fs').existsSync(publicPath)) {
 // =====================================================
 
 // Get table schema info
-app.get('/api/schema/oil_price_tiers', async (req, res) => {
+app.get('/api/schema/:table', async (req, res) => {
     try {
+        const tableName = req.params.table;
         // Query information_schema to get column details
         const { data, error } = await productDB
             .from('information_schema.columns')
             .select('column_name, data_type, is_nullable')
-            .eq('table_name', 'oil_price_tiers')
+            .eq('table_name', tableName)
             .eq('table_schema', 'public');
         
         if (error) throw error;
         
         res.json({ 
-            table: 'oil_price_tiers',
+            table: tableName,
             columns: data
         });
     } catch (error) {
