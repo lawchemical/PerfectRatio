@@ -102,7 +102,6 @@
                             <button onclick="showVesselTab('basic')" id="vessel-tab-basic" style="padding: 8px 12px; margin-right: 8px; background: #F1AD88; color: #101114; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">Basic Info</button>
                             <button onclick="showVesselTab('physical')" id="vessel-tab-physical" style="padding: 8px 12px; margin-right: 8px; background: #EDEAE6; color: #2E3033; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">Physical</button>
                             <button onclick="showVesselTab('pricing')" id="vessel-tab-pricing" style="padding: 8px 12px; margin-right: 8px; background: #EDEAE6; color: #2E3033; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">Pricing</button>
-                            <button onclick="showVesselTab('inventory')" id="vessel-tab-inventory" style="padding: 8px 12px; margin-right: 8px; background: #EDEAE6; color: #2E3033; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">Inventory</button>
                         </div>
                         
                         <form id="vesselForm" style="padding: 20px;">
@@ -137,6 +136,24 @@
                                         <option value="other">Other</option>
                                     </select>
                                 </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Product URL</label>
+                                    <input type="url" name="product_url" placeholder="https://..." style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Notes</label>
+                                    <textarea name="notes" rows="3" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; resize: vertical;"></textarea>
+                                </div>
+                                <div style="display: flex; gap: 24px; margin-bottom: 16px;">
+                                    <label style="display: flex; align-items: center; gap: 8px; font-weight: 500; color: #2E3033; font-size: 14px;">
+                                        <input type="checkbox" name="is_active" checked style="width: 16px; height: 16px;">
+                                        Is Active (appears in app)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; font-weight: 500; color: #2E3033; font-size: 14px;">
+                                        <input type="checkbox" name="is_discontinued" style="width: 16px; height: 16px;">
+                                        Is Discontinued
+                                    </label>
+                                </div>
                             </div>
                             
                             <div id="vessel-tab-content-physical" style="display: none;">
@@ -166,24 +183,54 @@
                                     </select>
                                 </div>
                                 <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Recommended Fill Volume</label>
+                                    <input type="number" name="recommended_fill_volume" step="0.1" min="0" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Max Fill Volume</label>
+                                    <input type="number" name="max_fill_volume" step="0.1" min="0" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                                <div style="margin-bottom: 16px;">
                                     <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Color</label>
-                                    <input type="text" name="color" placeholder="e.g., Clear, Amber, White" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                    <select name="color" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; background: white;">
+                                        <option value="">Select color...</option>
+                                        <option value="red">Red</option>
+                                        <option value="purple">Purple</option>
+                                        <option value="orange">Orange</option>
+                                        <option value="multi">Multi</option>
+                                        <option value="clear">Clear</option>
+                                        <option value="amber">Amber</option>
+                                        <option value="white">White</option>
+                                        <option value="black">Black</option>
+                                        <option value="blue">Blue</option>
+                                        <option value="green">Green</option>
+                                        <option value="silver">Silver</option>
+                                        <option value="gold">Gold</option>
+                                    </select>
                                 </div>
                                 <div style="margin-bottom: 16px;">
                                     <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Shape</label>
-                                    <input type="text" name="shape" placeholder="e.g., Round, Square, Oval" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                    <select name="shape" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; background: white;">
+                                        <option value="">Select shape...</option>
+                                        <option value="round">Round</option>
+                                        <option value="square">Square</option>
+                                        <option value="oval">Oval</option>
+                                        <option value="rectangular">Rectangular</option>
+                                        <option value="cylinder">Cylinder</option>
+                                        <option value="cone">Cone</option>
+                                        <option value="hexagon">Hexagon</option>
+                                        <option value="heart">Heart</option>
+                                        <option value="star">Star</option>
+                                        <option value="irregular">Irregular</option>
+                                    </select>
                                 </div>
                                 <div style="margin-bottom: 16px;">
                                     <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Neck Size (for bottles)</label>
                                     <input type="text" name="neck_size" placeholder="e.g., 24-410, 20-410" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
                                 </div>
                                 <div style="margin-bottom: 16px;">
-                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Weight (grams)</label>
-                                    <input type="number" name="weight_grams" step="0.1" min="0" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
-                                </div>
-                                <div style="margin-bottom: 16px;">
-                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Max Fill Volume</label>
-                                    <input type="number" name="max_fill_volume" step="0.1" min="0" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Weight (pounds)</label>
+                                    <input type="number" name="weight_pounds" step="0.01" min="0" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
                                 </div>
                             </div>
                             
@@ -204,38 +251,6 @@
                                 <div style="margin-bottom: 16px;">
                                     <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Minimum Order Qty</label>
                                     <input type="number" name="minimum_order_quantity" min="1" value="1" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
-                                </div>
-                            </div>
-                            
-                            <div id="vessel-tab-content-inventory" style="display: none;">
-                                <h3 style="color: #101114; margin-bottom: 20px;">Inventory & Additional Info</h3>
-                                <div style="margin-bottom: 16px;">
-                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Quantity on Hand</label>
-                                    <input type="number" name="quantity_on_hand" min="0" value="0" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
-                                </div>
-                                <div style="margin-bottom: 16px;">
-                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Location</label>
-                                    <input type="text" name="location" placeholder="Storage location" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
-                                </div>
-                                <div style="margin-bottom: 16px;">
-                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Reorder Point</label>
-                                    <input type="number" name="reorder_point" min="0" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
-                                </div>
-                                <div style="margin-bottom: 16px;">
-                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Product URL</label>
-                                    <input type="url" name="product_url" placeholder="https://..." style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
-                                </div>
-                                <div style="margin-bottom: 16px;">
-                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Notes</label>
-                                    <textarea name="notes" rows="3" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; resize: vertical;"></textarea>
-                                </div>
-                                <div style="display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 16px;">
-                                    <div>
-                                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                                            <input type="checkbox" name="is_in_library" checked style="transform: scale(1.2);">
-                                            <span style="font-weight: 500; color: #2E3033; font-size: 14px;">Add to Library</span>
-                                        </label>
-                                    </div>
                                 </div>
                             </div>
                         </form>
@@ -261,7 +276,7 @@
         // Tab switching function for vessels
         window.showVesselTab = function(tabName) {
             // Hide all tabs
-            const allTabs = ['basic', 'physical', 'pricing', 'inventory'];
+            const allTabs = ['basic', 'physical', 'pricing'];
             allTabs.forEach(tab => {
                 const content = document.getElementById('vessel-tab-content-' + tab);
                 const button = document.getElementById('vessel-tab-' + tab);
@@ -407,24 +422,24 @@
             form.elements['color'].value = vessel.color || '';
             form.elements['shape'].value = vessel.shape || '';
             form.elements['neck_size'].value = vessel.neck_size || '';
-            form.elements['weight_grams'].value = vessel.weight_grams || '';
+            form.elements['weight_pounds'].value = vessel.weight_pounds || '';
+            form.elements['recommended_fill_volume'].value = vessel.recommended_fill_volume || '';
             form.elements['max_fill_volume'].value = vessel.max_fill_volume || '';
             form.elements['price_per_unit'].value = vessel.price_per_unit;
             form.elements['case_count'].value = vessel.case_count || 1;
             form.elements['case_price'].value = vessel.case_price || '';
             form.elements['minimum_order_quantity'].value = vessel.minimum_order_quantity || 1;
-            form.elements['quantity_on_hand'].value = vessel.quantity_on_hand || 0;
-            form.elements['location'].value = vessel.location || '';
-            form.elements['reorder_point'].value = vessel.reorder_point || '';
             form.elements['product_url'].value = vessel.product_url || '';
             form.elements['notes'].value = vessel.notes || '';
-            form.elements['is_in_library'].checked = vessel.is_in_library;
+            form.elements['is_active'].checked = vessel.is_active !== false;
+            form.elements['is_discontinued'].checked = vessel.is_discontinued || false;
         } else {
             title.textContent = 'Add Vessel';
             form.reset();
             form.elements['case_count'].value = 1;
             form.elements['minimum_order_quantity'].value = 1;
-            form.elements['is_in_library'].checked = true;
+            form.elements['is_active'].checked = true;
+            form.elements['is_discontinued'].checked = false;
         }
         
         // Reset to first tab
@@ -441,17 +456,17 @@
         const data = Object.fromEntries(formData);
         
         // Convert checkboxes
-        data.is_in_library = formData.get('is_in_library') === 'on';
+        data.is_active = formData.get('is_active') === 'on';
+        data.is_discontinued = formData.get('is_discontinued') === 'on';
         
         // Convert numbers
         data.size = parseFloat(data.size);
         data.price_per_unit = parseFloat(data.price_per_unit);
         data.case_count = parseInt(data.case_count) || 1;
         data.minimum_order_quantity = parseInt(data.minimum_order_quantity) || 1;
-        data.quantity_on_hand = parseInt(data.quantity_on_hand) || 0;
-        data.reorder_point = data.reorder_point ? parseInt(data.reorder_point) : null;
-        data.weight_grams = data.weight_grams ? parseFloat(data.weight_grams) : null;
+        data.weight_pounds = data.weight_pounds ? parseFloat(data.weight_pounds) : null;
         data.max_fill_volume = data.max_fill_volume ? parseFloat(data.max_fill_volume) : null;
+        data.recommended_fill_volume = data.recommended_fill_volume ? parseFloat(data.recommended_fill_volume) : null;
         data.case_price = data.case_price ? parseFloat(data.case_price) : null;
         
         try {

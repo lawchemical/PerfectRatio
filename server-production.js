@@ -772,9 +772,16 @@ app.post('/api/admin/suppliers', async (req, res) => {
         // Clean up empty strings to null for optional fields
         const supplierData = {
             name: req.body.name,
-            website_url: req.body.website || null,
-            contact_email: req.body.email || null,
-            contact_phone: req.body.phone || null
+            website_url: req.body.website_url || req.body.website || null,
+            contact_email: req.body.contact_email || req.body.email || null,
+            contact_phone: req.body.contact_phone || req.body.phone || null,
+            address: req.body.address || null,
+            city: req.body.city || null,
+            state: req.body.state || null,
+            country: req.body.country || null,
+            postal_code: req.body.postal_code || null,
+            notes: req.body.notes || null,
+            is_active: req.body.is_active !== undefined ? req.body.is_active : true
         };
         
         console.log('Cleaned supplier data:', supplierData);
@@ -821,9 +828,16 @@ app.put('/api/admin/suppliers/:id', async (req, res) => {
         // Clean up empty strings to null for optional fields
         const supplierData = {
             name: req.body.name,
-            website_url: req.body.website || null,
-            contact_email: req.body.email || null,
-            contact_phone: req.body.phone || null
+            website_url: req.body.website_url || req.body.website || null,
+            contact_email: req.body.contact_email || req.body.email || null,
+            contact_phone: req.body.contact_phone || req.body.phone || null,
+            address: req.body.address || null,
+            city: req.body.city || null,
+            state: req.body.state || null,
+            country: req.body.country || null,
+            postal_code: req.body.postal_code || null,
+            notes: req.body.notes || null,
+            is_active: req.body.is_active !== undefined ? req.body.is_active : true
         };
         
         const { data, error } = await productDBAdmin
@@ -868,14 +882,51 @@ app.delete('/api/admin/suppliers/:id', async (req, res) => {
 // Admin: Add base
 app.post('/api/admin/bases', async (req, res) => {
     try {
-        const { data, error } = await productDBAdmin
+        const { price_tiers, ...baseData } = req.body;
+        
+        // Insert the base product
+        const { data: newBase, error } = await productDBAdmin
             .from('base_products')
-            .insert(req.body)
+            .insert(baseData)
             .select()
             .single();
         
         if (error) throw error;
-        res.json(data);
+        
+        // Handle price tiers if provided
+        if (price_tiers && newBase) {
+            const tierData = { base_product_id: newBase.id };
+            
+            // Extract tier data for all 5 tiers
+            for (let i = 1; i <= 5; i++) {
+                const tierName = price_tiers[`tier${i}_name`];
+                const tierSize = price_tiers[`tier${i}_size`];
+                const tierUnit = price_tiers[`tier${i}_unit`];
+                const tierPrice = price_tiers[`tier${i}_price`];
+                const tierSku = price_tiers[`tier${i}_sku`];
+                
+                if (tierSize && tierPrice) {
+                    if (tierName) tierData[`tier${i}_name`] = tierName;
+                    tierData[`tier${i}_size`] = parseFloat(tierSize);
+                    tierData[`tier${i}_unit`] = tierUnit || 'lb';
+                    tierData[`tier${i}_price`] = parseFloat(tierPrice);
+                    if (tierSku) tierData[`tier${i}_sku`] = tierSku;
+                }
+            }
+            
+            // Insert price tiers if we have any
+            if (Object.keys(tierData).length > 1) {
+                const { error: tierError } = await productDBAdmin
+                    .from('base_price_tiers')
+                    .insert(tierData);
+                
+                if (tierError) {
+                    console.error('Error saving base price tiers:', tierError);
+                }
+            }
+        }
+        
+        res.json(newBase);
     } catch (error) {
         console.error('Error creating base:', error);
         res.status(500).json({ error: 'Database error' });
@@ -1106,14 +1157,55 @@ app.delete('/api/admin/oils/:id', async (req, res) => {
 // Admin: Add vessel
 app.post('/api/admin/vessels', async (req, res) => {
     try {
-        const { data, error } = await productDBAdmin
+        const { price_tiers, ...vesselData } = req.body;
+        
+        // Insert the vessel
+        const { data: newVessel, error } = await productDBAdmin
             .from('vessels')
-            .insert(req.body)
+            .insert(vesselData)
             .select()
             .single();
         
         if (error) throw error;
-        res.json(data);
+        
+        // Handle price tiers if provided and table exists
+        if (price_tiers && newVessel) {
+            const tierData = { vessel_id: newVessel.id };
+            
+            // Extract tier data for all 5 tiers
+            for (let i = 1; i <= 5; i++) {
+                const tierName = price_tiers[`tier${i}_name`];
+                const tierSize = price_tiers[`tier${i}_size`];
+                const tierUnit = price_tiers[`tier${i}_unit`];
+                const tierPrice = price_tiers[`tier${i}_price`];
+                const tierSku = price_tiers[`tier${i}_sku`];
+                
+                if (tierSize && tierPrice) {
+                    if (tierName) tierData[`tier${i}_name`] = tierName;
+                    tierData[`tier${i}_size`] = parseFloat(tierSize);
+                    tierData[`tier${i}_unit`] = tierUnit || 'units';
+                    tierData[`tier${i}_price`] = parseFloat(tierPrice);
+                    if (tierSku) tierData[`tier${i}_sku`] = tierSku;
+                }
+            }
+            
+            // Try to insert price tiers (table might not exist yet)
+            if (Object.keys(tierData).length > 1) {
+                try {
+                    const { error: tierError } = await productDBAdmin
+                        .from('vessel_price_tiers')
+                        .insert(tierData);
+                    
+                    if (tierError) {
+                        console.error('Vessel price tiers table may not exist:', tierError.message);
+                    }
+                } catch (tierErr) {
+                    console.error('Vessel price tiers not implemented yet');
+                }
+            }
+        }
+        
+        res.json(newVessel);
     } catch (error) {
         console.error('Error creating vessel:', error);
         res.status(500).json({ error: 'Database error' });

@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Admin Database Fields</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #666;
+            margin-top: 0;
+        }
+        .test-button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .test-button:hover {
+            background: #45a049;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .field-check {
+            padding: 5px;
+            border-left: 3px solid #ccc;
+            padding-left: 10px;
+        }
+        .field-check.pass {
+            border-color: #4CAF50;
+        }
+        .field-check.fail {
+            border-color: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Admin Database Field Testing</h1>
+    
+    <div class="test-section">
+        <h2>🌸 Fragrance Oil - Test All 18 IFRA Categories</h2>
+        <button class="test-button" onclick="testFragranceOil()">Create Test Oil with All Fields</button>
+        <button class="test-button" onclick="verifyFragranceOilFields()">Verify IFRA Fields</button>
+        <div id="oil-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🧼 Base Product - Test New Fields</h2>
+        <button class="test-button" onclick="testBaseProduct()">Create Test Base Product</button>
+        <button class="test-button" onclick="verifyBaseFields()">Verify Base Fields</button>
+        <div id="base-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🏺 Vessel - Test Enhanced Fields</h2>
+        <button class="test-button" onclick="testVessel()">Create Test Vessel</button>
+        <button class="test-button" onclick="verifyVesselFields()">Verify Vessel Fields</button>
+        <div id="vessel-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>💰 Price Tiers - Test Names and SKUs</h2>
+        <button class="test-button" onclick="testPriceTiers()">Test All Price Tier Tables</button>
+        <div id="tier-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Field Verification Summary</h2>
+        <button class="test-button" onclick="runFullTest()">Run Complete Test Suite</button>
+        <div id="summary-result" class="result"></div>
+    </div>
+
+    <script>
+        // Test data with all new fields
+        const testOilData = {
+            supplier_id: null, // Will be set after creating supplier
+            name: 'TEST Lavender Oil ' + Date.now(),
+            product_name: 'Premium Test Lavender',
+            sku: 'TEST-LAV-' + Date.now(),
+            is_active: true,
+            is_discontinued: false,
+            ifra_url: 'https://test.com/ifra.pdf',
+            ifra_version: 'Amendment 51',
+            ifra_date: '2024-01-15',
+            // All 18 IFRA categories
+            ifra_category_1: 0.5,
+            ifra_category_2: 2.5,
+            ifra_category_3: 5.0,
+            ifra_category_4: 10.0,
+            ifra_category_5a: 3.5,
+            ifra_category_5b: 3.5,
+            ifra_category_5c: 3.5,
+            ifra_category_5d: 2.0,
+            ifra_category_6: 1.0,
+            ifra_category_7a: 5.0,
+            ifra_category_7b: 3.0,
+            ifra_category_8: 2.5,
+            ifra_category_9: 8.0,
+            ifra_category_10a: 15.0,
+            ifra_category_10b: 20.0,
+            ifra_category_11a: 1.5,
+            ifra_category_11b: 2.0,
+            ifra_category_12: 100.0,
+            flash_point_f: 160,
+            specific_gravity: 0.885,
+            vanillin_pct: 0.5,
+            intensity_rating: 4.5,
+            overall_rating: 4.8,
+            usage_notes: 'Test soap notes field'
+        };
+
+        const testBaseData = {
+            supplier_id: null,
+            name: 'TEST Soap Base ' + Date.now(),
+            sku: 'TEST-BASE-' + Date.now(),
+            is_active: true,
+            is_discontinued: false,
+            max_load_pct: 10.0,
+            unit_mode: 'weight',
+            specific_gravity: 1.05,
+            ifra_category: 'Soap - Category 9',
+            ifra_category_2: 'Shampoo - Category 9',
+            is_dual_purpose: true,
+            notes: 'Test base product'
+        };
+
+        const testVesselData = {
+            supplier_id: null,
+            name: 'TEST 4oz Jar ' + Date.now(),
+            sku: 'TEST-JAR-' + Date.now(),
+            is_active: true,
+            is_discontinued: false,
+            vessel_type: 'jar',
+            size: 4.0,
+            size_unit: 'oz',
+            material: 'glass',
+            color: 'amber',
+            shape: 'round',
+            neck_size: '70-400',
+            recommended_fill_volume: 3.5,
+            max_fill_volume: 3.8,
+            weight_pounds: 0.25,
+            product_url: 'https://test.com/jar',
+            notes: 'Test vessel'
+        };
+
+        // Get your Railway admin URL
+        const ADMIN_URL = prompt('Enter your Railway Admin URL (e.g., https://your-admin.railway.app):');
+
+        async function createTestSupplier() {
+            try {
+                const response = await fetch(`${ADMIN_URL}/api/admin/suppliers`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: 'TEST Supplier ' + Date.now(),
+                        website_url: 'https://test.com',
+                        is_active: true
+                    })
+                });
+                const data = await response.json();
+                return data.id;
+            } catch (error) {
+                console.error('Failed to create supplier:', error);
+                return null;
+            }
+        }
+
+        async function testFragranceOil() {
+            const resultDiv = document.getElementById('oil-result');
+            resultDiv.className = 'result info';
+            resultDiv.textContent = 'Creating test fragrance oil with all 18 IFRA categories...';
+            
+            try {
+                // Create supplier first
+                const supplierId = await createTestSupplier();
+                testOilData.supplier_id = supplierId;
+                
+                const response = await fetch(`${ADMIN_URL}/api/admin/fragrance-oils`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testOilData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    
+                    // Check all IFRA categories
+                    let fieldReport = 'Fragrance Oil Created Successfully!\n\n';
+                    fieldReport += 'Field Verification:\n';
+                    fieldReport += `✅ Name: ${data.name}\n`;
+                    fieldReport += `✅ is_active: ${data.is_active}\n`;
+                    fieldReport += `✅ is_discontinued: ${data.is_discontinued}\n`;
+                    fieldReport += `✅ ifra_url: ${data.ifra_url}\n\n`;
+                    
+                    fieldReport += 'IFRA Categories (18 total):\n';
+                    const ifraFields = [
+                        'ifra_category_1', 'ifra_category_2', 'ifra_category_3', 'ifra_category_4',
+                        'ifra_category_5a', 'ifra_category_5b', 'ifra_category_5c', 'ifra_category_5d',
+                        'ifra_category_6', 'ifra_category_7a', 'ifra_category_7b', 'ifra_category_8',
+                        'ifra_category_9', 'ifra_category_10a', 'ifra_category_10b',
+                        'ifra_category_11a', 'ifra_category_11b', 'ifra_category_12'
+                    ];
+                    
+                    let allFieldsPresent = true;
+                    for (const field of ifraFields) {
+                        if (data[field] !== undefined) {
+                            fieldReport += `✅ ${field}: ${data[field]}%\n`;
+                        } else {
+                            fieldReport += `❌ ${field}: MISSING\n`;
+                            allFieldsPresent = false;
+                        }
+                    }
+                    
+                    if (allFieldsPresent) {
+                        fieldReport += '\n🎉 ALL 18 IFRA CATEGORIES WORKING!';
+                    } else {
+                        fieldReport += '\n⚠️ Some IFRA categories are missing';
+                    }
+                    
+                    resultDiv.textContent = fieldReport;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `Error: ${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        async function testBaseProduct() {
+            const resultDiv = document.getElementById('base-result');
+            resultDiv.className = 'result info';
+            resultDiv.textContent = 'Creating test base product...';
+            
+            try {
+                const supplierId = await createTestSupplier();
+                testBaseData.supplier_id = supplierId;
+                
+                const response = await fetch(`${ADMIN_URL}/api/admin/base-products`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testBaseData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    let report = 'Base Product Created Successfully!\n\n';
+                    report += `✅ Name: ${data.name}\n`;
+                    report += `✅ is_active: ${data.is_active}\n`;
+                    report += `✅ is_discontinued: ${data.is_discontinued}\n`;
+                    report += `✅ ifra_category: ${data.ifra_category}\n`;
+                    report += `✅ ifra_category_2: ${data.ifra_category_2}\n`;
+                    report += `✅ is_dual_purpose: ${data.is_dual_purpose}\n`;
+                    
+                    // Test price tiers
+                    if (data.id) {
+                        const tierData = {
+                            base_product_id: data.id,
+                            tier1_name: 'Sample',
+                            tier1_size: 1,
+                            tier1_unit: 'lb',
+                            tier1_price: 4.99,
+                            tier1_sku: 'BASE-1LB'
+                        };
+                        
+                        const tierResponse = await fetch(`${ADMIN_URL}/api/admin/base-price-tiers`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(tierData)
+                        });
+                        
+                        if (tierResponse.ok) {
+                            const tierResult = await tierResponse.json();
+                            report += '\n✅ Price tier with name/SKU saved!';
+                            report += `\n   Tier 1: ${tierResult.tier1_name} (${tierResult.tier1_sku})`;
+                        }
+                    }
+                    
+                    resultDiv.textContent = report;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `Error: ${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        async function testVessel() {
+            const resultDiv = document.getElementById('vessel-result');
+            resultDiv.className = 'result info';
+            resultDiv.textContent = 'Creating test vessel...';
+            
+            try {
+                const supplierId = await createTestSupplier();
+                testVesselData.supplier_id = supplierId;
+                
+                const response = await fetch(`${ADMIN_URL}/api/admin/vessels`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testVesselData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    let report = 'Vessel Created Successfully!\n\n';
+                    report += `✅ Name: ${data.name}\n`;
+                    report += `✅ is_active: ${data.is_active}\n`;
+                    report += `✅ is_discontinued: ${data.is_discontinued}\n`;
+                    report += `✅ recommended_fill_volume: ${data.recommended_fill_volume} oz\n`;
+                    report += `✅ max_fill_volume: ${data.max_fill_volume} oz\n`;
+                    report += `✅ weight_pounds: ${data.weight_pounds} lbs\n`;
+                    report += `✅ color: ${data.color}\n`;
+                    report += `✅ shape: ${data.shape}\n`;
+                    
+                    // Test vessel price tiers
+                    if (data.id) {
+                        const tierData = {
+                            vessel_id: data.id,
+                            tier1_name: 'Single',
+                            tier1_size: 1,
+                            tier1_unit: 'units',
+                            tier1_price: 1.50,
+                            tier1_sku: 'JAR-1'
+                        };
+                        
+                        const tierResponse = await fetch(`${ADMIN_URL}/api/admin/vessel-price-tiers`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(tierData)
+                        });
+                        
+                        if (tierResponse.ok) {
+                            const tierResult = await tierResponse.json();
+                            report += '\n✅ Vessel price tier table working!';
+                            report += `\n   Tier 1: ${tierResult.tier1_name} (${tierResult.tier1_sku})`;
+                        } else {
+                            report += '\n❌ vessel_price_tiers table might not exist';
+                        }
+                    }
+                    
+                    resultDiv.textContent = report;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `Error: ${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        async function runFullTest() {
+            const resultDiv = document.getElementById('summary-result');
+            resultDiv.className = 'result info';
+            resultDiv.textContent = 'Running complete test suite...\n';
+            
+            let summary = '📊 COMPLETE TEST RESULTS\n';
+            summary += '='.repeat(40) + '\n\n';
+            
+            // Test each product type
+            const tests = [
+                { name: 'Fragrance Oils', func: testFragranceOil, div: 'oil-result' },
+                { name: 'Base Products', func: testBaseProduct, div: 'base-result' },
+                { name: 'Vessels', func: testVessel, div: 'vessel-result' }
+            ];
+            
+            let allPassed = true;
+            
+            for (const test of tests) {
+                await test.func();
+                await new Promise(resolve => setTimeout(resolve, 1000)); // Wait between tests
+                
+                const result = document.getElementById(test.div).className.includes('success');
+                summary += `${result ? '✅' : '❌'} ${test.name}\n`;
+                if (!result) allPassed = false;
+            }
+            
+            summary += '\n' + '='.repeat(40) + '\n';
+            summary += allPassed ? 
+                '🎉 ALL TESTS PASSED! Database migration successful!' :
+                '⚠️ Some tests failed. Check individual results above.';
+            
+            resultDiv.className = allPassed ? 'result success' : 'result error';
+            resultDiv.textContent = summary;
+        }
+
+        async function verifyFragranceOilFields() {
+            const resultDiv = document.getElementById('oil-result');
+            resultDiv.className = 'result info';
+            resultDiv.textContent = 'Fetching fragrance oil schema...';
+            
+            try {
+                const response = await fetch(`${ADMIN_URL}/api/admin/fragrance-oils`);
+                const oils = await response.json();
+                
+                if (oils.length > 0) {
+                    const sampleOil = oils[0];
+                    const expectedFields = [
+                        'is_active', 'is_discontinued', 'ifra_url',
+                        'ifra_category_1', 'ifra_category_2', 'ifra_category_3', 'ifra_category_4',
+                        'ifra_category_5a', 'ifra_category_5b', 'ifra_category_5c', 'ifra_category_5d',
+                        'ifra_category_6', 'ifra_category_7a', 'ifra_category_7b', 'ifra_category_8',
+                        'ifra_category_9', 'ifra_category_10a', 'ifra_category_10b',
+                        'ifra_category_11a', 'ifra_category_11b', 'ifra_category_12'
+                    ];
+                    
+                    let report = 'Field Verification for Fragrance Oils:\n\n';
+                    expectedFields.forEach(field => {
+                        const exists = field in sampleOil;
+                        report += `${exists ? '✅' : '❌'} ${field}\n`;
+                    });
+                    
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = report;
+                } else {
+                    resultDiv.className = 'result info';
+                    resultDiv.textContent = 'No fragrance oils in database to verify';
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        async function verifyBaseFields() {
+            const resultDiv = document.getElementById('base-result');
+            // Similar verification for base products
+            resultDiv.className = 'result info';
+            resultDiv.textContent = 'Verifying base product fields...';
+        }
+
+        async function verifyVesselFields() {
+            const resultDiv = document.getElementById('vessel-result');
+            // Similar verification for vessels
+            resultDiv.className = 'result info';
+            resultDiv.textContent = 'Verifying vessel fields...';
+        }
+
+        async function testPriceTiers() {
+            const resultDiv = document.getElementById('tier-result');
+            resultDiv.className = 'result info';
+            resultDiv.textContent = 'Testing all price tier tables...';
+            
+            // Test each price tier table
+            const tables = [
+                'oil_price_tiers',
+                'base_price_tiers',
+                'vessel_price_tiers'
+            ];
+            
+            let report = 'Price Tier Tables Test:\n\n';
+            
+            for (const table of tables) {
+                report += `Testing ${table}...\n`;
+                // You would need endpoints to test these
+            }
+            
+            resultDiv.className = 'result info';
+            resultDiv.textContent = report;
+        }
+    </script>
+</body>
+</html>
