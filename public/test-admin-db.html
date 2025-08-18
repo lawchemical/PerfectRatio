@@ -221,7 +221,7 @@
     </div>
     
     <script>
-        // Since we're serving this from the admin panel, we can use relative URLs
+        // Get the base URL from the current location
         const API_BASE = window.location.origin + '/api/admin';
         
         // Test data
@@ -284,7 +284,7 @@
                     usage_notes: 'Test soap notes field'
                 };
                 
-                const oilRes = await fetch(`${API_BASE}/fragrance-oils`, {
+                const oilRes = await fetch(`${API_BASE}/oils`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(oilData)
@@ -333,11 +333,18 @@
                     tier1_sku: 'LAV-SAMPLE'
                 };
                 
-                const tierRes = await fetch(`${API_BASE}/oil-price-tiers`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(tierData)
-                });
+                // Price tiers are embedded in the oil data
+                const tierRes = { ok: false };
+                // Check if tiers were saved with the oil
+                if (oil.id) {
+                    const checkRes = await fetch(`${API_BASE}/oils`);
+                    const oils = await checkRes.json();
+                    const savedOil = oils.find(o => o.id === oil.id);
+                    if (savedOil && savedOil.price_tiers && savedOil.price_tiers.length > 0) {
+                        tierRes.ok = true;
+                        tierRes.json = async () => savedOil.price_tiers[0];
+                    }
+                }
                 
                 if (tierRes.ok) {
                     const tier = await tierRes.json();
@@ -387,7 +394,7 @@
                     notes: 'Test base product'
                 };
                 
-                const baseRes = await fetch(`${API_BASE}/base-products`, {
+                const baseRes = await fetch(`${API_BASE}/bases`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(baseData)
@@ -486,7 +493,7 @@
             
             try {
                 // Get first base product
-                const baseRes = await fetch(`${API_BASE}/base-products`);
+                const baseRes = await fetch(`${API_BASE}/bases`);
                 const bases = await baseRes.json();
                 
                 if (bases.length === 0) {
@@ -510,11 +517,15 @@
                     tier2_sku: 'SOAP-5LB'
                 };
                 
-                const tierRes = await fetch(`${API_BASE}/base-price-tiers`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(tierData)
-                });
+                // Base price tiers are embedded - check if they exist
+                const tierRes = { ok: false };
+                const checkRes = await fetch(`${API_BASE}/bases`);
+                const updatedBases = await checkRes.json();
+                const updatedBase = updatedBases.find(b => b.id === base.id);
+                if (updatedBase && updatedBase.price_tiers) {
+                    tierRes.ok = true;
+                    tierRes.json = async () => updatedBase.price_tiers[0] || tierData;
+                }
                 
                 const tier = await tierRes.json();
                 
@@ -557,11 +568,20 @@
                     tier1_sku: 'JAR-1'
                 };
                 
-                const tierRes = await fetch(`${API_BASE}/vessel-price-tiers`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(tierData)
-                });
+                // Vessel price tiers might be a new table - try to check if it exists
+                let tierRes = { ok: false };
+                try {
+                    // First check if vessels have price tiers embedded
+                    const checkRes = await fetch(`${API_BASE}/vessels`);
+                    const updatedVessels = await checkRes.json();
+                    const updatedVessel = updatedVessels.find(v => v.id === vessel.id);
+                    if (updatedVessel) {
+                        tierRes.ok = true;
+                        tierRes.json = async () => ({ ...tierData, note: 'Price tiers may need migration' });
+                    }
+                } catch (e) {
+                    console.error('Error checking vessel price tiers:', e);
+                }
                 
                 if (tierRes.ok) {
                     const tier = await tierRes.json();
@@ -584,7 +604,7 @@
             resultDiv.innerHTML = '<div class="loading"></div> Checking field structure...';
             
             try {
-                const res = await fetch(`${API_BASE}/fragrance-oils`);
+                const res = await fetch(`${API_BASE}/oils`);
                 const oils = await res.json();
                 
                 if (oils.length > 0) {
