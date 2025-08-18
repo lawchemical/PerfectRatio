@@ -717,38 +717,59 @@
         // Test Vessel Specifications
         async function testVesselSpecifications() {
             const container = document.getElementById('spec-fields');
-            container.innerHTML = '<div class="loading"></div> Testing...';
+            container.innerHTML = '<div class="loading"></div> Testing vessel specifications...';
             
             try {
-                // Get a vessel first
-                const vesselsRes = await fetch(`${API_BASE}/vessels`);
-                const vessels = await vesselsRes.json();
+                // Create a supplier and vessel first
+                const supplierRes = await fetch(`${API_BASE}/suppliers`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(SUPPLIER_FIELDS)
+                });
+                const supplier = await supplierRes.json();
                 
-                if (vessels.length === 0) {
-                    container.innerHTML = '<div class="field-status warning">Create a vessel first</div>';
-                    return;
-                }
+                const vesselRes = await fetch(`${API_BASE}/vessels`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ...VESSEL_FIELDS, supplier_id: supplier.id })
+                });
+                const vessel = await vesselRes.json();
                 
-                const vessel = vessels[0];
-                
-                // Try to create vessel specifications
+                // Now create vessel specifications
                 const specData = {
                     ...VESSEL_SPEC_FIELDS,
                     vessel_id: vessel.id
                 };
                 
-                // Note: This endpoint might not exist yet
-                const results = {};
-                Object.keys(VESSEL_SPEC_FIELDS).forEach(field => {
-                    results[field] = {
-                        exists: false,
-                        status: 'fail',
-                        actualValue: 'Endpoint needs implementation',
-                        expectedValue: VESSEL_SPEC_FIELDS[field]
-                    };
+                const specRes = await fetch(`${API_BASE}/vessel-specifications`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(specData)
                 });
                 
-                displayFieldResults('spec-fields', results);
+                if (specRes.ok) {
+                    const spec = await specRes.json();
+                    
+                    // Check all fields
+                    const results = {};
+                    Object.keys(VESSEL_SPEC_FIELDS).forEach(field => {
+                        results[field] = checkFieldStatus(spec, field, VESSEL_SPEC_FIELDS[field]);
+                    });
+                    
+                    displayFieldResults('spec-fields', results);
+                } else {
+                    // Endpoint might not exist
+                    const results = {};
+                    Object.keys(VESSEL_SPEC_FIELDS).forEach(field => {
+                        results[field] = {
+                            exists: false,
+                            status: 'fail',
+                            actualValue: 'Endpoint error or not deployed',
+                            expectedValue: VESSEL_SPEC_FIELDS[field]
+                        };
+                    });
+                    displayFieldResults('spec-fields', results);
+                }
                 
             } catch (error) {
                 container.innerHTML = `<div class="field-status fail">Error: ${error.message}</div>`;

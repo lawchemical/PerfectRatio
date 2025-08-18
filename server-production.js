@@ -1247,6 +1247,119 @@ app.delete('/api/admin/vessels/:id', async (req, res) => {
 });
 
 // =====================================================
+// VESSEL SPECIFICATIONS ENDPOINTS
+// =====================================================
+
+// Admin: Get vessel specifications
+app.get('/api/admin/vessel-specifications', async (req, res) => {
+    try {
+        const { data, error } = await productDB
+            .from('vessel_specifications')
+            .select('*')
+            .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        res.json(data || []);
+    } catch (error) {
+        console.error('Error loading vessel specifications:', error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Admin: Get vessel specifications by vessel ID
+app.get('/api/admin/vessel-specifications/vessel/:vesselId', async (req, res) => {
+    try {
+        const { data, error } = await productDB
+            .from('vessel_specifications')
+            .select('*')
+            .eq('vessel_id', req.params.vesselId)
+            .single();
+        
+        if (error && error.code !== 'PGRST116') throw error; // PGRST116 = no rows found
+        res.json(data || null);
+    } catch (error) {
+        console.error('Error loading vessel specification:', error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Admin: Add vessel specifications
+app.post('/api/admin/vessel-specifications', async (req, res) => {
+    try {
+        const specData = {
+            vessel_id: req.body.vessel_id,
+            diameter_mm: req.body.diameter_mm ? parseFloat(req.body.diameter_mm) : null,
+            height_mm: req.body.height_mm ? parseFloat(req.body.height_mm) : null,
+            opening_diameter_mm: req.body.opening_diameter_mm ? parseFloat(req.body.opening_diameter_mm) : null,
+            wall_thickness_mm: req.body.wall_thickness_mm ? parseFloat(req.body.wall_thickness_mm) : null,
+            weight_g: req.body.weight_g ? parseFloat(req.body.weight_g) : null,
+            is_food_safe: req.body.is_food_safe === true || req.body.is_food_safe === 'true',
+            is_leak_proof: req.body.is_leak_proof === true || req.body.is_leak_proof === 'true',
+            is_child_resistant: req.body.is_child_resistant === true || req.body.is_child_resistant === 'true',
+            uv_protection: req.body.uv_protection === true || req.body.uv_protection === 'true'
+        };
+        
+        const { data, error } = await productDBAdmin
+            .from('vessel_specifications')
+            .insert(specData)
+            .select()
+            .single();
+        
+        if (error) throw error;
+        res.json(data);
+    } catch (error) {
+        console.error('Error creating vessel specifications:', error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Admin: Update vessel specifications
+app.put('/api/admin/vessel-specifications/:id', async (req, res) => {
+    try {
+        const specData = {
+            diameter_mm: req.body.diameter_mm ? parseFloat(req.body.diameter_mm) : null,
+            height_mm: req.body.height_mm ? parseFloat(req.body.height_mm) : null,
+            opening_diameter_mm: req.body.opening_diameter_mm ? parseFloat(req.body.opening_diameter_mm) : null,
+            wall_thickness_mm: req.body.wall_thickness_mm ? parseFloat(req.body.wall_thickness_mm) : null,
+            weight_g: req.body.weight_g ? parseFloat(req.body.weight_g) : null,
+            is_food_safe: req.body.is_food_safe === true || req.body.is_food_safe === 'true',
+            is_leak_proof: req.body.is_leak_proof === true || req.body.is_leak_proof === 'true',
+            is_child_resistant: req.body.is_child_resistant === true || req.body.is_child_resistant === 'true',
+            uv_protection: req.body.uv_protection === true || req.body.uv_protection === 'true'
+        };
+        
+        const { data, error } = await productDBAdmin
+            .from('vessel_specifications')
+            .update(specData)
+            .eq('id', req.params.id)
+            .select()
+            .single();
+        
+        if (error) throw error;
+        res.json(data);
+    } catch (error) {
+        console.error('Error updating vessel specifications:', error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Admin: Delete vessel specifications
+app.delete('/api/admin/vessel-specifications/:id', async (req, res) => {
+    try {
+        const { error } = await productDBAdmin
+            .from('vessel_specifications')
+            .delete()
+            .eq('id', req.params.id);
+        
+        if (error) throw error;
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error deleting vessel specifications:', error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// =====================================================
 // ADMIN IMPORT ENDPOINTS
 // =====================================================
 

@@ -161,18 +161,26 @@
                                     <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Theme Family *</label>
                                     <select name="theme_family" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; background: white;">
                                         <option value="">Select theme family...</option>
-                                        <option value="Fresh">Fresh</option>
                                         <option value="Floral">Floral</option>
-                                        <option value="Oriental">Oriental</option>
-                                        <option value="Woody">Woody</option>
-                                        <option value="Gourmand">Gourmand</option>
+                                        <option value="Fruity">Fruity</option>
                                         <option value="Citrus">Citrus</option>
                                         <option value="Green">Green</option>
-                                        <option value="Aquatic">Aquatic</option>
+                                        <option value="Aquatic / Marine">Aquatic / Marine</option>
+                                        <option value="Woody">Woody</option>
+                                        <option value="Oriental / Amber">Oriental / Amber</option>
+                                        <option value="Gourmand">Gourmand</option>
                                         <option value="Spicy">Spicy</option>
-                                        <option value="Fruity">Fruity</option>
-                                        <option value="Herbal">Herbal</option>
-                                        <option value="Other">Other</option>
+                                        <option value="Earthy">Earthy</option>
+                                        <option value="Powdery">Powdery</option>
+                                        <option value="Aromatic">Aromatic</option>
+                                        <option value="Leather">Leather</option>
+                                        <option value="Aldehydic">Aldehydic</option>
+                                        <option value="Chypre">Chypre</option>
+                                        <option value="Fougere">Fougere</option>
+                                        <option value="Smoky">Smoky</option>
+                                        <option value="Metallic / Mineral">Metallic / Mineral</option>
+                                        <option value="Animalic">Animalic</option>
+                                        <option value="Resinous / Balsamic">Resinous / Balsamic</option>
                                     </select>
                                 </div>
                                 <div style="margin-bottom: 16px;">
@@ -594,7 +602,12 @@
             if (oil.specific_gravity) form.elements['specific_gravity'].value = oil.specific_gravity;
             if (oil.vanillin_pct) form.elements['vanillin_pct'].value = oil.vanillin_pct;
             if (oil.scent_description) form.elements['scent_description'].value = oil.scent_description;
-            if (oil.theme_family) form.elements['theme_family'].value = oil.theme_family;
+            if (oil.theme_family) {
+                console.log('Setting theme_family:', oil.theme_family);
+                form.elements['theme_family'].value = oil.theme_family;
+                // Double-check it was set
+                console.log('Theme family dropdown value after setting:', form.elements['theme_family'].value);
+            }
             if (oil.fragrance_notes_top) form.elements['fragrance_notes_top'].value = oil.fragrance_notes_top;
             if (oil.fragrance_notes_middle) form.elements['fragrance_notes_middle'].value = oil.fragrance_notes_middle;
             if (oil.fragrance_notes_base) form.elements['fragrance_notes_base'].value = oil.fragrance_notes_base;
