@@ -662,7 +662,20 @@
             form.elements['flash_point_f'].value = oil.flash_point_f || '';
             form.elements['ifra_version'].value = oil.ifra_version || '';
             form.elements['ifra_date'].value = oil.ifra_date || '';
+            form.elements['ifra_url'].value = oil.ifra_url || '';
             form.elements['solvent_note'].value = oil.solvent_note || '';
+            
+            // Load IFRA category fields
+            const ifraCategories = ['1', '2', '3', '4', '5a', '5b', '5c', '5d', '6', '7a', '7b', '8', '9', '10a', '10b', '11a', '11b', '12'];
+            ifraCategories.forEach(cat => {
+                const fieldName = `ifra_category_${cat}`;
+                if (oil[fieldName] !== undefined && oil[fieldName] !== null) {
+                    const element = form.elements[fieldName];
+                    if (element) {
+                        element.value = oil[fieldName];
+                    }
+                }
+            });
             
             // Load additional fields if they exist
             if (oil.specific_gravity) form.elements['specific_gravity'].value = oil.specific_gravity;
