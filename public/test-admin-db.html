@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Field Testing - Admin Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #F5F7FA 0%, #C3CFE2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: #2E3033;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .test-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        
+        .test-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        
+        .test-card h2 {
+            color: #101114;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #F1AD88;
+            padding-bottom: 10px;
+        }
+        
+        .test-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            width: 100%;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+        
+        .test-button:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .test-button.secondary {
+            background: linear-gradient(135deg, #F1AD88 0%, #E89365 100%);
+        }
+        
+        .test-button.success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+        
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+        }
+        
+        .result.success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        
+        .result.error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        
+        .result.info {
+            background: #d1ecf1;
+            border-color: #bee5eb;
+            color: #0c5460;
+        }
+        
+        .field-status {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        
+        .field-status.pass {
+            background: #e7f5e7;
+        }
+        
+        .field-status.fail {
+            background: #ffe7e7;
+        }
+        
+        .status-icon {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+        
+        .summary-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .summary-card h2 {
+            color: white;
+            border: none;
+            margin-bottom: 20px;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Database Migration Test Suite</h1>
+        
+        <div class="test-grid">
+            <!-- Fragrance Oil Tests -->
+            <div class="test-card">
+                <h2>🌸 Fragrance Oils</h2>
+                <button class="test-button" onclick="testFragranceOil()">
+                    Test All 18 IFRA Categories
+                </button>
+                <button class="test-button secondary" onclick="verifyOilFields()">
+                    Verify Field Structure
+                </button>
+                <div id="oil-result" class="result"></div>
+            </div>
+            
+            <!-- Base Product Tests -->
+            <div class="test-card">
+                <h2>🧼 Base Products</h2>
+                <button class="test-button" onclick="testBaseProduct()">
+                    Test New Fields
+                </button>
+                <button class="test-button secondary" onclick="testBasePriceTiers()">
+                    Test Price Tiers
+                </button>
+                <div id="base-result" class="result"></div>
+            </div>
+            
+            <!-- Vessel Tests -->
+            <div class="test-card">
+                <h2>🏺 Vessels</h2>
+                <button class="test-button" onclick="testVessel()">
+                    Test Enhanced Fields
+                </button>
+                <button class="test-button secondary" onclick="testVesselPriceTiers()">
+                    Test Vessel Price Tiers
+                </button>
+                <div id="vessel-result" class="result"></div>
+            </div>
+        </div>
+        
+        <!-- Summary Card -->
+        <div class="summary-card">
+            <h2>📊 Complete Test Suite</h2>
+            <button class="test-button success" onclick="runCompleteTest()">
+                Run All Tests
+            </button>
+            <div id="summary-result" class="result" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: white; margin-top: 20px;"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Since we're serving this from the admin panel, we can use relative URLs
+        const API_BASE = window.location.origin + '/api/admin';
+        
+        // Test data
+        const testTimestamp = Date.now();
+        
+        async function testFragranceOil() {
+            const resultDiv = document.getElementById('oil-result');
+            resultDiv.className = 'result info';
+            resultDiv.innerHTML = '<div class="loading"></div> Creating test fragrance oil...';
+            
+            try {
+                // First create a supplier
+                const supplierRes = await fetch(`${API_BASE}/suppliers`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: `TEST Supplier ${testTimestamp}`,
+                        website_url: 'https://test.com',
+                        is_active: true
+                    })
+                });
+                
+                const supplier = await supplierRes.json();
+                
+                // Create fragrance oil with all IFRA categories
+                const oilData = {
+                    supplier_id: supplier.id,
+                    name: `TEST Lavender Oil ${testTimestamp}`,
+                    product_name: 'Premium Test Lavender',
+                    sku: `TEST-LAV-${testTimestamp}`,
+                    is_active: true,
+                    is_discontinued: false,
+                    ifra_url: 'https://test.com/ifra.pdf',
+                    ifra_version: 'Amendment 51',
+                    ifra_date: '2024-01-15',
+                    // All 18 IFRA categories
+                    ifra_category_1: 0.5,
+                    ifra_category_2: 2.5,
+                    ifra_category_3: 5.0,
+                    ifra_category_4: 10.0,
+                    ifra_category_5a: 3.5,
+                    ifra_category_5b: 3.5,
+                    ifra_category_5c: 3.5,
+                    ifra_category_5d: 2.0,
+                    ifra_category_6: 1.0,
+                    ifra_category_7a: 5.0,
+                    ifra_category_7b: 3.0,
+                    ifra_category_8: 2.5,
+                    ifra_category_9: 8.0,
+                    ifra_category_10a: 15.0,
+                    ifra_category_10b: 20.0,
+                    ifra_category_11a: 1.5,
+                    ifra_category_11b: 2.0,
+                    ifra_category_12: 100.0,
+                    flash_point_f: 160,
+                    specific_gravity: 0.885,
+                    vanillin_pct: 0.5,
+                    intensity_rating: 4.5,
+                    overall_rating: 4.8,
+                    usage_notes: 'Test soap notes field'
+                };
+                
+                const oilRes = await fetch(`${API_BASE}/fragrance-oils`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(oilData)
+                });
+                
+                const oil = await oilRes.json();
+                
+                // Check all fields
+                let report = '✅ Fragrance Oil Created!\n\n';
+                report += 'New Fields Status:\n';
+                report += `✅ is_active: ${oil.is_active}\n`;
+                report += `✅ is_discontinued: ${oil.is_discontinued}\n`;
+                report += `✅ ifra_url: ${oil.ifra_url}\n\n`;
+                
+                report += 'IFRA Categories (18 total):\n';
+                const ifraFields = [
+                    'ifra_category_1', 'ifra_category_2', 'ifra_category_3', 'ifra_category_4',
+                    'ifra_category_5a', 'ifra_category_5b', 'ifra_category_5c', 'ifra_category_5d',
+                    'ifra_category_6', 'ifra_category_7a', 'ifra_category_7b', 'ifra_category_8',
+                    'ifra_category_9', 'ifra_category_10a', 'ifra_category_10b',
+                    'ifra_category_11a', 'ifra_category_11b', 'ifra_category_12'
+                ];
+                
+                let allPresent = true;
+                ifraFields.forEach(field => {
+                    const exists = oil[field] !== undefined;
+                    report += `${exists ? '✅' : '❌'} ${field}: ${oil[field] || 'MISSING'}%\n`;
+                    if (!exists) allPresent = false;
+                });
+                
+                if (allPresent) {
+                    report += '\n🎉 ALL 18 IFRA CATEGORIES WORKING!';
+                    resultDiv.className = 'result success';
+                } else {
+                    report += '\n⚠️ Some IFRA categories missing';
+                    resultDiv.className = 'result error';
+                }
+                
+                // Test price tiers
+                const tierData = {
+                    fragrance_oil_id: oil.id,
+                    tier1_name: 'Sample Size',
+                    tier1_size: 0.5,
+                    tier1_unit: 'oz',
+                    tier1_price: 5.99,
+                    tier1_sku: 'LAV-SAMPLE'
+                };
+                
+                const tierRes = await fetch(`${API_BASE}/oil-price-tiers`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(tierData)
+                });
+                
+                if (tierRes.ok) {
+                    const tier = await tierRes.json();
+                    report += `\n\n✅ Price tier saved with name: ${tier.tier1_name} (${tier.tier1_sku})`;
+                }
+                
+                resultDiv.textContent = report;
+                
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `Error: ${error.message}`;
+            }
+        }
+        
+        async function testBaseProduct() {
+            const resultDiv = document.getElementById('base-result');
+            resultDiv.className = 'result info';
+            resultDiv.innerHTML = '<div class="loading"></div> Creating test base product...';
+            
+            try {
+                // Create supplier
+                const supplierRes = await fetch(`${API_BASE}/suppliers`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: `TEST Base Supplier ${testTimestamp}`,
+                        website_url: 'https://test.com',
+                        is_active: true
+                    })
+                });
+                
+                const supplier = await supplierRes.json();
+                
+                // Create base product
+                const baseData = {
+                    supplier_id: supplier.id,
+                    name: `TEST Soap Base ${testTimestamp}`,
+                    sku: `TEST-BASE-${testTimestamp}`,
+                    is_active: true,
+                    is_discontinued: false,
+                    max_load_pct: 10.0,
+                    unit_mode: 'weight',
+                    specific_gravity: 1.05,
+                    ifra_category: 'Soap - Category 9',
+                    ifra_category_2: 'Shampoo - Category 9',
+                    is_dual_purpose: true,
+                    notes: 'Test base product'
+                };
+                
+                const baseRes = await fetch(`${API_BASE}/base-products`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(baseData)
+                });
+                
+                const base = await baseRes.json();
+                
+                let report = '✅ Base Product Created!\n\n';
+                report += 'New Fields Status:\n';
+                report += `✅ is_active: ${base.is_active}\n`;
+                report += `✅ is_discontinued: ${base.is_discontinued}\n`;
+                report += `✅ ifra_category: ${base.ifra_category}\n`;
+                report += `✅ ifra_category_2: ${base.ifra_category_2}\n`;
+                report += `✅ is_dual_purpose: ${base.is_dual_purpose}\n`;
+                
+                resultDiv.className = 'result success';
+                resultDiv.textContent = report;
+                
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `Error: ${error.message}`;
+            }
+        }
+        
+        async function testVessel() {
+            const resultDiv = document.getElementById('vessel-result');
+            resultDiv.className = 'result info';
+            resultDiv.innerHTML = '<div class="loading"></div> Creating test vessel...';
+            
+            try {
+                // Create supplier
+                const supplierRes = await fetch(`${API_BASE}/suppliers`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: `TEST Vessel Supplier ${testTimestamp}`,
+                        website_url: 'https://test.com',
+                        is_active: true
+                    })
+                });
+                
+                const supplier = await supplierRes.json();
+                
+                // Create vessel
+                const vesselData = {
+                    supplier_id: supplier.id,
+                    name: `TEST 4oz Jar ${testTimestamp}`,
+                    sku: `TEST-JAR-${testTimestamp}`,
+                    is_active: true,
+                    is_discontinued: false,
+                    vessel_type: 'jar',
+                    size: 4.0,
+                    size_unit: 'oz',
+                    material: 'glass',
+                    color: 'amber',
+                    shape: 'round',
+                    neck_size: '70-400',
+                    recommended_fill_volume: 3.5,
+                    max_fill_volume: 3.8,
+                    weight_pounds: 0.25,
+                    product_url: 'https://test.com/jar',
+                    notes: 'Test vessel'
+                };
+                
+                const vesselRes = await fetch(`${API_BASE}/vessels`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(vesselData)
+                });
+                
+                const vessel = await vesselRes.json();
+                
+                let report = '✅ Vessel Created!\n\n';
+                report += 'New Fields Status:\n';
+                report += `✅ is_active: ${vessel.is_active}\n`;
+                report += `✅ is_discontinued: ${vessel.is_discontinued}\n`;
+                report += `✅ recommended_fill_volume: ${vessel.recommended_fill_volume} oz\n`;
+                report += `✅ max_fill_volume: ${vessel.max_fill_volume} oz\n`;
+                report += `✅ weight_pounds: ${vessel.weight_pounds} lbs\n`;
+                report += `✅ color (dropdown): ${vessel.color}\n`;
+                report += `✅ shape (dropdown): ${vessel.shape}\n`;
+                
+                resultDiv.className = 'result success';
+                resultDiv.textContent = report;
+                
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `Error: ${error.message}`;
+            }
+        }
+        
+        async function testBasePriceTiers() {
+            const resultDiv = document.getElementById('base-result');
+            resultDiv.className = 'result info';
+            resultDiv.innerHTML = '<div class="loading"></div> Testing base price tiers...';
+            
+            try {
+                // Get first base product
+                const baseRes = await fetch(`${API_BASE}/base-products`);
+                const bases = await baseRes.json();
+                
+                if (bases.length === 0) {
+                    throw new Error('No base products found. Create one first.');
+                }
+                
+                const base = bases[0];
+                
+                // Create price tier with names and SKUs
+                const tierData = {
+                    base_product_id: base.id,
+                    tier1_name: 'Trial Size',
+                    tier1_size: 1.0,
+                    tier1_unit: 'lb',
+                    tier1_price: 4.99,
+                    tier1_sku: 'SOAP-1LB',
+                    tier2_name: 'Small Pack',
+                    tier2_size: 5.0,
+                    tier2_unit: 'lb',
+                    tier2_price: 19.99,
+                    tier2_sku: 'SOAP-5LB'
+                };
+                
+                const tierRes = await fetch(`${API_BASE}/base-price-tiers`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(tierData)
+                });
+                
+                const tier = await tierRes.json();
+                
+                let report = '✅ Base Price Tiers Working!\n\n';
+                report += `Tier 1: ${tier.tier1_name} (${tier.tier1_sku}) - $${tier.tier1_price}\n`;
+                report += `Tier 2: ${tier.tier2_name} (${tier.tier2_sku}) - $${tier.tier2_price}\n`;
+                
+                resultDiv.className = 'result success';
+                resultDiv.textContent = report;
+                
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `Error: ${error.message}`;
+            }
+        }
+        
+        async function testVesselPriceTiers() {
+            const resultDiv = document.getElementById('vessel-result');
+            resultDiv.className = 'result info';
+            resultDiv.innerHTML = '<div class="loading"></div> Testing vessel price tiers table...';
+            
+            try {
+                // Get first vessel
+                const vesselRes = await fetch(`${API_BASE}/vessels`);
+                const vessels = await vesselRes.json();
+                
+                if (vessels.length === 0) {
+                    throw new Error('No vessels found. Create one first.');
+                }
+                
+                const vessel = vessels[0];
+                
+                // Create price tier
+                const tierData = {
+                    vessel_id: vessel.id,
+                    tier1_name: 'Single Unit',
+                    tier1_size: 1,
+                    tier1_unit: 'units',
+                    tier1_price: 1.50,
+                    tier1_sku: 'JAR-1'
+                };
+                
+                const tierRes = await fetch(`${API_BASE}/vessel-price-tiers`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(tierData)
+                });
+                
+                if (tierRes.ok) {
+                    const tier = await tierRes.json();
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `✅ vessel_price_tiers table EXISTS and WORKING!\n\nTier: ${tier.tier1_name} (${tier.tier1_sku}) - $${tier.tier1_price}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = '❌ vessel_price_tiers table might not exist\n\nRun the migration script to create it.';
+                }
+                
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `Error: ${error.message}`;
+            }
+        }
+        
+        async function verifyOilFields() {
+            const resultDiv = document.getElementById('oil-result');
+            resultDiv.className = 'result info';
+            resultDiv.innerHTML = '<div class="loading"></div> Checking field structure...';
+            
+            try {
+                const res = await fetch(`${API_BASE}/fragrance-oils`);
+                const oils = await res.json();
+                
+                if (oils.length > 0) {
+                    const oil = oils[0];
+                    const fields = [
+                        'is_active', 'is_discontinued', 'ifra_url',
+                        'ifra_category_1', 'ifra_category_2', 'ifra_category_3', 'ifra_category_4',
+                        'ifra_category_5a', 'ifra_category_5b', 'ifra_category_5c', 'ifra_category_5d',
+                        'ifra_category_6', 'ifra_category_7a', 'ifra_category_7b', 'ifra_category_8',
+                        'ifra_category_9', 'ifra_category_10a', 'ifra_category_10b',
+                        'ifra_category_11a', 'ifra_category_11b', 'ifra_category_12'
+                    ];
+                    
+                    let report = 'Field Structure Check:\n\n';
+                    fields.forEach(field => {
+                        const exists = field in oil;
+                        report += `${exists ? '✅' : '❌'} ${field}\n`;
+                    });
+                    
+                    resultDiv.className = 'result info';
+                    resultDiv.textContent = report;
+                } else {
+                    resultDiv.className = 'result info';
+                    resultDiv.textContent = 'No oils in database. Create one first.';
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `Error: ${error.message}`;
+            }
+        }
+        
+        async function runCompleteTest() {
+            const resultDiv = document.getElementById('summary-result');
+            resultDiv.className = 'result';
+            resultDiv.innerHTML = '<div class="loading"></div> Running complete test suite...';
+            
+            const tests = [
+                { name: 'Fragrance Oil (18 IFRA)', func: testFragranceOil },
+                { name: 'Base Product', func: testBaseProduct },
+                { name: 'Vessel', func: testVessel },
+                { name: 'Base Price Tiers', func: testBasePriceTiers },
+                { name: 'Vessel Price Tiers', func: testVesselPriceTiers }
+            ];
+            
+            let summary = '📊 TEST RESULTS\n' + '='.repeat(40) + '\n\n';
+            let passed = 0;
+            
+            for (const test of tests) {
+                try {
+                    await test.func();
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    summary += `✅ ${test.name}\n`;
+                    passed++;
+                } catch (error) {
+                    summary += `❌ ${test.name}: ${error.message}\n`;
+                }
+            }
+            
+            summary += '\n' + '='.repeat(40) + '\n';
+            summary += `Result: ${passed}/${tests.length} tests passed\n\n`;
+            
+            if (passed === tests.length) {
+                summary += '🎉 ALL TESTS PASSED!\nDatabase migration successful!';
+                resultDiv.style.color = '#38ef7d';
+            } else {
+                summary += '⚠️ Some tests failed.\nCheck individual results above.';
+                resultDiv.style.color = '#ff6b6b';
+            }
+            
+            resultDiv.textContent = summary;
+        }
+    </script>
+</body>
+</html>
