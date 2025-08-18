@@ -601,7 +601,7 @@
             form.querySelector('[name="supplier_id"]').value = base.supplier_id;
             form.querySelector('[name="name"]').value = base.name;
             form.querySelector('[name="sku"]').value = base.sku || '';
-            form.querySelector('[name="base_type"]').value = base.base_type || '';
+            // base_type field was removed - no longer needed
             form.querySelector('[name="max_load_pct"]').value = base.max_load_pct;
             form.querySelector('[name="unit_mode"]').value = base.unit_mode;
             form.querySelector('[name="wax_type"]').value = base.wax_type || '';
