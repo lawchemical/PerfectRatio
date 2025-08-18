@@ -844,9 +844,31 @@
             data.total_ratings = parseInt(rawData.total_ratings);
         }
         
-        // Note: Additional fields for iOS app (theme_family, fragrance_notes, etc.) 
-        // will need to be saved to the ProductDetails table separately
-        // For now, we're only saving core fragrance_oils table fields
+        // Handle price tiers
+        const priceTiers = {};
+        ['tier1', 'tier2', 'tier3', 'tier4', 'tier5'].forEach(tier => {
+            const name = rawData[`${tier}_name`];
+            const size = rawData[`${tier}_size`];
+            const unit = rawData[`${tier}_unit`];
+            const price = rawData[`${tier}_price`];
+            const sku = rawData[`${tier}_sku`];
+            
+            console.log(`${tier}: name=${name}, size=${size}, unit=${unit}, price=${price}, sku=${sku}`);
+            
+            if (size && price) {
+                priceTiers[`${tier}_name`] = name || '';
+                priceTiers[`${tier}_size`] = parseFloat(size);
+                priceTiers[`${tier}_unit`] = unit;
+                priceTiers[`${tier}_price`] = parseFloat(price);
+                priceTiers[`${tier}_sku`] = sku || '';
+            }
+        });
+        
+        console.log('Collected price tiers:', priceTiers);
+        
+        if (Object.keys(priceTiers).length > 0) {
+            data.price_tiers = priceTiers;
+        }
 
         console.log('Cleaned data for database:', data);
 
