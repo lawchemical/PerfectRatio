@@ -1266,15 +1266,15 @@ app.use((err, req, res, next) => {
     });
 });
 
-// Handle process errors
+// Handle process errors - but don't exit immediately
 process.on('uncaughtException', (err) => {
     console.error('Uncaught Exception:', err);
-    process.exit(1);
+    // Don't exit for now to see if this is the issue
 });
 
 process.on('unhandledRejection', (reason, promise) => {
     console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-    process.exit(1);
+    // Don't exit for now to see if this is the issue
 });
 
 // Start server - bind to 0.0.0.0 for Railway
