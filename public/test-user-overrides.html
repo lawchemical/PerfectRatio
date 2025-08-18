@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test User Overrides System</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .test-result {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #5a67d8;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .oil-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .oil-data {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+        }
+        .oil-data h4 {
+            margin-top: 0;
+            color: #495057;
+        }
+        .field-diff {
+            background: #fff3cd;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        input, select {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .custom-fields {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .field-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .field-group label {
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧪 User Override System Test</h1>
+        <p>Test the dual-database architecture with user customizations</p>
+    </div>
+
+    <!-- Authentication Section -->
+    <div class="test-section">
+        <div class="test-title">1️⃣ Authentication</div>
+        <div>
+            <input type="email" id="testEmail" placeholder="test@example.com" value="test@example.com">
+            <input type="password" id="testPassword" placeholder="password" value="testpass123">
+            <button onclick="signIn()">Sign In</button>
+            <button onclick="signUp()">Sign Up New User</button>
+        </div>
+        <div id="authResult"></div>
+    </div>
+
+    <!-- Load Oils Section -->
+    <div class="test-section">
+        <div class="test-title">2️⃣ Load Fragrance Oils</div>
+        <button onclick="loadPublicOils()" id="loadPublicBtn">Load Public Oils (No Auth)</button>
+        <button onclick="loadUserOils()" id="loadUserBtn" disabled>Load User Oils (With Overrides)</button>
+        <div id="oilsResult"></div>
+        <div id="oilComparison" class="oil-comparison"></div>
+    </div>
+
+    <!-- Customize Oil Section -->
+    <div class="test-section">
+        <div class="test-title">3️⃣ Customize Fragrance Oil</div>
+        <div>
+            <select id="oilSelect" disabled>
+                <option value="">Select an oil to customize...</option>
+            </select>
+        </div>
+        <div class="custom-fields" id="customFields" style="display: none;">
+            <div class="field-group">
+                <label>Custom Max Load %</label>
+                <input type="number" id="customMaxLoad" step="0.01" placeholder="e.g., 8.5">
+            </div>
+            <div class="field-group">
+                <label>Custom Price per Unit</label>
+                <input type="number" id="customPrice" step="0.01" placeholder="e.g., 25.99">
+            </div>
+            <div class="field-group">
+                <label>Custom Flash Point (°F)</label>
+                <input type="number" id="customFlashPoint" placeholder="e.g., 185">
+            </div>
+            <div class="field-group">
+                <label>Personal Notes</label>
+                <input type="text" id="personalNotes" placeholder="Works great in CP soap">
+            </div>
+            <div class="field-group">
+                <label>Personal Rating</label>
+                <input type="number" id="personalRating" min="0" max="5" step="0.5" placeholder="4.5">
+            </div>
+            <div class="field-group">
+                <label>Quantity on Hand</label>
+                <input type="number" id="quantityOnHand" step="0.01" placeholder="16">
+            </div>
+            <div class="field-group">
+                <label>Performance in CP Soap</label>
+                <input type="text" id="perfCPSoap" placeholder="No acceleration, slight vanilla discoloration">
+            </div>
+            <div class="field-group">
+                <label>Mark as Favorite</label>
+                <input type="checkbox" id="isFavorite">
+            </div>
+        </div>
+        <div style="margin-top: 15px;">
+            <button onclick="saveCustomizations()" id="saveBtn" disabled>Save Customizations</button>
+            <button onclick="revertToDefaults()" id="revertBtn" disabled>Revert to Defaults</button>
+            <button onclick="updateUsage()" id="usageBtn" disabled>Increment Usage</button>
+        </div>
+        <div id="customResult"></div>
+    </div>
+
+    <!-- Comparison Section -->
+    <div class="test-section">
+        <div class="test-title">4️⃣ Before/After Comparison</div>
+        <button onclick="compareOilData()" id="compareBtn" disabled>Compare Default vs Custom</button>
+        <div id="comparisonResult"></div>
+    </div>
+
+    <script>
+        let authToken = null;
+        let selectedOilId = null;
+        let publicOils = [];
+        let userOils = [];
+
+        // Sign In
+        async function signIn() {
+            try {
+                const email = document.getElementById('testEmail').value;
+                const password = document.getElementById('testPassword').value;
+                
+                const response = await fetch('/api/auth/signin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    authToken = data.session.access_token;
+                    document.getElementById('authResult').innerHTML = 
+                        `<div class="test-result success">✅ Signed in as: ${data.user.email}</div>`;
+                    
+                    // Enable authenticated buttons
+                    document.getElementById('loadUserBtn').disabled = false;
+                    document.getElementById('oilSelect').disabled = false;
+                } else {
+                    document.getElementById('authResult').innerHTML = 
+                        `<div class="test-result error">❌ Sign in failed: ${data.error}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('authResult').innerHTML = 
+                    `<div class="test-result error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        // Sign Up
+        async function signUp() {
+            try {
+                const email = document.getElementById('testEmail').value;
+                const password = document.getElementById('testPassword').value;
+                
+                const response = await fetch('/api/auth/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        email, 
+                        password,
+                        fullName: 'Test User',
+                        companyName: 'Test Company'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('authResult').innerHTML = 
+                        `<div class="test-result success">✅ Account created! Now sign in.</div>`;
+                } else {
+                    document.getElementById('authResult').innerHTML = 
+                        `<div class="test-result error">❌ Sign up failed: ${data.error}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('authResult').innerHTML = 
+                    `<div class="test-result error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        // Load Public Oils
+        async function loadPublicOils() {
+            try {
+                const response = await fetch('/api/oils');
+                publicOils = await response.json();
+                
+                document.getElementById('oilsResult').innerHTML = 
+                    `<div class="test-result success">✅ Loaded ${publicOils.length} public oils (no user data)</div>`;
+                
+                // Populate select
+                const select = document.getElementById('oilSelect');
+                select.innerHTML = '<option value="">Select an oil to customize...</option>';
+                publicOils.forEach(oil => {
+                    select.innerHTML += `<option value="${oil.id}">${oil.name || oil.product_name}</option>`;
+                });
+                
+                // Show first oil as example
+                if (publicOils.length > 0) {
+                    displayOilExample(publicOils[0], 'public');
+                }
+            } catch (error) {
+                document.getElementById('oilsResult').innerHTML = 
+                    `<div class="test-result error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        // Load User Oils
+        async function loadUserOils() {
+            if (!authToken) {
+                alert('Please sign in first');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/user/oils', {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                userOils = await response.json();
+                
+                const customized = userOils.filter(o => o.has_user_overrides).length;
+                document.getElementById('oilsResult').innerHTML = 
+                    `<div class="test-result success">✅ Loaded ${userOils.length} user oils (${customized} with customizations)</div>`;
+                
+                // Show comparison if we have customizations
+                if (customized > 0) {
+                    const customOil = userOils.find(o => o.has_user_overrides);
+                    const publicOil = publicOils.find(p => p.id === customOil.id);
+                    if (publicOil && customOil) {
+                        displayComparison(publicOil, customOil);
+                    }
+                } else if (userOils.length > 0) {
+                    displayOilExample(userOils[0], 'user');
+                }
+                
+                document.getElementById('compareBtn').disabled = false;
+            } catch (error) {
+                document.getElementById('oilsResult').innerHTML = 
+                    `<div class="test-result error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        // Display oil example
+        function displayOilExample(oil, type) {
+            const html = `
+                <div class="oil-data">
+                    <h4>${type === 'public' ? '📦 Public Data' : '👤 User Data'}</h4>
+                    <strong>${oil.name || oil.product_name}</strong><br>
+                    Max Load: ${oil.max_load_pct || 'N/A'}%<br>
+                    Flash Point: ${oil.flash_point_f || 'N/A'}°F<br>
+                    Price: $${oil.price_per_unit || 'N/A'}<br>
+                    ${oil.personal_notes ? `Notes: ${oil.personal_notes}<br>` : ''}
+                    ${oil.personal_rating ? `Rating: ${oil.personal_rating}/5<br>` : ''}
+                    ${oil.times_used ? `Used: ${oil.times_used} times<br>` : ''}
+                    ${oil.has_user_overrides ? '<span class="field-diff">Has Customizations</span>' : ''}
+                </div>
+            `;
+            
+            document.getElementById('oilComparison').innerHTML = html;
+        }
+
+        // Display comparison
+        function displayComparison(publicOil, userOil) {
+            const html = `
+                <div class="oil-data">
+                    <h4>📦 Default Product Data</h4>
+                    <strong>${publicOil.name || publicOil.product_name}</strong><br>
+                    Max Load: ${publicOil.max_load_pct || 'N/A'}%<br>
+                    Flash Point: ${publicOil.flash_point_f || 'N/A'}°F<br>
+                    Price: $${publicOil.price_per_unit || 'N/A'}<br>
+                    Supplier: ${publicOil.supplier_name || 'N/A'}
+                </div>
+                <div class="oil-data">
+                    <h4>👤 With User Overrides</h4>
+                    <strong>${userOil.name || userOil.product_name}</strong><br>
+                    Max Load: ${userOil.max_load_pct || 'N/A'}% ${userOil.max_load_pct !== publicOil.max_load_pct ? '<span class="field-diff">Custom</span>' : ''}<br>
+                    Flash Point: ${userOil.flash_point_f || 'N/A'}°F ${userOil.flash_point_f !== publicOil.flash_point_f ? '<span class="field-diff">Custom</span>' : ''}<br>
+                    Price: $${userOil.price_per_unit || 'N/A'} ${userOil.price_per_unit !== publicOil.price_per_unit ? '<span class="field-diff">Custom</span>' : ''}<br>
+                    Supplier: ${userOil.supplier_name || 'N/A'}<br>
+                    ${userOil.personal_notes ? `<br>📝 Notes: ${userOil.personal_notes}` : ''}
+                    ${userOil.personal_rating ? `<br>⭐ Rating: ${userOil.personal_rating}/5` : ''}
+                    ${userOil.times_used ? `<br>📊 Used: ${userOil.times_used} times` : ''}
+                    ${userOil.is_favorite ? '<br>❤️ Favorite' : ''}
+                </div>
+            `;
+            
+            document.getElementById('oilComparison').innerHTML = html;
+        }
+
+        // Handle oil selection
+        document.getElementById('oilSelect').addEventListener('change', (e) => {
+            selectedOilId = e.target.value;
+            if (selectedOilId) {
+                document.getElementById('customFields').style.display = 'grid';
+                document.getElementById('saveBtn').disabled = false;
+                document.getElementById('revertBtn').disabled = false;
+                document.getElementById('usageBtn').disabled = false;
+                
+                // Load existing customizations if any
+                const userOil = userOils.find(o => o.id === selectedOilId);
+                if (userOil && userOil.has_user_overrides) {
+                    document.getElementById('customMaxLoad').value = userOil.max_load_pct || '';
+                    document.getElementById('customPrice').value = userOil.price_per_unit || '';
+                    document.getElementById('customFlashPoint').value = userOil.flash_point_f || '';
+                    document.getElementById('personalNotes').value = userOil.personal_notes || '';
+                    document.getElementById('personalRating').value = userOil.personal_rating || '';
+                    document.getElementById('quantityOnHand').value = userOil.quantity_on_hand || '';
+                    document.getElementById('perfCPSoap').value = userOil.performance_in_cp_soap || '';
+                    document.getElementById('isFavorite').checked = userOil.is_favorite || false;
+                }
+            } else {
+                document.getElementById('customFields').style.display = 'none';
+            }
+        });
+
+        // Save Customizations
+        async function saveCustomizations() {
+            if (!authToken || !selectedOilId) {
+                alert('Please sign in and select an oil');
+                return;
+            }
+            
+            const customizations = {};
+            
+            const maxLoad = document.getElementById('customMaxLoad').value;
+            if (maxLoad) customizations.custom_max_load_pct = parseFloat(maxLoad);
+            
+            const price = document.getElementById('customPrice').value;
+            if (price) customizations.custom_price_per_unit = parseFloat(price);
+            
+            const flashPoint = document.getElementById('customFlashPoint').value;
+            if (flashPoint) customizations.custom_flash_point_f = parseFloat(flashPoint);
+            
+            const notes = document.getElementById('personalNotes').value;
+            if (notes) customizations.personal_notes = notes;
+            
+            const rating = document.getElementById('personalRating').value;
+            if (rating) customizations.personal_rating = parseFloat(rating);
+            
+            const qty = document.getElementById('quantityOnHand').value;
+            if (qty) customizations.quantity_on_hand = parseFloat(qty);
+            
+            const perfCP = document.getElementById('perfCPSoap').value;
+            if (perfCP) customizations.performance_in_cp_soap = perfCP;
+            
+            customizations.is_favorite = document.getElementById('isFavorite').checked;
+            
+            try {
+                const response = await fetch(`/api/user/oils/${selectedOilId}/customize`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(customizations)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('customResult').innerHTML = 
+                        `<div class="test-result success">✅ Customizations saved successfully!</div>`;
+                    
+                    // Reload user oils to see changes
+                    await loadUserOils();
+                } else {
+                    document.getElementById('customResult').innerHTML = 
+                        `<div class="test-result error">❌ Error: ${data.error}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('customResult').innerHTML = 
+                    `<div class="test-result error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        // Revert to Defaults
+        async function revertToDefaults() {
+            if (!authToken || !selectedOilId) {
+                alert('Please sign in and select an oil');
+                return;
+            }
+            
+            if (!confirm('Revert all customizations to default values?')) return;
+            
+            try {
+                const response = await fetch(`/api/user/oils/${selectedOilId}/customize`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('customResult').innerHTML = 
+                        `<div class="test-result success">✅ Reverted to default values!</div>`;
+                    
+                    // Clear form
+                    document.getElementById('customMaxLoad').value = '';
+                    document.getElementById('customPrice').value = '';
+                    document.getElementById('customFlashPoint').value = '';
+                    document.getElementById('personalNotes').value = '';
+                    document.getElementById('personalRating').value = '';
+                    document.getElementById('quantityOnHand').value = '';
+                    document.getElementById('perfCPSoap').value = '';
+                    document.getElementById('isFavorite').checked = false;
+                    
+                    // Reload user oils
+                    await loadUserOils();
+                } else {
+                    document.getElementById('customResult').innerHTML = 
+                        `<div class="test-result error">❌ Error: ${data.error}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('customResult').innerHTML = 
+                    `<div class="test-result error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        // Update Usage
+        async function updateUsage() {
+            if (!authToken || !selectedOilId) {
+                alert('Please sign in and select an oil');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/user/oils/${selectedOilId}/usage`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ incrementUsage: true })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('customResult').innerHTML = 
+                        `<div class="test-result success">✅ Usage updated! Times used: ${data.times_used}, Last used: ${new Date(data.last_used_date).toLocaleDateString()}</div>`;
+                    
+                    // Reload user oils
+                    await loadUserOils();
+                } else {
+                    document.getElementById('customResult').innerHTML = 
+                        `<div class="test-result error">❌ Error: ${data.error}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('customResult').innerHTML = 
+                    `<div class="test-result error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        // Compare Oil Data
+        async function compareOilData() {
+            if (publicOils.length === 0 || userOils.length === 0) {
+                alert('Please load both public and user oils first');
+                return;
+            }
+            
+            const customizedOils = userOils.filter(o => o.has_user_overrides);
+            
+            let comparisonHtml = '<div class="test-result info"><h3>📊 Customization Summary</h3>';
+            comparisonHtml += `<p>Total oils: ${userOils.length}<br>`;
+            comparisonHtml += `Customized oils: ${customizedOils.length}<br>`;
+            comparisonHtml += `Favorites: ${userOils.filter(o => o.is_favorite).length}</p>`;
+            
+            if (customizedOils.length > 0) {
+                comparisonHtml += '<h4>Customized Oils:</h4><ul>';
+                customizedOils.forEach(oil => {
+                    const publicOil = publicOils.find(p => p.id === oil.id);
+                    comparisonHtml += `<li><strong>${oil.name || oil.product_name}</strong>`;
+                    
+                    const changes = [];
+                    if (publicOil) {
+                        if (oil.max_load_pct !== publicOil.max_load_pct) {
+                            changes.push(`Max Load: ${publicOil.max_load_pct}% → ${oil.max_load_pct}%`);
+                        }
+                        if (oil.price_per_unit !== publicOil.price_per_unit) {
+                            changes.push(`Price: $${publicOil.price_per_unit} → $${oil.price_per_unit}`);
+                        }
+                    }
+                    if (oil.personal_notes) changes.push(`Notes: "${oil.personal_notes}"`);
+                    if (oil.personal_rating) changes.push(`Rating: ${oil.personal_rating}/5`);
+                    if (oil.times_used) changes.push(`Used ${oil.times_used} times`);
+                    
+                    if (changes.length > 0) {
+                        comparisonHtml += '<ul>' + changes.map(c => `<li>${c}</li>`).join('') + '</ul>';
+                    }
+                    comparisonHtml += '</li>';
+                });
+                comparisonHtml += '</ul>';
+            }
+            
+            comparisonHtml += '</div>';
+            document.getElementById('comparisonResult').innerHTML = comparisonHtml;
+        }
+    </script>
+</body>
+</html>

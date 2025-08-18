@@ -211,7 +211,7 @@ app.get('/api/bases', async (req, res) => {
     }
 });
 
-// Get all fragrance oils with supplier info
+// Get all fragrance oils with supplier info (public endpoint - no user overrides)
 app.get('/api/oils', async (req, res) => {
     try {
         const { data, error } = await productDB
@@ -242,6 +242,257 @@ app.get('/api/oils', async (req, res) => {
     } catch (error) {
         console.error('Error fetching oils:', error);
         res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Get fragrance oils with user overrides (authenticated endpoint)
+app.get('/api/user/oils', requireAuth, async (req, res) => {
+    try {
+        // Get base fragrance oils from product database
+        const { data: oils, error: oilError } = await productDB
+            .from('fragrance_oils')
+            .select(`
+                *,
+                supplier:suppliers(name, website_url),
+                price_tiers:oil_price_tiers(*),
+                ifra_entries(*),
+                notes:fragrance_notes(*)
+            `)
+            .eq('is_active', true)
+            .order('name');
+        
+        if (oilError) throw oilError;
+        
+        // Get user overrides from user database
+        const { data: overrides, error: overrideError } = await userDB
+            .from('user_fragrance_oil_overrides')
+            .select('*')
+            .eq('user_id', req.user.id);
+        
+        if (overrideError && overrideError.code !== 'PGRST116') throw overrideError;
+        
+        // Create a map of overrides by fragrance_oil_id
+        const overrideMap = {};
+        if (overrides) {
+            overrides.forEach(override => {
+                overrideMap[override.fragrance_oil_id] = override;
+            });
+        }
+        
+        // Merge oils with user overrides
+        const mergedOils = oils.map(oil => {
+            const override = overrideMap[oil.id];
+            
+            if (!override) {
+                // No override, return original with flattened structure
+                return {
+                    ...oil,
+                    supplier_name: oil.supplier?.name,
+                    supplier_website: oil.supplier?.website_url,
+                    price_tiers: oil.price_tiers,
+                    ifra_entries: oil.ifra_entries,
+                    fragrance_notes: oil.notes,
+                    // User-specific fields default to null
+                    personal_notes: null,
+                    personal_rating: null,
+                    is_favorite: false,
+                    times_used: 0,
+                    last_used_date: null,
+                    quantity_on_hand: null,
+                    quantity_unit: 'oz'
+                };
+            }
+            
+            // Merge with overrides - custom values take precedence
+            return {
+                ...oil,
+                // Use custom values if they exist, otherwise use original
+                max_load_pct: override.custom_max_load_pct ?? oil.max_load_pct,
+                recommended_load_pct: override.custom_recommended_load_pct ?? oil.recommended_load_pct,
+                flash_point_f: override.custom_flash_point_f ?? oil.flash_point_f,
+                specific_gravity: override.custom_specific_gravity ?? oil.specific_gravity,
+                vanilla_content: override.custom_vanilla_content ?? oil.vanilla_content,
+                price_per_unit: override.custom_price_per_unit ?? oil.price_per_unit,
+                
+                // IFRA overrides
+                ifra_entries: oil.ifra_entries?.map(entry => ({
+                    ...entry,
+                    max_pct: override[`custom_ifra_category_${entry.category_id}`] ?? entry.max_pct
+                })),
+                
+                // Flatten supplier info
+                supplier_name: oil.supplier?.name,
+                supplier_website: oil.supplier?.website_url,
+                price_tiers: oil.price_tiers,
+                fragrance_notes: oil.notes,
+                
+                // User-specific data
+                personal_notes: override.personal_notes,
+                personal_rating: override.personal_rating,
+                is_favorite: override.is_favorite || false,
+                times_used: override.times_used || 0,
+                last_used_date: override.last_used_date,
+                quantity_on_hand: override.quantity_on_hand,
+                quantity_unit: override.quantity_unit || 'oz',
+                location: override.location,
+                
+                // Performance notes
+                performance_in_cp_soap: override.performance_in_cp_soap,
+                performance_in_mp_soap: override.performance_in_mp_soap,
+                performance_in_candles: override.performance_in_candles,
+                performance_in_lotions: override.performance_in_lotions,
+                discoloration_notes: override.discoloration_notes,
+                acceleration_notes: override.acceleration_notes,
+                
+                // Flag to indicate this has user customizations
+                has_user_overrides: true
+            };
+        });
+        
+        res.json(mergedOils);
+    } catch (error) {
+        console.error('Error fetching user oils:', error);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Save or update user fragrance oil customizations
+app.post('/api/user/oils/:oilId/customize', requireAuth, async (req, res) => {
+    try {
+        const { oilId } = req.params;
+        const userId = req.user.id;
+        const customizations = req.body;
+        
+        // Prepare the override data
+        const overrideData = {
+            user_id: userId,
+            fragrance_oil_id: oilId,
+            ...customizations,
+            updated_at: new Date().toISOString()
+        };
+        
+        // Upsert the customization
+        const { data, error } = await userDBAdmin
+            .from('user_fragrance_oil_overrides')
+            .upsert(overrideData, {
+                onConflict: 'user_id,fragrance_oil_id'
+            })
+            .select()
+            .single();
+        
+        if (error) throw error;
+        
+        res.json({ 
+            success: true, 
+            message: 'Customizations saved successfully',
+            data 
+        });
+    } catch (error) {
+        console.error('Error saving oil customizations:', error);
+        res.status(500).json({ error: 'Failed to save customizations' });
+    }
+});
+
+// Revert specific fields to default (remove custom overrides)
+app.delete('/api/user/oils/:oilId/customize', requireAuth, async (req, res) => {
+    try {
+        const { oilId } = req.params;
+        const userId = req.user.id;
+        const { fields } = req.body; // Array of field names to revert
+        
+        if (!fields || !Array.isArray(fields)) {
+            // If no specific fields, delete the entire override record
+            const { error } = await userDBAdmin
+                .from('user_fragrance_oil_overrides')
+                .delete()
+                .eq('user_id', userId)
+                .eq('fragrance_oil_id', oilId);
+            
+            if (error) throw error;
+            
+            return res.json({ 
+                success: true, 
+                message: 'All customizations removed' 
+            });
+        }
+        
+        // Set specific fields to null
+        const updates = {};
+        fields.forEach(field => {
+            if (field.startsWith('custom_')) {
+                updates[field] = null;
+            }
+        });
+        
+        const { data, error } = await userDBAdmin
+            .from('user_fragrance_oil_overrides')
+            .update({
+                ...updates,
+                updated_at: new Date().toISOString()
+            })
+            .eq('user_id', userId)
+            .eq('fragrance_oil_id', oilId)
+            .select()
+            .single();
+        
+        if (error && error.code !== 'PGRST116') throw error;
+        
+        res.json({ 
+            success: true, 
+            message: 'Selected customizations reverted to defaults',
+            data 
+        });
+    } catch (error) {
+        console.error('Error reverting oil customizations:', error);
+        res.status(500).json({ error: 'Failed to revert customizations' });
+    }
+});
+
+// Update usage statistics when oil is used in a formula
+app.post('/api/user/oils/:oilId/usage', requireAuth, async (req, res) => {
+    try {
+        const { oilId } = req.params;
+        const userId = req.user.id;
+        const { incrementUsage = true } = req.body;
+        
+        // Check if override exists
+        const { data: existing, error: checkError } = await userDB
+            .from('user_fragrance_oil_overrides')
+            .select('times_used')
+            .eq('user_id', userId)
+            .eq('fragrance_oil_id', oilId)
+            .single();
+        
+        if (checkError && checkError.code !== 'PGRST116') throw checkError;
+        
+        const currentUsage = existing?.times_used || 0;
+        const newUsage = incrementUsage ? currentUsage + 1 : currentUsage;
+        
+        // Upsert the usage data
+        const { data, error } = await userDBAdmin
+            .from('user_fragrance_oil_overrides')
+            .upsert({
+                user_id: userId,
+                fragrance_oil_id: oilId,
+                times_used: newUsage,
+                last_used_date: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            }, {
+                onConflict: 'user_id,fragrance_oil_id'
+            })
+            .select()
+            .single();
+        
+        if (error) throw error;
+        
+        res.json({ 
+            success: true,
+            times_used: data.times_used,
+            last_used_date: data.last_used_date
+        });
+    } catch (error) {
+        console.error('Error updating oil usage:', error);
+        res.status(500).json({ error: 'Failed to update usage statistics' });
     }
 });
 
