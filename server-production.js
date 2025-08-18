@@ -1284,10 +1284,10 @@ app.put('/api/admin/vessels/:id', async (req, res) => {
         if (error) throw error;
         
         // Handle price tiers if provided
-        if (price_tiers) {
+        if (price_tiers && Object.keys(price_tiers).length > 0) {
             try {
                 // First check if price tiers exist for this vessel
-                const { data: existingTiers } = await productDBAdmin
+                const { data: existingTiers, error: checkError } = await productDBAdmin
                     .from('vessel_price_tiers')
                     .select('*')
                     .eq('vessel_id', req.params.id)
