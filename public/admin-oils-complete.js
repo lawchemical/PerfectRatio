@@ -604,9 +604,40 @@
             if (oil.scent_description) form.elements['scent_description'].value = oil.scent_description;
             if (oil.theme_family) {
                 console.log('Setting theme_family:', oil.theme_family);
-                form.elements['theme_family'].value = oil.theme_family;
-                // Double-check it was set
-                console.log('Theme family dropdown value after setting:', form.elements['theme_family'].value);
+                
+                // Check if the value exists in the dropdown options
+                const themeSelect = form.elements['theme_family'];
+                let validOption = false;
+                for (let i = 0; i < themeSelect.options.length; i++) {
+                    if (themeSelect.options[i].value === oil.theme_family) {
+                        validOption = true;
+                        break;
+                    }
+                }
+                
+                if (validOption) {
+                    themeSelect.value = oil.theme_family;
+                } else {
+                    // Try to map common legacy values
+                    const mappings = {
+                        'Fresh Floral': 'Floral',
+                        'Fresh': 'Green',
+                        'Oriental': 'Oriental / Amber',
+                        'Aquatic': 'Aquatic / Marine',
+                        'Metallic': 'Metallic / Mineral',
+                        'Resinous': 'Resinous / Balsamic',
+                        'Herbal': 'Aromatic'
+                    };
+                    
+                    if (mappings[oil.theme_family]) {
+                        themeSelect.value = mappings[oil.theme_family];
+                        console.log(`Mapped "${oil.theme_family}" to "${mappings[oil.theme_family]}"`);
+                    } else {
+                        console.warn(`Theme family "${oil.theme_family}" not found in dropdown options. Leaving unselected.`);
+                    }
+                }
+                
+                console.log('Theme family dropdown value after setting:', themeSelect.value);
             }
             if (oil.fragrance_notes_top) form.elements['fragrance_notes_top'].value = oil.fragrance_notes_top;
             if (oil.fragrance_notes_middle) form.elements['fragrance_notes_middle'].value = oil.fragrance_notes_middle;
