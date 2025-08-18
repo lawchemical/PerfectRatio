@@ -28,11 +28,19 @@ const USER_INFO = {
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 
-// Initialize Supabase clients
-const productDB = createClient(PRODUCT_DATA.url, PRODUCT_DATA.anonKey);
-const productDBAdmin = createClient(PRODUCT_DATA.url, PRODUCT_DATA.serviceKey);
-const userDB = createClient(USER_INFO.url, USER_INFO.anonKey);
-const userDBAdmin = createClient(USER_INFO.url, USER_INFO.serviceKey);
+// Initialize Supabase clients with error handling
+let productDB, productDBAdmin, userDB, userDBAdmin;
+
+try {
+    productDB = createClient(PRODUCT_DATA.url, PRODUCT_DATA.anonKey);
+    productDBAdmin = createClient(PRODUCT_DATA.url, PRODUCT_DATA.serviceKey);
+    userDB = createClient(USER_INFO.url, USER_INFO.anonKey);
+    userDBAdmin = createClient(USER_INFO.url, USER_INFO.serviceKey);
+    console.log('Supabase clients initialized successfully');
+} catch (error) {
+    console.error('Error initializing Supabase clients:', error);
+    // Continue anyway - health check should still work
+}
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -71,9 +79,13 @@ app.get('/', (req, res) => {
 
 app.get('/health', (req, res) => {
     console.log('Health check received, sending response...');
-    // Try simple text response first
-    res.status(200).send('OK');
-    console.log('Health check response sent');
+    try {
+        res.writeHead(200, { 'Content-Type': 'text/plain' });
+        res.end('OK');
+        console.log('Health check response sent successfully');
+    } catch (error) {
+        console.error('Error sending health check response:', error);
+    }
 });
 
 // =====================================================
