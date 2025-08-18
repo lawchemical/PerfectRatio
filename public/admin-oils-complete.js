@@ -109,6 +109,16 @@
                                     <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Scent Description</label>
                                     <textarea name="scent_description" rows="3" maxlength="500" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; resize: vertical;"></textarea>
                                 </div>
+                                <div style="display: flex; gap: 24px; margin-bottom: 16px;">
+                                    <label style="display: flex; align-items: center; gap: 8px; font-weight: 500; color: #2E3033; font-size: 14px;">
+                                        <input type="checkbox" name="is_active" checked style="width: 16px; height: 16px;">
+                                        Is Active (appears in app)
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; font-weight: 500; color: #2E3033; font-size: 14px;">
+                                        <input type="checkbox" name="is_discontinued" style="width: 16px; height: 16px;">
+                                        Is Discontinued
+                                    </label>
+                                </div>
                             </div>
                             
                             <div id="tab-content-technical" style="display: none;">
