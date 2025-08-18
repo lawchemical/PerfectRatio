@@ -69,15 +69,44 @@
                             </div>
                             <div class="form-group">
                                 <label>Website</label>
-                                <input type="text" class="form-control" name="website" placeholder="www.example.com">
+                                <input type="text" class="form-control" name="website_url" placeholder="www.example.com">
                             </div>
                             <div class="form-group">
                                 <label>Email</label>
-                                <input type="email" class="form-control" name="email">
+                                <input type="email" class="form-control" name="contact_email">
                             </div>
                             <div class="form-group">
                                 <label>Phone</label>
-                                <input type="tel" class="form-control" name="phone">
+                                <input type="tel" class="form-control" name="contact_phone">
+                            </div>
+                            <div class="form-group">
+                                <label>Address</label>
+                                <input type="text" class="form-control" name="address" placeholder="Street address">
+                            </div>
+                            <div class="form-group">
+                                <label>City</label>
+                                <input type="text" class="form-control" name="city">
+                            </div>
+                            <div class="form-group">
+                                <label>State</label>
+                                <input type="text" class="form-control" name="state" placeholder="e.g., TX">
+                            </div>
+                            <div class="form-group">
+                                <label>Country</label>
+                                <input type="text" class="form-control" name="country" placeholder="e.g., USA">
+                            </div>
+                            <div class="form-group">
+                                <label>Postal Code</label>
+                                <input type="text" class="form-control" name="postal_code">
+                            </div>
+                            <div class="form-group">
+                                <label>Notes</label>
+                                <textarea class="form-control" name="notes" rows="3" placeholder="Additional notes about this supplier"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" name="is_active" checked> Is Active
+                                </label>
                             </div>
                         </div>
                         <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 20px; border-top: 1px solid var(--driftwood);">
@@ -144,9 +173,9 @@
                     <td>${supplier.id}</td>
                     <td>${supplier.name}</td>
                     <td>${baseCount} bases, ${oilCount} oils</td>
-                    <td>${supplier.website ? `<a href="${supplier.website}" target="_blank">${supplier.website}</a>` : '-'}</td>
-                    <td>${supplier.email || '-'}</td>
-                    <td>${supplier.phone || '-'}</td>
+                    <td>${supplier.website_url || supplier.website ? `<a href="${supplier.website_url || supplier.website}" target="_blank">${supplier.website_url || supplier.website}</a>` : '-'}</td>
+                    <td>${supplier.contact_email || supplier.email || '-'}</td>
+                    <td>${supplier.contact_phone || supplier.phone || '-'}</td>
                     <td class="actions">
                         <button class="btn btn-info" onclick="editSupplier(${supplierId})">Edit</button>
                         <button class="btn btn-danger" onclick="deleteSupplier(${supplierId})">Delete</button>
@@ -161,7 +190,9 @@
         const suppliers = AdminCore.getSuppliers();
         const filtered = suppliers.filter(s => 
             s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (s.contact_email && s.contact_email.toLowerCase().includes(searchTerm.toLowerCase())) ||
             (s.email && s.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
+            (s.website_url && s.website_url.toLowerCase().includes(searchTerm.toLowerCase())) ||
             (s.website && s.website.toLowerCase().includes(searchTerm.toLowerCase()))
         );
         
@@ -188,9 +219,9 @@
                     <td>${supplier.id}</td>
                     <td>${supplier.name}</td>
                     <td>${baseCount} bases, ${oilCount} oils</td>
-                    <td>${supplier.website ? `<a href="${supplier.website}" target="_blank">${supplier.website}</a>` : '-'}</td>
-                    <td>${supplier.email || '-'}</td>
-                    <td>${supplier.phone || '-'}</td>
+                    <td>${supplier.website_url || supplier.website ? `<a href="${supplier.website_url || supplier.website}" target="_blank">${supplier.website_url || supplier.website}</a>` : '-'}</td>
+                    <td>${supplier.contact_email || supplier.email || '-'}</td>
+                    <td>${supplier.contact_phone || supplier.phone || '-'}</td>
                     <td class="actions">
                         <button class="btn btn-info" onclick="editSupplier(${supplierId})">Edit</button>
                         <button class="btn btn-danger" onclick="deleteSupplier(${supplierId})">Delete</button>
@@ -210,11 +241,19 @@
         
         if (supplier) {
             form.name.value = supplier.name;
-            form.website.value = supplier.website || '';
-            form.email.value = supplier.email || '';
-            form.phone.value = supplier.phone || '';
+            form.website_url.value = supplier.website_url || supplier.website || '';
+            form.contact_email.value = supplier.contact_email || supplier.email || '';
+            form.contact_phone.value = supplier.contact_phone || supplier.phone || '';
+            form.address.value = supplier.address || '';
+            form.city.value = supplier.city || '';
+            form.state.value = supplier.state || '';
+            form.country.value = supplier.country || '';
+            form.postal_code.value = supplier.postal_code || '';
+            form.notes.value = supplier.notes || '';
+            form.is_active.checked = supplier.is_active !== false;
         } else {
             form.reset();
+            form.is_active.checked = true;
         }
         
         modal.classList.add('active');
@@ -228,11 +267,14 @@
         const id = data.id;
         delete data.id;
         
+        // Convert checkbox to boolean
+        data.is_active = formData.get('is_active') === 'on';
+        
         // Format website URL - add https:// if not present
-        if (data.website && data.website.trim() !== '') {
-            const website = data.website.trim();
+        if (data.website_url && data.website_url.trim() !== '') {
+            const website = data.website_url.trim();
             if (!website.startsWith('http://') && !website.startsWith('https://')) {
-                data.website = 'https://' + website;
+                data.website_url = 'https://' + website;
             }
         }
         
