@@ -191,6 +191,7 @@ app.get('/api/bases', async (req, res) => {
                 supplier:suppliers(name, website_url),
                 price_tiers:base_price_tiers(*)
             `)
+            .eq('is_active', true)
             .order('name');
         
         if (error) throw error;
@@ -222,6 +223,7 @@ app.get('/api/oils', async (req, res) => {
                 ifra_entries(*),
                 notes:fragrance_notes(*)
             `)
+            .eq('is_active', true)
             .order('name');
         
         if (error) throw error;
@@ -253,6 +255,7 @@ app.get('/api/vessels', async (req, res) => {
                 supplier:suppliers(name, website_url),
                 specifications:vessel_specifications(*)
             `)
+            .eq('is_active', true)
             .order('name');
         
         if (error) throw error;
