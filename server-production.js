@@ -51,9 +51,7 @@ const PORT = process.env.PORT || 8080;
 
 // Health check - handle before any middleware
 app.get('/health', (req, res) => {
-    console.log('Health check received, sending response...');
-    res.status(200).send('OK');
-    console.log('Health check response sent successfully');
+    res.send('OK');
 });
 
 // Root endpoint
@@ -1288,6 +1286,16 @@ const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`- User API: /api/user/*`);
     console.log(`- Admin Panel: /admin`);
     console.log(`- Status: /api/status`);
+    
+    // Test the health endpoint locally
+    setTimeout(() => {
+        const http = require('http');
+        http.get(`http://localhost:${PORT}/health`, (res) => {
+            console.log(`\n✅ Local health check successful: ${res.statusCode}`);
+        }).on('error', (err) => {
+            console.error('❌ Local health check failed:', err.message);
+        });
+    }, 1000);
 });
 
 server.on('error', (err) => {
