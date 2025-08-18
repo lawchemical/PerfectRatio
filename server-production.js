@@ -920,11 +920,11 @@ app.post('/api/admin/oils', async (req, res) => {
                 if (tierSize && tierPrice) {
                     tierEntries.push({
                         fragrance_oil_id: newOil.id,
-                        tier_name: tierName || `Tier ${i}`,
-                        size: tierSize,
+                        name: tierName || `Tier ${i}`, // Try 'name' instead of 'tier_name'
+                        quantity: tierSize, // Try 'quantity' instead of 'size'
                         unit: tierUnit || 'oz',
-                        unit_price: tierPrice, // Changed from 'price' to 'unit_price'
-                        supplier_sku: tierSku || null
+                        price: tierPrice, // Try 'price' instead of 'unit_price'
+                        sku: tierSku || null // Try 'sku' instead of 'supplier_sku'
                     });
                 }
             }
@@ -1005,11 +1005,11 @@ app.put('/api/admin/oils/:id', async (req, res) => {
                 if (tierSize && tierPrice) {
                     tierEntries.push({
                         fragrance_oil_id: req.params.id,
-                        tier_name: tierName || `Tier ${i}`,
-                        size: tierSize,
+                        name: tierName || `Tier ${i}`, // Try 'name' instead of 'tier_name'
+                        quantity: tierSize, // Try 'quantity' instead of 'size'
                         unit: tierUnit || 'oz',
-                        unit_price: tierPrice, // Changed from 'price' to 'unit_price'
-                        supplier_sku: tierSku || null
+                        price: tierPrice, // Try 'price' instead of 'unit_price'
+                        sku: tierSku || null // Try 'sku' instead of 'supplier_sku'
                     });
                 }
             }
