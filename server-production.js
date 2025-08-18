@@ -1273,6 +1273,16 @@ app.put('/api/admin/vessels/:id', async (req, res) => {
     try {
         const { price_tiers, ...vesselData } = req.body;
         
+        // Log for debugging
+        console.log('Updating vessel with data:', Object.keys(vesselData));
+        
+        // Remove any undefined or empty fields that might cause issues
+        Object.keys(vesselData).forEach(key => {
+            if (vesselData[key] === undefined || vesselData[key] === '') {
+                delete vesselData[key];
+            }
+        });
+        
         // Update the vessel
         const { data, error } = await productDBAdmin
             .from('vessels')
@@ -1341,8 +1351,9 @@ app.put('/api/admin/vessels/:id', async (req, res) => {
         
         res.json(data);
     } catch (error) {
-        console.error('Error updating vessel:', error);
-        res.status(500).json({ error: 'Database error' });
+        console.error('Error updating vessel:', error.message);
+        console.error('Full error:', error);
+        res.status(500).json({ error: error.message || 'Database error' });
     }
 });
 
