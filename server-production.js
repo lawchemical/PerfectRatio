@@ -932,33 +932,34 @@ app.post('/api/admin/oils', async (req, res) => {
         
         // Handle price tiers if provided
         if (price_tiers && newOil) {
-            const tierEntries = [];
+            console.log('Processing price tiers for new oil:', price_tiers);
+            
+            // Build single row with tier columns
+            const tierData = { fragrance_oil_id: newOil.id };
+            
+            // Extract tier data and build column-based row
             for (let i = 1; i <= 5; i++) {
-                const tierName = price_tiers[`tier${i}_name`];
                 const tierSize = price_tiers[`tier${i}_size`];
                 const tierUnit = price_tiers[`tier${i}_unit`];
                 const tierPrice = price_tiers[`tier${i}_price`];
-                const tierSku = price_tiers[`tier${i}_sku`];
                 
                 if (tierSize && tierPrice) {
-                    tierEntries.push({
-                        fragrance_oil_id: newOil.id,
-                        name: tierName || `Tier ${i}`, // Try 'name' instead of 'tier_name'
-                        quantity: tierSize, // Try 'quantity' instead of 'size'
-                        unit: tierUnit || 'oz',
-                        price: tierPrice, // Try 'price' instead of 'unit_price'
-                        sku: tierSku || null // Try 'sku' instead of 'supplier_sku'
-                    });
+                    tierData[`tier${i}_size`] = parseFloat(tierSize);
+                    tierData[`tier${i}_unit`] = tierUnit || 'oz';
+                    tierData[`tier${i}_price`] = parseFloat(tierPrice);
                 }
             }
             
-            if (tierEntries.length > 0) {
+            // Only insert if we have at least one tier
+            if (Object.keys(tierData).length > 1) {
                 const { error: tierError } = await productDBAdmin
                     .from('oil_price_tiers')
-                    .insert(tierEntries);
+                    .insert(tierData);
                 
                 if (tierError) {
                     console.error('Error saving price tiers:', tierError);
+                } else {
+                    console.log('Successfully saved price tiers');
                 }
             }
         }
@@ -1008,7 +1009,7 @@ app.put('/api/admin/oils/:id', async (req, res) => {
         
         // Handle price tiers if provided
         if (price_tiers) {
-            console.log('Processing price tiers:', price_tiers);
+            console.log('Processing price tiers for update:', price_tiers);
             
             // Delete existing price tiers
             await productDBAdmin
@@ -1016,34 +1017,32 @@ app.put('/api/admin/oils/:id', async (req, res) => {
                 .delete()
                 .eq('fragrance_oil_id', req.params.id);
             
-            // Add new price tiers
-            const tierEntries = [];
+            // Build single row with tier columns
+            const tierData = { fragrance_oil_id: req.params.id };
+            
+            // Extract tier data and build column-based row
             for (let i = 1; i <= 5; i++) {
-                const tierName = price_tiers[`tier${i}_name`];
                 const tierSize = price_tiers[`tier${i}_size`];
                 const tierUnit = price_tiers[`tier${i}_unit`];
                 const tierPrice = price_tiers[`tier${i}_price`];
-                const tierSku = price_tiers[`tier${i}_sku`];
                 
                 if (tierSize && tierPrice) {
-                    tierEntries.push({
-                        fragrance_oil_id: req.params.id,
-                        name: tierName || `Tier ${i}`, // Try 'name' instead of 'tier_name'
-                        quantity: tierSize, // Try 'quantity' instead of 'size'
-                        unit: tierUnit || 'oz',
-                        price: tierPrice, // Try 'price' instead of 'unit_price'
-                        sku: tierSku || null // Try 'sku' instead of 'supplier_sku'
-                    });
+                    tierData[`tier${i}_size`] = parseFloat(tierSize);
+                    tierData[`tier${i}_unit`] = tierUnit || 'oz';
+                    tierData[`tier${i}_price`] = parseFloat(tierPrice);
                 }
             }
             
-            if (tierEntries.length > 0) {
+            // Only insert if we have at least one tier
+            if (Object.keys(tierData).length > 1) {
                 const { error: tierError } = await productDBAdmin
                     .from('oil_price_tiers')
-                    .insert(tierEntries);
+                    .insert(tierData);
                 
                 if (tierError) {
                     console.error('Error saving price tiers:', tierError);
+                } else {
+                    console.log('Successfully saved price tiers');
                 }
             }
         }
