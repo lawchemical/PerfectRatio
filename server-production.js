@@ -1234,8 +1234,8 @@ app.use((err, req, res, next) => {
     });
 });
 
-// Start server
-app.listen(PORT, () => {
+// Start server - bind to 0.0.0.0 for Railway
+app.listen(PORT, '0.0.0.0', () => {
     console.log('🚀 PerfectRatio Production Server Running');
     console.log(`📊 Port: ${PORT}`);
     console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
