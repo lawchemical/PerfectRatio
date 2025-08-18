@@ -780,24 +780,8 @@
         
         console.log('Final data being sent:', data);
         
-        // Clean up fields not directly in fragrance_oils table
-        const fieldsToMove = [
-            'fragrance_notes_top', 'fragrance_notes_middle', 'fragrance_notes_base',
-            'theme_family', 'scent_description', 'soap_acceleration',
-            'product_url', 'blending_notes', 'usage_notes'
-        ];
-        
-        const productDetails = {};
-        fieldsToMove.forEach(field => {
-            if (data[field]) {
-                productDetails[field] = data[field];
-                delete data[field];
-            }
-        });
-        
-        if (Object.keys(productDetails).length > 0) {
-            data.product_details = productDetails;
-        }
+        // All fields are now directly in fragrance_oils table
+        // No need to move anything to product_details
         
         try {
             const isEdit = !!data.id;
@@ -899,6 +883,37 @@
             data.notes = rawData.notes;
         }
         
+        // Fragrance note fields - These are ALL direct database fields now
+        if (rawData.theme_family && rawData.theme_family !== '') {
+            data.theme_family = rawData.theme_family;
+        }
+        if (rawData.fragrance_notes_top && rawData.fragrance_notes_top !== '') {
+            data.fragrance_notes_top = rawData.fragrance_notes_top;
+        }
+        if (rawData.fragrance_notes_middle && rawData.fragrance_notes_middle !== '') {
+            data.fragrance_notes_middle = rawData.fragrance_notes_middle;
+        }
+        if (rawData.fragrance_notes_base && rawData.fragrance_notes_base !== '') {
+            data.fragrance_notes_base = rawData.fragrance_notes_base;
+        }
+        if (rawData.blending_notes && rawData.blending_notes !== '') {
+            data.blending_notes = rawData.blending_notes;
+        }
+        if (rawData.usage_notes && rawData.usage_notes !== '') {
+            data.usage_notes = rawData.usage_notes;
+        }
+        if (rawData.soap_acceleration && rawData.soap_acceleration !== '') {
+            data.soap_acceleration = rawData.soap_acceleration;
+        }
+        if (rawData.product_url && rawData.product_url !== '') {
+            data.product_url = rawData.product_url;
+        }
+        
+        // Also add scent_description as its own field (not just mapped to scent_profile)
+        if (rawData.scent_description && rawData.scent_description !== '') {
+            data.scent_description = rawData.scent_description;
+        }
+        
         // Rating fields
         if (rawData.price_rating && rawData.price_rating !== '') {
             data.price_rating = parseInt(rawData.price_rating);
@@ -909,8 +924,40 @@
         if (rawData.performance_rating && rawData.performance_rating !== '') {
             data.performance_rating = parseFloat(rawData.performance_rating);
         }
+        if (rawData.intensity_rating && rawData.intensity_rating !== '') {
+            data.intensity_rating = parseFloat(rawData.intensity_rating);
+        }
+        if (rawData.overall_rating && rawData.overall_rating !== '') {
+            data.overall_rating = parseFloat(rawData.overall_rating);
+        }
         if (rawData.total_ratings && rawData.total_ratings !== '') {
             data.total_ratings = parseInt(rawData.total_ratings);
+        }
+        
+        // IFRA fields
+        if (rawData.ifra_url && rawData.ifra_url !== '') {
+            data.ifra_url = rawData.ifra_url;
+        }
+        if (rawData.ifra_version && rawData.ifra_version !== '') {
+            data.ifra_version = rawData.ifra_version;
+        }
+        if (rawData.ifra_date && rawData.ifra_date !== '') {
+            data.ifra_date = rawData.ifra_date;
+        }
+        if (rawData.solvent_note && rawData.solvent_note !== '') {
+            data.solvent_note = rawData.solvent_note;
+        }
+        
+        // Status fields
+        data.is_active = rawData.is_active === 'on' || rawData.is_active === true || rawData.is_active === 'true';
+        data.is_discontinued = rawData.is_discontinued === 'on' || rawData.is_discontinued === true || rawData.is_discontinued === 'true';
+        
+        // All 18 IFRA categories
+        for (let i of ['1', '2', '3', '4', '5a', '5b', '5c', '5d', '6', '7a', '7b', '8', '9', '10a', '10b', '11a', '11b', '12']) {
+            const fieldName = `ifra_category_${i}`;
+            if (rawData[fieldName] && rawData[fieldName] !== '') {
+                data[fieldName] = parseFloat(rawData[fieldName]);
+            }
         }
         
         // Handle price tiers
