@@ -960,6 +960,9 @@ app.post('/api/admin/oils', async (req, res) => {
 // Admin: Update oil
 app.put('/api/admin/oils/:id', async (req, res) => {
     try {
+        console.log('Updating oil:', req.params.id);
+        console.log('Request body:', JSON.stringify(req.body, null, 2));
+        
         const { price_tiers, ifra_entries, ...oilData } = req.body;
         
         // Update the oil itself (without price_tiers and ifra_entries)
@@ -974,6 +977,8 @@ app.put('/api/admin/oils/:id', async (req, res) => {
         
         // Handle price tiers if provided
         if (price_tiers) {
+            console.log('Processing price tiers:', price_tiers);
+            
             // Delete existing price tiers
             await productDBAdmin
                 .from('oil_price_tiers')
