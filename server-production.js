@@ -923,7 +923,7 @@ app.post('/api/admin/oils', async (req, res) => {
                         tier_name: tierName || `Tier ${i}`,
                         size: tierSize,
                         unit: tierUnit || 'oz',
-                        price: tierPrice,
+                        unit_price: tierPrice, // Changed from 'price' to 'unit_price'
                         supplier_sku: tierSku || null
                     });
                 }
@@ -1008,7 +1008,7 @@ app.put('/api/admin/oils/:id', async (req, res) => {
                         tier_name: tierName || `Tier ${i}`,
                         size: tierSize,
                         unit: tierUnit || 'oz',
-                        price: tierPrice,
+                        unit_price: tierPrice, // Changed from 'price' to 'unit_price'
                         supplier_sku: tierSku || null
                     });
                 }
