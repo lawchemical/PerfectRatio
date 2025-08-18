@@ -306,6 +306,72 @@
                                         </div>
                                     </div>
                                 </div>
+                                
+                                <!-- Tier 4 -->
+                                <div style="padding: 16px; background: #F5F3F0; border-radius: 8px; margin-bottom: 16px;">
+                                    <h4 style="color: #101114; margin-bottom: 12px;">Pricing Tier 4</h4>
+                                    <div style="margin-bottom: 12px;">
+                                        <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Display Name (e.g., "Bulk", "10 Pounds")</label>
+                                        <input type="text" name="tier4_name" placeholder="e.g., Bulk" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                    </div>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px;">
+                                        <div>
+                                            <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Size</label>
+                                            <input type="number" name="tier4_size" step="0.01" min="0" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                        </div>
+                                        <div>
+                                            <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Unit</label>
+                                            <select name="tier4_unit" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; background: white;">
+                                                <option value="oz">oz</option>
+                                                <option value="ml">ml</option>
+                                                <option value="lb">lb</option>
+                                                <option value="kg">kg</option>
+                                                <option value="g">g</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Price ($)</label>
+                                            <input type="number" name="tier4_price" step="0.01" min="0" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                        </div>
+                                        <div>
+                                            <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">SKU</label>
+                                            <input type="text" name="tier4_sku" placeholder="Supplier SKU" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Tier 5 -->
+                                <div style="padding: 16px; background: #F5F3F0; border-radius: 8px; margin-bottom: 16px;">
+                                    <h4 style="color: #101114; margin-bottom: 12px;">Pricing Tier 5</h4>
+                                    <div style="margin-bottom: 12px;">
+                                        <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Display Name (e.g., "Wholesale", "25 Pounds")</label>
+                                        <input type="text" name="tier5_name" placeholder="e.g., Wholesale" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                    </div>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px;">
+                                        <div>
+                                            <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Size</label>
+                                            <input type="number" name="tier5_size" step="0.01" min="0" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                        </div>
+                                        <div>
+                                            <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Unit</label>
+                                            <select name="tier5_unit" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; background: white;">
+                                                <option value="oz">oz</option>
+                                                <option value="ml">ml</option>
+                                                <option value="lb">lb</option>
+                                                <option value="kg">kg</option>
+                                                <option value="g">g</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Price ($)</label>
+                                            <input type="number" name="tier5_price" step="0.01" min="0" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                        </div>
+                                        <div>
+                                            <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">SKU</label>
+                                            <input type="text" name="tier5_sku" placeholder="Supplier SKU" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             
                             <div id="tab-content-ifra" style="display: none;">
@@ -680,6 +746,7 @@
                     form.elements['tier4_size'].value = tier.tier4_size;
                     form.elements['tier4_unit'].value = tier.tier4_unit || 'oz';
                     form.elements['tier4_price'].value = tier.tier4_price;
+                    if (tier.tier4_sku) form.elements['tier4_sku'].value = tier.tier4_sku;
                 }
                 // Tier 5
                 if (tier.tier5_size) {
@@ -687,6 +754,7 @@
                     form.elements['tier5_size'].value = tier.tier5_size;
                     form.elements['tier5_unit'].value = tier.tier5_unit || 'oz';
                     form.elements['tier5_price'].value = tier.tier5_price;
+                    if (tier.tier5_sku) form.elements['tier5_sku'].value = tier.tier5_sku;
                 }
             }
             

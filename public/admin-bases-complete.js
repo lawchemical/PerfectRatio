@@ -384,6 +384,10 @@
                                         <label>Price ($)</label>
                                         <input type="number" class="form-control" name="tier4_price" step="0.01" min="0">
                                     </div>
+                                    <div class="form-group">
+                                        <label>SKU</label>
+                                        <input type="text" class="form-control" name="tier4_sku" placeholder="Supplier SKU for this tier">
+                                    </div>
                                 </div>
                             </div>
                             
@@ -412,6 +416,10 @@
                                     <div class="form-group">
                                         <label>Price ($)</label>
                                         <input type="number" class="form-control" name="tier5_price" step="0.01" min="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>SKU</label>
+                                        <input type="text" class="form-control" name="tier5_sku" placeholder="Supplier SKU for this tier">
                                     </div>
                                 </div>
                             </div>
@@ -601,6 +609,8 @@
             form.querySelector('[name="supplier_id"]').value = base.supplier_id;
             form.querySelector('[name="name"]').value = base.name;
             form.querySelector('[name="sku"]').value = base.sku || '';
+            form.querySelector('[name="is_active"]').checked = base.is_active !== false;
+            form.querySelector('[name="is_discontinued"]').checked = base.is_discontinued === true;
             // base_type field was removed - no longer needed
             form.querySelector('[name="max_load_pct"]').value = base.max_load_pct;
             form.querySelector('[name="unit_mode"]').value = base.unit_mode;
@@ -610,8 +620,6 @@
             form.querySelector('[name="ifra_category_2"]').value = base.ifra_category_2 || '';
             form.querySelector('[name="is_dual_purpose"]').checked = base.is_dual_purpose;
             form.querySelector('[name="notes"]').value = base.notes || '';
-            form.querySelector('[name="is_in_library"]').checked = base.is_in_library;
-            form.querySelector('[name="is_custom"]').checked = base.is_custom;
             
             // Load ratings
             if (base.ease_of_use_rating) form.querySelector('[name="ease_of_use_rating"]').value = base.ease_of_use_rating;
@@ -647,12 +655,14 @@
                     form.querySelector('[name="tier4_size"]').value = tier.tier4_size;
                     form.querySelector('[name="tier4_unit"]').value = tier.tier4_unit || 'oz';
                     form.querySelector('[name="tier4_price"]').value = tier.tier4_price;
+                    form.querySelector('[name="tier4_sku"]').value = tier.tier4_sku || '';
                 }
                 if (tier.tier5_size) {
                     form.querySelector('[name="tier5_name"]').value = tier.tier5_name || '';
                     form.querySelector('[name="tier5_size"]').value = tier.tier5_size;
                     form.querySelector('[name="tier5_unit"]').value = tier.tier5_unit || 'oz';
                     form.querySelector('[name="tier5_price"]').value = tier.tier5_price;
+                    form.querySelector('[name="tier5_sku"]').value = tier.tier5_sku || '';
                 }
             }
         } else {
