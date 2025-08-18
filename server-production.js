@@ -86,6 +86,28 @@ if (require('fs').existsSync(publicPath)) {
 // DATABASE TEST ENDPOINT
 // =====================================================
 
+// Get table schema info
+app.get('/api/schema/oil_price_tiers', async (req, res) => {
+    try {
+        // Query information_schema to get column details
+        const { data, error } = await productDB
+            .from('information_schema.columns')
+            .select('column_name, data_type, is_nullable')
+            .eq('table_name', 'oil_price_tiers')
+            .eq('table_schema', 'public');
+        
+        if (error) throw error;
+        
+        res.json({ 
+            table: 'oil_price_tiers',
+            columns: data
+        });
+    } catch (error) {
+        console.error('Schema check error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 app.get('/api/test-db', async (req, res) => {
     try {
         console.log('Testing database connection...');
