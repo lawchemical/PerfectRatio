@@ -109,10 +109,18 @@ app.get('/api/test-db', async (req, res) => {
             });
         }
         
+        // Also test oil_price_tiers table structure
+        const { data: tierData, error: tierError } = await productDB
+            .from('oil_price_tiers')
+            .select('*')
+            .limit(1);
+        
         res.json({ 
             status: 'Database connected',
             test: 'success',
-            data
+            data,
+            oil_price_tiers_sample: tierData,
+            oil_price_tiers_error: tierError
         });
     } catch (error) {
         console.error('Test endpoint error:', error);
