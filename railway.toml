@@ -2,7 +2,9 @@
 builder = "nixpacks"
 
 [deploy]
-startCommand = "npm start"
+# Start command should be set in Railway service settings
+# Admin server: npm run start-admin
+# Cache server: npm run start-cache
 healthcheckPath = "/health"
 healthcheckTimeout = 30
 restartPolicyType = "always"
