@@ -474,18 +474,18 @@
             },
             bases: {
                 filename: 'base_products_template.csv',
-                headers: ['name', 'product_type', 'supplier_name', 'sku', 'price_per_lb', 'max_fragrance_load', 'notes', 'ifra_category'],
-                sample: ['Soy Wax 464', 'candle', 'Acme Supplies', 'SW464', '2.50', '10', 'Container wax', '12']
+                headers: ['name', 'product_type', 'supplier_name', 'sku', 'price_per_lb', 'max_fragrance_load', 'notes', 'ifra_category', 'ifra_category_2', 'is_dual_purpose', 'melting_point', 'pour_temp_min', 'pour_temp_max', 'fragrance_temp', 'cure_time_days', 'wax_type', 'ease_of_use_rating', 'performance_rating', 'base_type'],
+                sample: ['Soy Wax 464', 'candle', 'Acme Supplies', 'SW464', '2.50', '10', 'Container wax', '12', '9', 'true', '119', '135', '145', '185', '14', 'soy', '4.5', '4.8', 'wax']
             },
             oils: {
                 filename: 'fragrance_oils_template.csv',
-                headers: ['product_name', 'supplier_name', 'sku', 'flash_point', 'ifra_category_12', 'vanillin_pct', 'price_tier1', 'categories', 'scent_description'],
-                sample: ['Vanilla Bean', 'Fragrance Co', 'VB001', '200', '100', '5.5', '3.99', 'Gourmand,Sweet', 'Rich vanilla with caramel notes']
+                headers: ['product_name', 'supplier_name', 'sku', 'flash_point', 'ifra_category_1', 'ifra_category_2', 'ifra_category_3', 'ifra_category_4', 'ifra_category_5', 'ifra_category_6', 'ifra_category_7', 'ifra_category_8', 'ifra_category_9', 'ifra_category_10', 'ifra_category_11', 'ifra_category_12', 'vanillin_pct', 'price_tier1', 'price_tier2', 'price_tier3', 'categories', 'scent_description', 'is_favorite', 'scent_strength_rating', 'cold_throw_rating', 'hot_throw_rating'],
+                sample: ['Vanilla Bean', 'Fragrance Co', 'VB001', '200', '2', '4', '5', '10', '8', '5', '6', '5', '25', '10', '15', '100', '5.5', '3.99', '3.79', '3.59', 'Gourmand,Sweet', 'Rich vanilla with caramel notes', 'false', '4.5', '4.2', '4.8']
             },
             vessels: {
                 filename: 'vessels_template.csv',
-                headers: ['name', 'vessel_type', 'size', 'size_unit', 'price_per_unit', 'sku', 'supplier_name', 'material', 'color', 'shape', 'case_count'],
-                sample: ['8oz Straight Jar', 'jar', '8', 'oz', '2.50', 'JAR8OZ', 'Container Co', 'glass', 'clear', 'round', '12']
+                headers: ['name', 'vessel_type', 'size', 'size_unit', 'price_per_unit', 'sku', 'supplier_name', 'material', 'color', 'shape', 'neck_size', 'case_count', 'case_price', 'minimum_order_quantity', 'weight_grams', 'dimensions', 'image_url', 'is_in_library'],
+                sample: ['8oz Straight Jar', 'jar', '8', 'oz', '2.50', 'JAR8OZ', 'Container Co', 'glass', 'clear', 'round', '70-400', '12', '30.00', '1', '150', '3x3x4', 'https://example.com/jar.jpg', 'true']
             }
         };
         

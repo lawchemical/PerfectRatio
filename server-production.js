@@ -1800,7 +1800,7 @@ app.post('/api/admin/import/suppliers', async (req, res) => {
     }
 });
 
-// Admin: Import base products
+// Admin: Import base products - Enhanced with dual-purpose and ratings support
 app.post('/api/admin/import/bases', async (req, res) => {
     try {
         const { data } = req.body;
@@ -1808,61 +1808,114 @@ app.post('/api/admin/import/bases', async (req, res) => {
             return res.status(400).json({ error: 'Invalid data format' });
         }
 
-        let created = 0, updated = 0;
+        let created = 0, updated = 0, errors = [];
 
         for (const item of data) {
-            // Get supplier ID by name
-            let supplierId = null;
-            if (item.supplier_name) {
-                const { data: supplier } = await productDBAdmin
-                    .from('suppliers')
+            try {
+                // Get supplier ID by name
+                let supplierId = null;
+                if (item.supplier_name) {
+                    const { data: supplier } = await productDBAdmin
+                        .from('suppliers')
+                        .select('id')
+                        .eq('name', item.supplier_name)
+                        .single();
+                    
+                    supplierId = supplier?.id;
+                    
+                    // Create supplier if it doesn't exist
+                    if (!supplierId && item.supplier_name) {
+                        const { data: newSupplier } = await productDBAdmin
+                            .from('suppliers')
+                            .insert({
+                                name: item.supplier_name,
+                                contact_email: `${item.supplier_name.toLowerCase().replace(/\s+/g, '')}@example.com`
+                            })
+                            .select('id')
+                            .single();
+                        
+                        supplierId = newSupplier?.id;
+                    }
+                }
+
+                // Check if base exists by SKU or name
+                const { data: existing } = await productDBAdmin
+                    .from('base_products')
                     .select('id')
-                    .eq('name', item.supplier_name)
+                    .or(`sku.eq.${item.sku || ''},name.eq.${item.name}`)
                     .single();
-                
-                supplierId = supplier?.id;
-            }
 
-            // Check if base exists by SKU or name
-            const { data: existing } = await productDBAdmin
-                .from('base_products')
-                .select('id')
-                .or(`sku.eq.${item.sku || ''},name.eq.${item.name}`)
-                .single();
+                // Parse boolean values
+                const isDualPurpose = item.is_dual_purpose === 'true' || 
+                                     item.is_dual_purpose === true || 
+                                     item.is_dual_purpose === '1' || 
+                                     item.is_dual_purpose === 1;
 
-            const baseData = {
-                name: item.name,
-                product_type: item.product_type,
-                supplier_id: supplierId,
-                sku: item.sku || null,
-                price_per_lb: parseFloat(item.price_per_lb) || 0,
-                max_fragrance_load: parseFloat(item.max_fragrance_load) || 10,
-                notes: item.notes || null,
-                ifra_category: item.ifra_category || null
-            };
+                const baseData = {
+                    name: item.name,
+                    base_type: item.base_type || item.product_type || 'soap_base',
+                    supplier_id: supplierId,
+                    sku: item.sku || null,
+                    max_load_pct: parseFloat(item.max_load_pct || item.max_fragrance_load) || 10,
+                    unit_mode: item.unit_mode || 'weight',
+                    specific_gravity: parseFloat(item.specific_gravity) || 1.0,
+                    notes: item.notes || null,
+                    
+                    // IFRA Categories
+                    ifra_category: item.ifra_category || null,
+                    ifra_category_2: item.ifra_category_2 || null,
+                    is_dual_purpose: isDualPurpose,
+                    
+                    // Wax/Base specific
+                    wax_type: item.wax_type || null,
+                    
+                    // Ratings
+                    ease_of_use_rating: parseFloat(item.ease_of_use_rating) || null,
+                    performance_rating: parseFloat(item.performance_rating) || null,
+                    total_ratings: parseInt(item.total_ratings) || 0,
+                    library_add_count: parseInt(item.library_add_count) || 0,
+                    batch_count: parseInt(item.batch_count) || 0
+                };
 
-            if (existing) {
-                // Update existing base
-                const { error } = await productDBAdmin
-                    .from('base_products')
-                    .update(baseData)
-                    .eq('id', existing.id);
-                
-                if (!error) updated++;
-            } else {
-                // Create new base
-                const { error } = await productDBAdmin
-                    .from('base_products')
-                    .insert(baseData);
-                
-                if (!error) created++;
+                if (existing) {
+                    // Update existing base
+                    const { error } = await productDBAdmin
+                        .from('base_products')
+                        .update(baseData)
+                        .eq('id', existing.id);
+                    
+                    if (!error) {
+                        updated++;
+                    } else {
+                        errors.push(`Error updating ${item.name}: ${error.message}`);
+                    }
+                } else {
+                    // Create new base
+                    const { error } = await productDBAdmin
+                        .from('base_products')
+                        .insert(baseData);
+                    
+                    if (!error) {
+                        created++;
+                    } else {
+                        errors.push(`Error creating ${item.name}: ${error.message}`);
+                    }
+                }
+            } catch (itemError) {
+                errors.push(`Error processing ${item.name}: ${itemError.message}`);
             }
         }
 
-        res.json({ success: true, created, updated });
+        res.json({ 
+            success: true, 
+            created, 
+            updated, 
+            errors: errors.length > 0 ? errors : undefined,
+            message: `Imported ${created} new and updated ${updated} base products` 
+        });
     } catch (error) {
         console.error('Error importing base products:', error);
-        res.status(500).json({ error: 'Import failed' });
+        res.status(500).json({ error: 'Import failed', details: error.message });
     }
 });
 
@@ -1875,63 +1928,104 @@ app.post('/api/admin/import/oils', async (req, res) => {
         }
 
         let created = 0, updated = 0;
+        const errors = [];
 
         for (const item of data) {
-            // Get supplier ID by name
-            let supplierId = null;
-            if (item.supplier_name) {
-                const { data: supplier } = await productDBAdmin
-                    .from('suppliers')
+            try {
+                // Get supplier ID by name
+                let supplierId = null;
+                if (item.supplier_name) {
+                    const { data: supplier } = await productDBAdmin
+                        .from('suppliers')
+                        .select('id')
+                        .eq('name', item.supplier_name)
+                        .single();
+                    
+                    supplierId = supplier?.id;
+                }
+
+                // Check if oil exists by SKU or product_name
+                const { data: existing } = await productDBAdmin
+                    .from('fragrance_oils')
                     .select('id')
-                    .eq('name', item.supplier_name)
+                    .or(`sku.eq.${item.sku || ''},product_name.eq.${item.product_name}`)
                     .single();
-                
-                supplierId = supplier?.id;
-            }
 
-            // Check if oil exists by SKU or product_name
-            const { data: existing } = await productDBAdmin
-                .from('fragrance_oils')
-                .select('id')
-                .or(`sku.eq.${item.sku || ''},product_name.eq.${item.product_name}`)
-                .single();
+                const oilData = {
+                    product_name: item.product_name,
+                    supplier_id: supplierId,
+                    sku: item.sku || null,
+                    flash_point: parseFloat(item.flash_point) || null,
+                    
+                    // All IFRA categories (database has individual columns)
+                    ifra_category_1: parseFloat(item.ifra_category_1) || null,
+                    ifra_category_2: parseFloat(item.ifra_category_2) || null,
+                    ifra_category_3: parseFloat(item.ifra_category_3) || null,
+                    ifra_category_4: parseFloat(item.ifra_category_4) || null,
+                    ifra_category_5: parseFloat(item.ifra_category_5) || null,
+                    ifra_category_6: parseFloat(item.ifra_category_6) || null,
+                    ifra_category_7: parseFloat(item.ifra_category_7) || null,
+                    ifra_category_8: parseFloat(item.ifra_category_8) || null,
+                    ifra_category_9: parseFloat(item.ifra_category_9) || null,
+                    ifra_category_10: parseFloat(item.ifra_category_10) || null,
+                    ifra_category_11: parseFloat(item.ifra_category_11) || null,
+                    ifra_category_12: parseFloat(item.ifra_category_12) || 100,
+                    
+                    vanillin_pct: parseFloat(item.vanillin_pct) || 0,
+                    price_tier1: parseFloat(item.price_tier1) || 0,
+                    price_tier2: parseFloat(item.price_tier2) || null,
+                    price_tier3: parseFloat(item.price_tier3) || null,
+                    
+                    // Additional fields
+                    categories: item.categories || null,
+                    scent_description: item.scent_description || null,
+                    is_favorite: item.is_favorite === 'true' || item.is_favorite === true || false,
+                    
+                    // Ratings
+                    scent_strength_rating: parseFloat(item.scent_strength_rating) || null,
+                    cold_throw_rating: parseFloat(item.cold_throw_rating) || null,
+                    hot_throw_rating: parseFloat(item.hot_throw_rating) || null
+                };
 
-            const oilData = {
-                product_name: item.product_name,
-                supplier_id: supplierId,
-                sku: item.sku || null,
-                flash_point: parseFloat(item.flash_point) || null,
-                ifra_category_12: parseFloat(item.ifra_category_12) || 100,
-                vanillin_pct: parseFloat(item.vanillin_pct) || 0,
-                price_tier1: parseFloat(item.price_tier1) || 0,
-                price_tier2: parseFloat(item.price_tier2) || null,
-                price_tier3: parseFloat(item.price_tier3) || null,
-                categories: item.categories || null,
-                scent_description: item.scent_description || null
-            };
-
-            if (existing) {
-                // Update existing oil
-                const { error } = await productDBAdmin
-                    .from('fragrance_oils')
-                    .update(oilData)
-                    .eq('id', existing.id);
-                
-                if (!error) updated++;
-            } else {
-                // Create new oil
-                const { error } = await productDBAdmin
-                    .from('fragrance_oils')
-                    .insert(oilData);
-                
-                if (!error) created++;
+                if (existing) {
+                    // Update existing oil
+                    const { error } = await productDBAdmin
+                        .from('fragrance_oils')
+                        .update(oilData)
+                        .eq('id', existing.id);
+                    
+                    if (!error) {
+                        updated++;
+                    } else {
+                        errors.push(`Error updating ${item.product_name}: ${error.message}`);
+                    }
+                } else {
+                    // Create new oil
+                    const { error } = await productDBAdmin
+                        .from('fragrance_oils')
+                        .insert(oilData);
+                    
+                    if (!error) {
+                        created++;
+                    } else {
+                        errors.push(`Error creating ${item.product_name}: ${error.message}`);
+                    }
+                }
+            } catch (itemError) {
+                errors.push(`Error processing ${item.product_name}: ${itemError.message}`);
             }
         }
 
-        res.json({ success: true, created, updated });
+        res.json({ 
+            success: true, 
+            created, 
+            updated, 
+            errors: errors.length > 0 ? errors : undefined,
+            message: `Imported ${created} new and updated ${updated} fragrance oils` 
+        });
     } catch (error) {
         console.error('Error importing fragrance oils:', error);
-        res.status(500).json({ error: 'Import failed' });
+        res.status(500).json({ error: 'Import failed', details: error.message });
     }
 });
 
@@ -1944,65 +2038,91 @@ app.post('/api/admin/import/vessels', async (req, res) => {
         }
 
         let created = 0, updated = 0;
+        const errors = [];
 
         for (const item of data) {
-            // Get supplier ID by name
-            let supplierId = null;
-            if (item.supplier_name) {
-                const { data: supplier } = await productDBAdmin
-                    .from('suppliers')
+            try {
+                // Get supplier ID by name
+                let supplierId = null;
+                if (item.supplier_name) {
+                    const { data: supplier } = await productDBAdmin
+                        .from('suppliers')
+                        .select('id')
+                        .eq('name', item.supplier_name)
+                        .single();
+                    
+                    supplierId = supplier?.id;
+                }
+
+                // Check if vessel exists by SKU or name
+                const { data: existing } = await productDBAdmin
+                    .from('vessels')
                     .select('id')
-                    .eq('name', item.supplier_name)
+                    .or(`sku.eq.${item.sku || ''},name.eq.${item.name}`)
                     .single();
-                
-                supplierId = supplier?.id;
-            }
 
-            // Check if vessel exists by SKU or name
-            const { data: existing } = await productDBAdmin
-                .from('vessels')
-                .select('id')
-                .or(`sku.eq.${item.sku || ''},name.eq.${item.name}`)
-                .single();
+                const vesselData = {
+                    name: item.name,
+                    vessel_type: item.vessel_type,
+                    size: parseFloat(item.size),
+                    size_unit: item.size_unit || 'oz',
+                    price_per_unit: parseFloat(item.price_per_unit) || 0,
+                    sku: item.sku || null,
+                    supplier_id: supplierId,
+                    material: item.material || null,
+                    color: item.color || null,
+                    shape: item.shape || null,
+                    neck_size: item.neck_size || null,
+                    
+                    // Additional fields
+                    case_count: parseInt(item.case_count) || 1,
+                    case_price: parseFloat(item.case_price) || null,
+                    minimum_order_quantity: parseInt(item.minimum_order_quantity) || 1,
+                    weight_grams: parseFloat(item.weight_grams) || null,
+                    dimensions: item.dimensions || null,
+                    image_url: item.image_url || null,
+                    is_in_library: item.is_in_library !== false // Default to true
+                };
 
-            const vesselData = {
-                name: item.name,
-                vessel_type: item.vessel_type,
-                size: parseFloat(item.size),
-                size_unit: item.size_unit || 'oz',
-                price_per_unit: parseFloat(item.price_per_unit),
-                sku: item.sku || null,
-                supplier_id: supplierId,
-                material: item.material || null,
-                color: item.color || null,
-                shape: item.shape || null,
-                neck_size: item.neck_size || null,
-                case_count: parseInt(item.case_count) || 1,
-                is_in_library: true
-            };
-
-            if (existing) {
-                // Update existing vessel
-                const { error } = await productDBAdmin
-                    .from('vessels')
-                    .update(vesselData)
-                    .eq('id', existing.id);
-                
-                if (!error) updated++;
-            } else {
-                // Create new vessel
-                const { error } = await productDBAdmin
-                    .from('vessels')
-                    .insert(vesselData);
-                
-                if (!error) created++;
+                if (existing) {
+                    // Update existing vessel
+                    const { error } = await productDBAdmin
+                        .from('vessels')
+                        .update(vesselData)
+                        .eq('id', existing.id);
+                    
+                    if (!error) {
+                        updated++;
+                    } else {
+                        errors.push(`Error updating ${item.name}: ${error.message}`);
+                    }
+                } else {
+                    // Create new vessel
+                    const { error } = await productDBAdmin
+                        .from('vessels')
+                        .insert(vesselData);
+                    
+                    if (!error) {
+                        created++;
+                    } else {
+                        errors.push(`Error creating ${item.name}: ${error.message}`);
+                    }
+                }
+            } catch (itemError) {
+                errors.push(`Error processing ${item.name}: ${itemError.message}`);
             }
         }
 
-        res.json({ success: true, created, updated });
+        res.json({ 
+            success: true, 
+            created, 
+            updated, 
+            errors: errors.length > 0 ? errors : undefined,
+            message: `Imported ${created} new and updated ${updated} vessels` 
+        });
     } catch (error) {
         console.error('Error importing vessels:', error);
-        res.status(500).json({ error: 'Import failed' });
+        res.status(500).json({ error: 'Import failed', details: error.message });
     }
 });
 
