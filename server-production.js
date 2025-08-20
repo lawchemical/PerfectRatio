@@ -1927,7 +1927,7 @@ app.post('/api/admin/import/oils', async (req, res) => {
             return res.status(400).json({ error: 'Invalid data format' });
         }
 
-        let created = 0, updated = 0, variantsCreated = 0;
+        let created = 0, updated = 0, tiersCreated = 0;
         const errors = [];
 
         for (const item of data) {
@@ -2034,6 +2034,77 @@ app.post('/api/admin/import/oils', async (req, res) => {
                     if (!error) {
                         updated++;
                         fragranceOilId = existing.id;
+                        
+                        // Update price tiers for existing oil
+                        const priceTiers = {
+                            fragrance_oil_id: fragranceOilId,
+                            // Tier 1
+                            tier1_name: item.tier1_name || null,
+                            tier1_size: parseFloat(item.tier1_size) || null,
+                            tier1_unit: item.tier1_unit || null,
+                            tier1_price: parseFloat(item.tier1_price) || null,
+                            tier1_sku: item.tier1_sku || null,
+                            // Tier 2
+                            tier2_name: item.tier2_name || null,
+                            tier2_size: parseFloat(item.tier2_size) || null,
+                            tier2_unit: item.tier2_unit || null,
+                            tier2_price: parseFloat(item.tier2_price) || null,
+                            tier2_sku: item.tier2_sku || null,
+                            // Tier 3
+                            tier3_name: item.tier3_name || null,
+                            tier3_size: parseFloat(item.tier3_size) || null,
+                            tier3_unit: item.tier3_unit || null,
+                            tier3_price: parseFloat(item.tier3_price) || null,
+                            tier3_sku: item.tier3_sku || null,
+                            // Tier 4
+                            tier4_name: item.tier4_name || null,
+                            tier4_size: parseFloat(item.tier4_size) || null,
+                            tier4_unit: item.tier4_unit || null,
+                            tier4_price: parseFloat(item.tier4_price) || null,
+                            tier4_sku: item.tier4_sku || null,
+                            // Tier 5
+                            tier5_name: item.tier5_name || null,
+                            tier5_size: parseFloat(item.tier5_size) || null,
+                            tier5_unit: item.tier5_unit || null,
+                            tier5_price: parseFloat(item.tier5_price) || null,
+                            tier5_sku: item.tier5_sku || null
+                        };
+                        
+                        // Only update price tiers if we have any tier data
+                        const hasValidTier = 
+                            (priceTiers.tier1_size && priceTiers.tier1_price) ||
+                            (priceTiers.tier2_size && priceTiers.tier2_price) ||
+                            (priceTiers.tier3_size && priceTiers.tier3_price) ||
+                            (priceTiers.tier4_size && priceTiers.tier4_price) ||
+                            (priceTiers.tier5_size && priceTiers.tier5_price);
+                        
+                        if (hasValidTier) {
+                            try {
+                                // First delete existing price tiers
+                                await productDBAdmin
+                                    .from('oil_price_tiers')
+                                    .delete()
+                                    .eq('fragrance_oil_id', fragranceOilId);
+                                
+                                // Then insert new price tiers
+                                const { error: tierError } = await productDBAdmin
+                                    .from('oil_price_tiers')
+                                    .insert(priceTiers);
+                                
+                                if (tierError) {
+                                    console.error('Error updating price tiers:', tierError);
+                                } else {
+                                    // Count how many tiers were actually populated
+                                    for (let i = 1; i <= 5; i++) {
+                                        if (priceTiers[`tier${i}_size`] && priceTiers[`tier${i}_price`]) {
+                                            tiersCreated++;
+                                        }
+                                    }
+                                }
+                            } catch (tierErr) {
+                                console.log('Error with price tiers:', tierErr.message);
+                            }
+                        }
                     } else {
                         errors.push(`Error updating ${item.product_name}: ${error.message}`);
                     }
@@ -2049,50 +2120,68 @@ app.post('/api/admin/import/oils', async (req, res) => {
                         created++;
                         fragranceOilId = newOil.id;
                         
-                        // Create variants for the new fragrance oil
-                        const variants = [
-                            { 
-                                size: '1 oz', 
-                                sku: item.sku_1oz || null,
-                                price: parseFloat(item.price_1oz) || parseFloat(item.price_tier1) || 0
-                            },
-                            { 
-                                size: '4 oz', 
-                                sku: item.sku_4oz || null,
-                                price: parseFloat(item.price_4oz) || parseFloat(item.price_tier2) || 0
-                            },
-                            { 
-                                size: '8 oz', 
-                                sku: item.sku_8oz || null,
-                                price: parseFloat(item.price_8oz) || parseFloat(item.price_tier3) || 0
-                            },
-                            { 
-                                size: '16 oz', 
-                                sku: item.sku_16oz || null,
-                                price: parseFloat(item.price_16oz) || 0
-                            }
-                        ];
+                        // Create price tiers for the new fragrance oil
+                        const priceTiers = {
+                            fragrance_oil_id: fragranceOilId,
+                            // Tier 1
+                            tier1_name: item.tier1_name || null,
+                            tier1_size: parseFloat(item.tier1_size) || null,
+                            tier1_unit: item.tier1_unit || null,
+                            tier1_price: parseFloat(item.tier1_price) || null,
+                            tier1_sku: item.tier1_sku || null,
+                            // Tier 2
+                            tier2_name: item.tier2_name || null,
+                            tier2_size: parseFloat(item.tier2_size) || null,
+                            tier2_unit: item.tier2_unit || null,
+                            tier2_price: parseFloat(item.tier2_price) || null,
+                            tier2_sku: item.tier2_sku || null,
+                            // Tier 3
+                            tier3_name: item.tier3_name || null,
+                            tier3_size: parseFloat(item.tier3_size) || null,
+                            tier3_unit: item.tier3_unit || null,
+                            tier3_price: parseFloat(item.tier3_price) || null,
+                            tier3_sku: item.tier3_sku || null,
+                            // Tier 4
+                            tier4_name: item.tier4_name || null,
+                            tier4_size: parseFloat(item.tier4_size) || null,
+                            tier4_unit: item.tier4_unit || null,
+                            tier4_price: parseFloat(item.tier4_price) || null,
+                            tier4_sku: item.tier4_sku || null,
+                            // Tier 5
+                            tier5_name: item.tier5_name || null,
+                            tier5_size: parseFloat(item.tier5_size) || null,
+                            tier5_unit: item.tier5_unit || null,
+                            tier5_price: parseFloat(item.tier5_price) || null,
+                            tier5_sku: item.tier5_sku || null
+                        };
                         
-                        // Check if fragrance_oil_variants table exists and create variants
-                        for (const variant of variants) {
-                            if (variant.price > 0 || variant.sku) {
-                                try {
-                                    const { error: variantError } = await productDBAdmin
-                                        .from('fragrance_oil_variants')
-                                        .insert({
-                                            fragrance_oil_id: fragranceOilId,
-                                            size: variant.size,
-                                            sku: variant.sku,
-                                            price: variant.price
-                                        });
-                                    
-                                    if (!variantError) {
-                                        variantsCreated++;
+                        // Insert price tiers into oil_price_tiers table
+                        // Only insert if at least one tier has valid data
+                        const hasValidTier = 
+                            (priceTiers.tier1_size && priceTiers.tier1_price) ||
+                            (priceTiers.tier2_size && priceTiers.tier2_price) ||
+                            (priceTiers.tier3_size && priceTiers.tier3_price) ||
+                            (priceTiers.tier4_size && priceTiers.tier4_price) ||
+                            (priceTiers.tier5_size && priceTiers.tier5_price);
+                        
+                        if (hasValidTier) {
+                            try {
+                                const { error: tierError } = await productDBAdmin
+                                    .from('oil_price_tiers')
+                                    .insert(priceTiers);
+                                
+                                if (tierError) {
+                                    console.error('Error inserting price tiers:', tierError);
+                                } else {
+                                    // Count how many tiers were actually populated
+                                    for (let i = 1; i <= 5; i++) {
+                                        if (priceTiers[`tier${i}_size`] && priceTiers[`tier${i}_price`]) {
+                                            tiersCreated++;
+                                        }
                                     }
-                                } catch (variantErr) {
-                                    // If variants table doesn't exist, skip variant creation
-                                    console.log('Variants table may not exist, skipping variant creation');
                                 }
+                            } catch (tierErr) {
+                                console.log('Error with price tiers:', tierErr.message);
                             }
                         }
                     } else {
@@ -2108,8 +2197,9 @@ app.post('/api/admin/import/oils', async (req, res) => {
             success: true, 
             created, 
             updated, 
+            tiersCreated,
             errors: errors.length > 0 ? errors : undefined,
-            message: `Imported ${created} new and updated ${updated} fragrance oils` 
+            message: `Imported ${created} new and updated ${updated} fragrance oils with ${tiersCreated} price tiers` 
         });
     } catch (error) {
         console.error('Error importing fragrance oils:', error);

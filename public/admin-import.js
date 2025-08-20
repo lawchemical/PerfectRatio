@@ -479,8 +479,62 @@
             },
             oils: {
                 filename: 'fragrance_oils_template.csv',
-                headers: ['product_name', 'supplier_name', 'sku', 'flash_point', 'ifra_category_1', 'ifra_category_2', 'ifra_category_3', 'ifra_category_4', 'ifra_category_5', 'ifra_category_6', 'ifra_category_7', 'ifra_category_8', 'ifra_category_9', 'ifra_category_10', 'ifra_category_11', 'ifra_category_12', 'vanillin_pct', 'price_tier1', 'price_tier2', 'price_tier3', 'categories', 'scent_description', 'is_favorite', 'scent_strength_rating', 'cold_throw_rating', 'hot_throw_rating'],
-                sample: ['Vanilla Bean', 'Fragrance Co', 'VB001', '200', '2', '4', '5', '10', '8', '5', '6', '5', '25', '10', '15', '100', '5.5', '3.99', '3.79', '3.59', 'Gourmand,Sweet', 'Rich vanilla with caramel notes', 'false', '4.5', '4.2', '4.8']
+                headers: [
+                    'product_name', 'supplier_name', 'flash_point', 'specific_gravity', 
+                    'vanilla_content', 'discoloration', 'ethyl_vanillin', 'vanillin_pct',
+                    // Price tier 1
+                    'tier1_name', 'tier1_size', 'tier1_unit', 'tier1_price', 'tier1_sku',
+                    // Price tier 2
+                    'tier2_name', 'tier2_size', 'tier2_unit', 'tier2_price', 'tier2_sku',
+                    // Price tier 3
+                    'tier3_name', 'tier3_size', 'tier3_unit', 'tier3_price', 'tier3_sku',
+                    // Price tier 4
+                    'tier4_name', 'tier4_size', 'tier4_unit', 'tier4_price', 'tier4_sku',
+                    // Price tier 5
+                    'tier5_name', 'tier5_size', 'tier5_unit', 'tier5_price', 'tier5_sku',
+                    // IFRA categories with subcategories
+                    'ifra_category_1', 'ifra_category_2', 'ifra_category_3', 'ifra_category_4',
+                    'ifra_category_5', 'ifra_category_5A', 'ifra_category_5B', 'ifra_category_5C', 'ifra_category_5D',
+                    'ifra_category_6', 
+                    'ifra_category_7', 'ifra_category_7A', 'ifra_category_7B',
+                    'ifra_category_8', 'ifra_category_9',
+                    'ifra_category_10', 'ifra_category_10A', 'ifra_category_10B',
+                    'ifra_category_11', 'ifra_category_11A', 'ifra_category_11B',
+                    'ifra_category_12',
+                    // Additional fields
+                    'categories', 'scent_description', 'is_favorite',
+                    'scent_strength_rating', 'cold_throw_rating', 'hot_throw_rating',
+                    'acceleration', 'ricing', 'separation',
+                    'top_notes', 'middle_notes', 'base_notes',
+                    'blends_well_with', 'usage_notes',
+                    'ifra_url', 'sds_url', 'image_url'
+                ],
+                sample: [
+                    'Vanilla Bean', 'Fragrance Co', '200', '0.98',
+                    '5', 'Medium Brown', '0', '5.5',
+                    // Price tiers
+                    'Sample', '1', 'oz', '3.99', 'VB001-1',
+                    'Small', '4', 'oz', '10.99', 'VB001-4',
+                    'Medium', '8', 'oz', '17.99', 'VB001-8',
+                    'Large', '16', 'oz', '29.99', 'VB001-16',
+                    'Bulk', '32', 'oz', '52.99', 'VB001-32',
+                    // IFRA values
+                    '2', '4', '5', '10',
+                    '8', '8', '8', '8', '8',
+                    '5',
+                    '6', '6', '6',
+                    '5', '25',
+                    '10', '10', '10',
+                    '15', '15', '15',
+                    '100',
+                    // Additional info
+                    'Gourmand,Sweet', 'Rich vanilla with caramel notes', 'false',
+                    '4.5', '4.2', '4.8',
+                    'None', 'None', 'None',
+                    'Vanilla, Caramel', 'Brown Sugar, Tonka', 'Sandalwood, Musk',
+                    'Chocolate, Coffee, Amber', 'Works well at 6-10% in CP soap',
+                    'https://example.com/vanilla-ifra.pdf', 'https://example.com/vanilla-sds.pdf', 'https://example.com/vanilla.jpg'
+                ]
             },
             vessels: {
                 filename: 'vessels_template.csv',
