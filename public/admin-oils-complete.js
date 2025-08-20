@@ -790,6 +790,10 @@
             if (oil.batch_count) form.elements['batch_count'].value = oil.batch_count;
         } else {
             title.textContent = 'Add Fragrance Oil';
+            // Explicitly clear the id field for new oils
+            if (form.elements['id']) {
+                form.elements['id'].value = '';
+            }
         }
         
         modal.classList.add('show');
@@ -852,6 +856,11 @@
         
         const formData = new FormData(e.target);
         const data = Object.fromEntries(formData);
+        
+        // Remove empty id field to ensure new items are created, not updated
+        if (!data.id || data.id === '') {
+            delete data.id;
+        }
         
         // Convert checkboxes
         data.is_active = formData.get('is_active') === 'on';
@@ -971,6 +980,11 @@
 
         // Map form fields to database schema and filter out unsupported fields
         const data = {};
+        
+        // IMPORTANT: Include ID for updates
+        if (rawData.id && rawData.id !== '') {
+            data.id = rawData.id;
+        }
         
         // Basic fields that exist in the database schema
         if (rawData.supplier_id && rawData.supplier_id !== '') data.supplier_id = rawData.supplier_id;
