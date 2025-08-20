@@ -1985,6 +1985,8 @@ app.post('/api/admin/import/oils', async (req, res) => {
                     specific_gravity: parseFloat(item.specific_gravity) || null,
                     vanilla_content: item.vanilla_content !== undefined ? parseFloat(item.vanilla_content) : null,
                     vanillin_pct: item.vanillin_pct !== undefined ? parseFloat(item.vanillin_pct) : (item.vanillin_content !== undefined ? parseFloat(item.vanillin_content) : null),
+                    ethyl_vanillin: item.ethyl_vanillin !== undefined ? parseFloat(item.ethyl_vanillin) : null,
+                    discoloration: item.discoloration || null,
                     
                     // All IFRA categories - using lowercase with underscores as in database
                     ifra_category_1: item.ifra_category_1 !== undefined ? parseFloat(item.ifra_category_1) : null,
@@ -2006,15 +2008,34 @@ app.post('/api/admin/import/oils', async (req, res) => {
                     ifra_category_11b: ifra11B,
                     ifra_category_12: item.ifra_category_12 !== undefined ? parseFloat(item.ifra_category_12) : 100,
                     
-                    // Additional fields - commented out as these columns don't exist in database
-                    // categories: item.categories || null,
-                    // scent_description: item.scent_description || null,
-                    // is_favorite: item.is_favorite === 'true' || item.is_favorite === true || false,
+                    // Extended fields
+                    categories: item.categories || null,
+                    scent_description: item.scent_description || null,
+                    is_favorite: item.is_favorite === 'true' || item.is_favorite === true || false,
                     
-                    // Ratings - commented out as these columns don't exist in database
-                    // scent_strength_rating: parseFloat(item.scent_strength_rating) || null,
-                    // cold_throw_rating: parseFloat(item.cold_throw_rating) || null,
-                    // hot_throw_rating: parseFloat(item.hot_throw_rating) || null
+                    // Ratings
+                    scent_strength_rating: item.scent_strength_rating ? parseFloat(item.scent_strength_rating) : null,
+                    cold_throw_rating: item.cold_throw_rating ? parseFloat(item.cold_throw_rating) : null,
+                    hot_throw_rating: item.hot_throw_rating ? parseFloat(item.hot_throw_rating) : null,
+                    
+                    // Soap-making properties
+                    acceleration: item.acceleration || null,
+                    ricing: item.ricing || null,
+                    separation: item.separation || null,
+                    
+                    // Fragrance notes
+                    top_notes: item.top_notes || null,
+                    middle_notes: item.middle_notes || null,
+                    base_notes: item.base_notes || null,
+                    
+                    // Blending and usage
+                    blends_well_with: item.blends_well_with || null,
+                    usage_notes: item.usage_notes || null,
+                    
+                    // Documentation URLs
+                    ifra_url: item.ifra_url || null,
+                    sds_url: item.sds_url || null,
+                    image_url: item.image_url || null
                 };
 
                 let fragranceOilId;
