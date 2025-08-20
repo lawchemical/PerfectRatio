@@ -2011,15 +2011,15 @@ app.post('/api/admin/import/oils', async (req, res) => {
                     price_tier2: parseFloat(item.price_tier2) || null,
                     price_tier3: parseFloat(item.price_tier3) || null,
                     
-                    // Additional fields
-                    categories: item.categories || null,
-                    scent_description: item.scent_description || null,
-                    is_favorite: item.is_favorite === 'true' || item.is_favorite === true || false,
+                    // Additional fields - commented out as these columns don't exist in database
+                    // categories: item.categories || null,
+                    // scent_description: item.scent_description || null,
+                    // is_favorite: item.is_favorite === 'true' || item.is_favorite === true || false,
                     
-                    // Ratings
-                    scent_strength_rating: parseFloat(item.scent_strength_rating) || null,
-                    cold_throw_rating: parseFloat(item.cold_throw_rating) || null,
-                    hot_throw_rating: parseFloat(item.hot_throw_rating) || null
+                    // Ratings - commented out as these columns don't exist in database
+                    // scent_strength_rating: parseFloat(item.scent_strength_rating) || null,
+                    // cold_throw_rating: parseFloat(item.cold_throw_rating) || null,
+                    // hot_throw_rating: parseFloat(item.hot_throw_rating) || null
                 };
 
                 let fragranceOilId;
