@@ -528,12 +528,23 @@
     // Load oils
     async function loadOils() {
         try {
+            // Ensure suppliers are loaded first for proper display
+            if (!AdminCore.getSuppliers() || AdminCore.getSuppliers().length === 0) {
+                await loadSuppliers();
+            }
+            
             const data = await AdminCore.apiRequest("/api/admin/oils");
             const oils = data;
             AdminCore.setOils(oils);
-            renderOils();
-            updateSupplierFilter();
+            
+            // Force table re-render with a small delay to ensure DOM is ready
+            setTimeout(() => {
+                renderOils();
+                updateSupplierFilter();
+            }, 100);
+            
         } catch (error) {
+            console.error('Error loading oils:', error);
             AdminCore.showToast('Failed to load fragrance oils', 'error');
         }
     }
@@ -935,8 +946,15 @@
             });
             
             AdminCore.showToast('Fragrance oil saved successfully', 'success');
+            
+            // Close modal and reset form
             closeOilModal();
-            await loadOils();
+            document.getElementById('oilForm').reset();
+            
+            // Reload oils with a small delay to ensure server has processed the new oil
+            setTimeout(async () => {
+                await loadOils();
+            }, 500);
         } catch (error) {
             AdminCore.showToast(`Failed to save fragrance oil: ${error.message}`, 'error');
         }
@@ -1146,8 +1164,15 @@
 
             console.log('Save response:', response);
             AdminCore.showToast('Fragrance oil saved successfully', 'success');
+            
+            // Close modal and reset form
             closeOilModal();
-            await loadOils();
+            document.getElementById('oilForm').reset();
+            
+            // Reload oils with a small delay to ensure server has processed the new oil
+            setTimeout(async () => {
+                await loadOils();
+            }, 500);
         } catch (error) {
             console.error('Error saving oil:', error);
             AdminCore.showToast(`Failed to save fragrance oil: ${error.message}`, 'error');
