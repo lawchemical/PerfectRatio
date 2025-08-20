@@ -25,21 +25,15 @@
                 <table id="oilsTable">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th style="width: 100px;">ID</th>
                             <th>NAME</th>
                             <th>SUPPLIER</th>
-                            <th>SKU</th>
-                            <th>FLASH PT</th>
-                            <th>NOTES</th>
-                            <th>IFRA</th>
-                            <th>RATING</th>
-                            <th>LIBRARY</th>
-                            <th>ACTIONS</th>
+                            <th style="width: 150px;">ACTIONS</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td colspan="10" style="text-align: center;">
+                            <td colspan="4" style="text-align: center;">
                                 <div class="loading"></div>
                             </td>
                         </tr>
@@ -577,7 +571,7 @@
         }
     }
 
-    // Render oils table with more information
+    // Render oils table - simplified to show only ID, Name, Supplier
     function renderOils(oilsToRender = null) {
         const oils = oilsToRender || AdminCore.getOils();
         const tbody = document.querySelector('#oilsTable tbody');
@@ -585,7 +579,7 @@
         if (oils.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="10" style="text-align: center;">No fragrance oils found</td>
+                    <td colspan="4" style="text-align: center;">No fragrance oils found</td>
                 </tr>
             `;
             return;
@@ -593,30 +587,35 @@
 
         tbody.innerHTML = oils.map(oil => {
             const oilId = typeof oil.id === 'string' ? `'${oil.id}'` : oil.id;
-            const fragranceNotes = [];
-            if (oil.fragrance_notes_top) fragranceNotes.push('T');
-            if (oil.fragrance_notes_middle) fragranceNotes.push('M');
-            if (oil.fragrance_notes_base) fragranceNotes.push('B');
+            
+            // Get supplier name - check multiple possible fields
+            let supplierName = oil.supplier_name || oil.supplier?.name || '';
+            if (!supplierName && oil.supplier_id) {
+                // Try to find supplier from the suppliers list
+                const suppliers = AdminCore.getSuppliers();
+                const supplier = suppliers.find(s => s.id === oil.supplier_id);
+                supplierName = supplier ? supplier.name : 'Unknown Supplier';
+            }
+            if (!supplierName) {
+                supplierName = 'No Supplier';
+            }
+            
+            // Get the display name - prioritize name over product_name
+            const displayName = oil.name || oil.product_name || 'Unnamed Oil';
+            
+            // Truncate ID if it's too long (UUIDs)
+            const displayId = oil.id && oil.id.length > 8 ? 
+                oil.id.substring(0, 8) + '...' : 
+                oil.id || '-';
             
             return `
                 <tr>
-                    <td>${oil.id}</td>
-                    <td>${oil.product_name || oil.name || '-'}</td>
-                    <td>${oil.supplier_name || '-'}</td>
-                    <td>${oil.sku || '-'}</td>
-                    <td>${oil.flash_point_f ? oil.flash_point_f + '°F' : '-'}</td>
-                    <td>${fragranceNotes.length > 0 ? fragranceNotes.join(',') : '-'}</td>
-                    <td>${oil.ifra_version || '-'}</td>
-                    <td>${oil.overall_rating ? parseFloat(oil.overall_rating).toFixed(1) : '-'}</td>
-                    <td>
-                        <span class="library-toggle ${oil.is_in_library ? 'in-library' : ''}" 
-                              onclick="toggleOilLibrary(${oilId}, ${!oil.is_in_library})">
-                            ${oil.is_in_library ? '✓ In Library' : '✗ Not in Library'}
-                        </span>
-                    </td>
+                    <td title="${oil.id}" style="font-family: monospace; font-size: 12px;">${displayId}</td>
+                    <td style="font-weight: 500;">${displayName}</td>
+                    <td>${supplierName}</td>
                     <td class="actions">
-                        <button class="btn-small" onclick="editOil(${oilId})">✏️</button>
-                        <button class="btn-small btn-danger" onclick="deleteOil(${oilId})">🗑️</button>
+                        <button class="btn-small" onclick="editOil(${oilId})" title="Edit">✏️</button>
+                        <button class="btn-small btn-danger" onclick="deleteOil(${oilId})" title="Delete">🗑️</button>
                     </td>
                 </tr>
             `;
