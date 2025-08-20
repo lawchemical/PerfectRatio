@@ -665,6 +665,9 @@
             form.elements['ifra_url'].value = oil.ifra_url || '';
             form.elements['solvent_note'].value = oil.solvent_note || '';
             
+            // Set checkbox states
+            form.elements['is_active'].checked = oil.is_active !== false;
+            
             // Load IFRA category fields
             const ifraCategories = ['1', '2', '3', '4', '5a', '5b', '5c', '5d', '6', '7a', '7b', '8', '9', '10a', '10b', '11a', '11b', '12'];
             ifraCategories.forEach(cat => {
@@ -851,6 +854,7 @@
         const data = Object.fromEntries(formData);
         
         // Convert checkboxes
+        data.is_active = formData.get('is_active') === 'on';
         data.is_in_library = formData.get('is_in_library') ? true : false;
         data.is_favorite = formData.get('is_favorite') ? true : false;
         data.is_custom = formData.get('is_custom') ? true : false;
