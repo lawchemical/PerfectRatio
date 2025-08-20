@@ -1919,7 +1919,7 @@ app.post('/api/admin/import/bases', async (req, res) => {
     }
 });
 
-// Admin: Import fragrance oils
+// Admin: Import fragrance oils with variants
 app.post('/api/admin/import/oils', async (req, res) => {
     try {
         const { data } = req.body;
@@ -1927,7 +1927,7 @@ app.post('/api/admin/import/oils', async (req, res) => {
             return res.status(400).json({ error: 'Invalid data format' });
         }
 
-        let created = 0, updated = 0;
+        let created = 0, updated = 0, variantsCreated = 0;
         const errors = [];
 
         for (const item of data) {
@@ -1942,33 +1942,68 @@ app.post('/api/admin/import/oils', async (req, res) => {
                         .single();
                     
                     supplierId = supplier?.id;
+                    
+                    // Create supplier if it doesn't exist
+                    if (!supplierId && item.supplier_name) {
+                        const { data: newSupplier } = await productDBAdmin
+                            .from('suppliers')
+                            .insert({
+                                name: item.supplier_name,
+                                contact_email: `${item.supplier_name.toLowerCase().replace(/\s+/g, '')}@example.com`
+                            })
+                            .select('id')
+                            .single();
+                        
+                        supplierId = newSupplier?.id;
+                    }
                 }
 
-                // Check if oil exists by SKU or product_name
+                // Check if oil exists by product_name (primary identifier)
                 const { data: existing } = await productDBAdmin
                     .from('fragrance_oils')
                     .select('id')
-                    .or(`sku.eq.${item.sku || ''},product_name.eq.${item.product_name}`)
+                    .eq('product_name', item.product_name)
                     .single();
+
+                // Parse IFRA subcategories
+                const ifra5A = parseFloat(item.ifra_category_5A) || parseFloat(item.ifra_category_5) || null;
+                const ifra5B = parseFloat(item.ifra_category_5B) || null;
+                const ifra5C = parseFloat(item.ifra_category_5C) || null;
+                const ifra5D = parseFloat(item.ifra_category_5D) || null;
+                const ifra7A = parseFloat(item.ifra_category_7A) || parseFloat(item.ifra_category_7) || null;
+                const ifra7B = parseFloat(item.ifra_category_7B) || null;
+                const ifra10A = parseFloat(item.ifra_category_10A) || parseFloat(item.ifra_category_10) || null;
+                const ifra10B = parseFloat(item.ifra_category_10B) || null;
+                const ifra11A = parseFloat(item.ifra_category_11A) || parseFloat(item.ifra_category_11) || null;
+                const ifra11B = parseFloat(item.ifra_category_11B) || null;
 
                 const oilData = {
                     product_name: item.product_name,
                     supplier_id: supplierId,
-                    sku: item.sku || null,
                     flash_point: parseFloat(item.flash_point) || null,
                     
-                    // All IFRA categories (database has individual columns)
+                    // All IFRA categories with subcategories
                     ifra_category_1: parseFloat(item.ifra_category_1) || null,
                     ifra_category_2: parseFloat(item.ifra_category_2) || null,
                     ifra_category_3: parseFloat(item.ifra_category_3) || null,
                     ifra_category_4: parseFloat(item.ifra_category_4) || null,
-                    ifra_category_5: parseFloat(item.ifra_category_5) || null,
+                    ifra_category_5: ifra5A, // Use 5A as the main category 5 value
+                    ifra_category_5A: ifra5A,
+                    ifra_category_5B: ifra5B,
+                    ifra_category_5C: ifra5C,
+                    ifra_category_5D: ifra5D,
                     ifra_category_6: parseFloat(item.ifra_category_6) || null,
-                    ifra_category_7: parseFloat(item.ifra_category_7) || null,
+                    ifra_category_7: ifra7A, // Use 7A as the main category 7 value
+                    ifra_category_7A: ifra7A,
+                    ifra_category_7B: ifra7B,
                     ifra_category_8: parseFloat(item.ifra_category_8) || null,
                     ifra_category_9: parseFloat(item.ifra_category_9) || null,
-                    ifra_category_10: parseFloat(item.ifra_category_10) || null,
-                    ifra_category_11: parseFloat(item.ifra_category_11) || null,
+                    ifra_category_10: ifra10A, // Use 10A as the main category 10 value
+                    ifra_category_10A: ifra10A,
+                    ifra_category_10B: ifra10B,
+                    ifra_category_11: ifra11A, // Use 11A as the main category 11 value
+                    ifra_category_11A: ifra11A,
+                    ifra_category_11B: ifra11B,
                     ifra_category_12: parseFloat(item.ifra_category_12) || 100,
                     
                     vanillin_pct: parseFloat(item.vanillin_pct) || 0,
@@ -1987,6 +2022,8 @@ app.post('/api/admin/import/oils', async (req, res) => {
                     hot_throw_rating: parseFloat(item.hot_throw_rating) || null
                 };
 
+                let fragranceOilId;
+                
                 if (existing) {
                     // Update existing oil
                     const { error } = await productDBAdmin
@@ -1996,17 +2033,68 @@ app.post('/api/admin/import/oils', async (req, res) => {
                     
                     if (!error) {
                         updated++;
+                        fragranceOilId = existing.id;
                     } else {
                         errors.push(`Error updating ${item.product_name}: ${error.message}`);
                     }
                 } else {
                     // Create new oil
-                    const { error } = await productDBAdmin
+                    const { data: newOil, error } = await productDBAdmin
                         .from('fragrance_oils')
-                        .insert(oilData);
+                        .insert(oilData)
+                        .select('id')
+                        .single();
                     
-                    if (!error) {
+                    if (!error && newOil) {
                         created++;
+                        fragranceOilId = newOil.id;
+                        
+                        // Create variants for the new fragrance oil
+                        const variants = [
+                            { 
+                                size: '1 oz', 
+                                sku: item.sku_1oz || null,
+                                price: parseFloat(item.price_1oz) || parseFloat(item.price_tier1) || 0
+                            },
+                            { 
+                                size: '4 oz', 
+                                sku: item.sku_4oz || null,
+                                price: parseFloat(item.price_4oz) || parseFloat(item.price_tier2) || 0
+                            },
+                            { 
+                                size: '8 oz', 
+                                sku: item.sku_8oz || null,
+                                price: parseFloat(item.price_8oz) || parseFloat(item.price_tier3) || 0
+                            },
+                            { 
+                                size: '16 oz', 
+                                sku: item.sku_16oz || null,
+                                price: parseFloat(item.price_16oz) || 0
+                            }
+                        ];
+                        
+                        // Check if fragrance_oil_variants table exists and create variants
+                        for (const variant of variants) {
+                            if (variant.price > 0 || variant.sku) {
+                                try {
+                                    const { error: variantError } = await productDBAdmin
+                                        .from('fragrance_oil_variants')
+                                        .insert({
+                                            fragrance_oil_id: fragranceOilId,
+                                            size: variant.size,
+                                            sku: variant.sku,
+                                            price: variant.price
+                                        });
+                                    
+                                    if (!variantError) {
+                                        variantsCreated++;
+                                    }
+                                } catch (variantErr) {
+                                    // If variants table doesn't exist, skip variant creation
+                                    console.log('Variants table may not exist, skipping variant creation');
+                                }
+                            }
+                        }
                     } else {
                         errors.push(`Error creating ${item.product_name}: ${error.message}`);
                     }
