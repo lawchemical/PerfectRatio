@@ -2127,6 +2127,146 @@ app.post('/api/admin/import/vessels', async (req, res) => {
 });
 
 // =====================================================
+// DELETE ENDPOINTS
+// =====================================================
+
+// Delete suppliers (single or bulk)
+app.delete('/api/admin/suppliers', async (req, res) => {
+    try {
+        const { ids } = req.body;
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({ error: 'No supplier IDs provided' });
+        }
+
+        // Check for dependent items before deleting
+        const { data: dependentBases } = await productDBAdmin
+            .from('base_products')
+            .select('id')
+            .in('supplier_id', ids)
+            .limit(1);
+
+        const { data: dependentOils } = await productDBAdmin
+            .from('fragrance_oils')
+            .select('id')
+            .in('supplier_id', ids)
+            .limit(1);
+
+        const { data: dependentVessels } = await productDBAdmin
+            .from('vessels')
+            .select('id')
+            .in('supplier_id', ids)
+            .limit(1);
+
+        if (dependentBases?.length || dependentOils?.length || dependentVessels?.length) {
+            return res.status(400).json({ 
+                error: 'Cannot delete suppliers with associated products',
+                details: 'Remove or reassign all products from these suppliers first'
+            });
+        }
+
+        // Delete suppliers
+        const { error } = await productDBAdmin
+            .from('suppliers')
+            .delete()
+            .in('id', ids);
+
+        if (error) throw error;
+
+        res.json({ 
+            success: true, 
+            message: `Deleted ${ids.length} supplier(s)` 
+        });
+    } catch (error) {
+        console.error('Error deleting suppliers:', error);
+        res.status(500).json({ error: 'Delete failed', details: error.message });
+    }
+});
+
+// Delete base products (single or bulk)
+app.delete('/api/admin/bases', async (req, res) => {
+    try {
+        const { ids } = req.body;
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({ error: 'No base product IDs provided' });
+        }
+
+        // Delete base products
+        const { error } = await productDBAdmin
+            .from('base_products')
+            .delete()
+            .in('id', ids);
+
+        if (error) throw error;
+
+        res.json({ 
+            success: true, 
+            message: `Deleted ${ids.length} base product(s)` 
+        });
+    } catch (error) {
+        console.error('Error deleting base products:', error);
+        res.status(500).json({ error: 'Delete failed', details: error.message });
+    }
+});
+
+// Delete fragrance oils (single or bulk)
+app.delete('/api/admin/oils', async (req, res) => {
+    try {
+        const { ids } = req.body;
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({ error: 'No fragrance oil IDs provided' });
+        }
+
+        // Delete associated IFRA entries first
+        await productDBAdmin
+            .from('ifra_entries')
+            .delete()
+            .in('fragrance_oil_id', ids);
+
+        // Delete fragrance oils
+        const { error } = await productDBAdmin
+            .from('fragrance_oils')
+            .delete()
+            .in('id', ids);
+
+        if (error) throw error;
+
+        res.json({ 
+            success: true, 
+            message: `Deleted ${ids.length} fragrance oil(s)` 
+        });
+    } catch (error) {
+        console.error('Error deleting fragrance oils:', error);
+        res.status(500).json({ error: 'Delete failed', details: error.message });
+    }
+});
+
+// Delete vessels (single or bulk)
+app.delete('/api/admin/vessels', async (req, res) => {
+    try {
+        const { ids } = req.body;
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({ error: 'No vessel IDs provided' });
+        }
+
+        // Delete vessels
+        const { error } = await productDBAdmin
+            .from('vessels')
+            .delete()
+            .in('id', ids);
+
+        if (error) throw error;
+
+        res.json({ 
+            success: true, 
+            message: `Deleted ${ids.length} vessel(s)` 
+        });
+    } catch (error) {
+        console.error('Error deleting vessels:', error);
+        res.status(500).json({ error: 'Delete failed', details: error.message });
+    }
+});
+
+// =====================================================
 // SERVE ADMIN PANEL
 // =====================================================
 
