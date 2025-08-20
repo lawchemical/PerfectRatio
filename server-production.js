@@ -228,14 +228,31 @@ app.get('/api/oils', async (req, res) => {
         
         if (error) throw error;
         
-        // Flatten for compatibility
+        // Flatten for compatibility and map field names for admin interface
         const oils = data.map(oil => ({
             ...oil,
             supplier_name: oil.supplier?.name,
             supplier_website: oil.supplier?.website_url,
             price_tiers: oil.price_tiers,
             ifra_entries: oil.ifra_entries,
-            fragrance_notes: oil.notes
+            fragrance_notes: oil.notes,
+            // Map new database fields to admin interface field names
+            fragrance_notes_top: oil.top_notes || oil.fragrance_notes_top,
+            fragrance_notes_middle: oil.middle_notes || oil.fragrance_notes_middle,
+            fragrance_notes_base: oil.base_notes || oil.fragrance_notes_base,
+            blending_notes: oil.blends_well_with || oil.blending_notes,
+            soap_acceleration: oil.acceleration || oil.soap_acceleration,
+            // Ensure all IFRA subcategories are included with proper names
+            ifra_category_5a: oil.ifra_category_5a,
+            ifra_category_5b: oil.ifra_category_5b,
+            ifra_category_5c: oil.ifra_category_5c,
+            ifra_category_5d: oil.ifra_category_5d,
+            ifra_category_7a: oil.ifra_category_7a,
+            ifra_category_7b: oil.ifra_category_7b,
+            ifra_category_10a: oil.ifra_category_10a,
+            ifra_category_10b: oil.ifra_category_10b,
+            ifra_category_11a: oil.ifra_category_11a,
+            ifra_category_11b: oil.ifra_category_11b
         }));
         
         res.json(oils);
