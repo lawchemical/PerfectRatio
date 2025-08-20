@@ -846,6 +846,8 @@
         });
         
         function switchToTab(tabName) {
+            console.log('[DEBUG] Switching to tab:', tabName);
+            
             // Update nav tabs
             document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
             document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
@@ -853,6 +855,10 @@
             // Update content
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.getElementById(tabName).classList.add('active');
+            
+            // Save current tab to localStorage
+            localStorage.setItem('adminActiveTab', tabName);
+            console.log('[DEBUG] Saved tab to localStorage:', tabName);
             
             // Load tab content if needed
             if (tabName === 'dashboard') {
@@ -954,8 +960,16 @@
             await AdminCore.logout();
         }
         
-        // Initialize
-        loadDashboard();
+        // Initialize - restore last active tab
+        const savedTab = localStorage.getItem('adminActiveTab');
+        console.log('[DEBUG] Saved tab from localStorage:', savedTab);
+        if (savedTab && document.querySelector(`[data-tab="${savedTab}"]`)) {
+            console.log('[DEBUG] Restoring tab:', savedTab);
+            switchToTab(savedTab);
+        } else {
+            console.log('[DEBUG] No saved tab, loading dashboard');
+            loadDashboard();
+        }
     </script>
 </body>
 </html>

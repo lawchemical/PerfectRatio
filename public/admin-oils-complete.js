@@ -1,7 +1,17 @@
 // Complete Fragrance Oils Admin Module with All Fields
 (function() {
+    // Track if module is initialized
+    let moduleInitialized = false;
+    
     // Module initialization
     async function initOilsModule() {
+        console.log('[DEBUG] initOilsModule called, initialized:', moduleInitialized);
+        if (moduleInitialized) {
+            console.log('[DEBUG] Module already initialized, skipping');
+            return;
+        }
+        moduleInitialized = true;
+        
         setupOilsTab();
         setupOilModal();
         await loadOils();
@@ -10,7 +20,16 @@
 
     // Setup the oils tab content
     function setupOilsTab() {
+        console.log('[DEBUG] setupOilsTab called');
         const oilsTab = document.getElementById('oils');
+        
+        // Check if already initialized
+        if (oilsTab.querySelector('#oilsTable')) {
+            console.log('[DEBUG] Oils tab already initialized, skipping setup');
+            return;
+        }
+        
+        console.log('[DEBUG] Setting up oils tab HTML');
         oilsTab.innerHTML = `
             <div class="search-bar">
                 <input type="text" class="search-input" id="oilSearch" placeholder="Search fragrance oils...">
@@ -58,7 +77,16 @@
 
     // Setup comprehensive oil modal with all fields
     function setupOilModal() {
+        console.log('[DEBUG] setupOilModal called');
         const modalsContainer = document.getElementById('modals-container');
+        
+        // Check if modal already exists
+        if (document.getElementById('oilModal')) {
+            console.log('[DEBUG] Oil modal already exists, skipping setup');
+            return;
+        }
+        
+        console.log('[DEBUG] Creating oil modal');
         const modalHTML = `
             <div id="oilModal" class="modal">
                 <div class="modal-content">
@@ -527,6 +555,7 @@
 
     // Load oils
     async function loadOils() {
+        console.log('[DEBUG] loadOils called');
         try {
             // Ensure suppliers are loaded first for proper display
             if (!AdminCore.getSuppliers() || AdminCore.getSuppliers().length === 0) {
@@ -534,6 +563,7 @@
             }
             
             const data = await AdminCore.apiRequest("/api/admin/oils");
+            console.log('[DEBUG] Loaded', data.length, 'oils from server');
             const oils = data;
             AdminCore.setOils(oils);
             
@@ -584,8 +614,33 @@
 
     // Render oils table - simplified to show only ID, Name, Supplier
     function renderOils(oilsToRender = null) {
+        console.log('[DEBUG] renderOils called');
         const oils = oilsToRender || AdminCore.getOils();
+        
+        // Check if table exists
+        const table = document.querySelector('#oilsTable');
+        if (!table) {
+            console.error('[DEBUG] Oils table not found! Tab may not be initialized');
+            return;
+        }
+        
         const tbody = document.querySelector('#oilsTable tbody');
+        if (!tbody) {
+            console.error('[DEBUG] Table tbody not found!');
+            return;
+        }
+        
+        // Check header structure to detect duplicate columns
+        const headers = table.querySelectorAll('thead th');
+        console.log('[DEBUG] Table headers count:', headers.length);
+        if (headers.length > 4) {
+            console.warn('[DEBUG] Duplicate headers detected! Expected 4, found', headers.length);
+            // Remove duplicate headers
+            const thead = table.querySelector('thead tr');
+            while (thead.children.length > 4) {
+                thead.removeChild(thead.lastChild);
+            }
+        }
         
         if (oils.length === 0) {
             tbody.innerHTML = `
@@ -624,7 +679,7 @@
                     <td title="${oil.id}" style="font-family: monospace; font-size: 12px;">${displayId}</td>
                     <td style="font-weight: 500;">${displayName}</td>
                     <td>${supplierName}</td>
-                    <td class="actions">
+                    <td class="actions" style="white-space: nowrap;">
                         <button class="btn-small" onclick="editOil(${oilId})" title="Edit">✏️</button>
                         <button class="btn-small btn-danger" onclick="deleteOil(${oilId})" title="Delete">🗑️</button>
                     </td>
