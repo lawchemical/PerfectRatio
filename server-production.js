@@ -939,7 +939,30 @@ app.get('/api/admin/oils', async (req, res) => {
             .order('name');
         
         if (error) throw error;
-        res.json(data || []);
+        
+        // Map fields for admin interface compatibility
+        const oils = (data || []).map(oil => ({
+            ...oil,
+            // Map new database fields to admin interface field names
+            fragrance_notes_top: oil.top_notes || oil.fragrance_notes_top,
+            fragrance_notes_middle: oil.middle_notes || oil.fragrance_notes_middle,
+            fragrance_notes_base: oil.base_notes || oil.fragrance_notes_base,
+            blending_notes: oil.blends_well_with || oil.blending_notes,
+            soap_acceleration: oil.acceleration || oil.soap_acceleration,
+            // Ensure all IFRA subcategories are included
+            ifra_category_5a: oil.ifra_category_5a,
+            ifra_category_5b: oil.ifra_category_5b,
+            ifra_category_5c: oil.ifra_category_5c,
+            ifra_category_5d: oil.ifra_category_5d,
+            ifra_category_7a: oil.ifra_category_7a,
+            ifra_category_7b: oil.ifra_category_7b,
+            ifra_category_10a: oil.ifra_category_10a,
+            ifra_category_10b: oil.ifra_category_10b,
+            ifra_category_11a: oil.ifra_category_11a,
+            ifra_category_11b: oil.ifra_category_11b
+        }));
+        
+        res.json(oils);
     } catch (error) {
         console.error('Error fetching oils:', error);
         res.status(500).json({ error: 'Database error' });
