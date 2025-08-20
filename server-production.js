@@ -2527,7 +2527,7 @@ process.on('unhandledRejection', (reason, promise) => {
 
 // Start server - bind to 0.0.0.0 for Railway
 const server = app.listen(PORT, '0.0.0.0', () => {
-    console.log('🚀 PerfectRatio Production Server Running');
+    console.log('🚀 PerfectRatio Production Server Running - v2.1');
     console.log(`📊 Port: ${PORT}`);
     console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(`🔗 Server listening on 0.0.0.0:${PORT}`);
