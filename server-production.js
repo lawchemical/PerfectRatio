@@ -1958,11 +1958,11 @@ app.post('/api/admin/import/oils', async (req, res) => {
                     }
                 }
 
-                // Check if oil exists by product_name (primary identifier)
+                // Check if oil exists by name (primary identifier)
                 const { data: existing } = await productDBAdmin
                     .from('fragrance_oils')
                     .select('id')
-                    .eq('product_name', item.product_name)
+                    .eq('name', item.product_name || item.name)
                     .single();
 
                 // Parse IFRA subcategories
@@ -1977,39 +1977,10 @@ app.post('/api/admin/import/oils', async (req, res) => {
                 const ifra11A = parseFloat(item.ifra_category_11A) || parseFloat(item.ifra_category_11) || null;
                 const ifra11B = parseFloat(item.ifra_category_11B) || null;
 
+                // Build oil data - using 'name' field instead of 'product_name'
                 const oilData = {
-                    product_name: item.product_name,
+                    name: item.product_name || item.name,  // Use 'name' field for database
                     supplier_id: supplierId,
-                    flash_point: parseFloat(item.flash_point) || null,
-                    
-                    // All IFRA categories with subcategories
-                    ifra_category_1: parseFloat(item.ifra_category_1) || null,
-                    ifra_category_2: parseFloat(item.ifra_category_2) || null,
-                    ifra_category_3: parseFloat(item.ifra_category_3) || null,
-                    ifra_category_4: parseFloat(item.ifra_category_4) || null,
-                    ifra_category_5: ifra5A, // Use 5A as the main category 5 value
-                    ifra_category_5A: ifra5A,
-                    ifra_category_5B: ifra5B,
-                    ifra_category_5C: ifra5C,
-                    ifra_category_5D: ifra5D,
-                    ifra_category_6: parseFloat(item.ifra_category_6) || null,
-                    ifra_category_7: ifra7A, // Use 7A as the main category 7 value
-                    ifra_category_7A: ifra7A,
-                    ifra_category_7B: ifra7B,
-                    ifra_category_8: parseFloat(item.ifra_category_8) || null,
-                    ifra_category_9: parseFloat(item.ifra_category_9) || null,
-                    ifra_category_10: ifra10A, // Use 10A as the main category 10 value
-                    ifra_category_10A: ifra10A,
-                    ifra_category_10B: ifra10B,
-                    ifra_category_11: ifra11A, // Use 11A as the main category 11 value
-                    ifra_category_11A: ifra11A,
-                    ifra_category_11B: ifra11B,
-                    ifra_category_12: parseFloat(item.ifra_category_12) || 100,
-                    
-                    vanillin_pct: parseFloat(item.vanillin_pct) || 0,
-                    price_tier1: parseFloat(item.price_tier1) || 0,
-                    price_tier2: parseFloat(item.price_tier2) || null,
-                    price_tier3: parseFloat(item.price_tier3) || null,
                     
                     // Additional fields - commented out as these columns don't exist in database
                     // categories: item.categories || null,
