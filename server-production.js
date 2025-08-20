@@ -1977,10 +1977,34 @@ app.post('/api/admin/import/oils', async (req, res) => {
                 const ifra11A = parseFloat(item.ifra_category_11A) || parseFloat(item.ifra_category_11) || null;
                 const ifra11B = parseFloat(item.ifra_category_11B) || null;
 
-                // Build oil data - using 'name' field instead of 'product_name'
+                // Build oil data - using 'name' field and including all IFRA categories
                 const oilData = {
                     name: item.product_name || item.name,  // Use 'name' field for database
                     supplier_id: supplierId,
+                    flash_point_f: parseFloat(item.flash_point) || null,
+                    specific_gravity: parseFloat(item.specific_gravity) || null,
+                    vanilla_content: item.vanilla_content !== undefined ? parseFloat(item.vanilla_content) : null,
+                    vanillin_pct: item.vanillin_pct !== undefined ? parseFloat(item.vanillin_pct) : (item.vanillin_content !== undefined ? parseFloat(item.vanillin_content) : null),
+                    
+                    // All IFRA categories - using lowercase with underscores as in database
+                    ifra_category_1: item.ifra_category_1 !== undefined ? parseFloat(item.ifra_category_1) : null,
+                    ifra_category_2: item.ifra_category_2 !== undefined ? parseFloat(item.ifra_category_2) : null,
+                    ifra_category_3: item.ifra_category_3 !== undefined ? parseFloat(item.ifra_category_3) : null,
+                    ifra_category_4: item.ifra_category_4 !== undefined ? parseFloat(item.ifra_category_4) : null,
+                    ifra_category_5a: ifra5A,
+                    ifra_category_5b: ifra5B,
+                    ifra_category_5c: ifra5C,
+                    ifra_category_5d: ifra5D,
+                    ifra_category_6: item.ifra_category_6 !== undefined ? parseFloat(item.ifra_category_6) : null,
+                    ifra_category_7a: ifra7A,
+                    ifra_category_7b: ifra7B,
+                    ifra_category_8: item.ifra_category_8 !== undefined ? parseFloat(item.ifra_category_8) : null,
+                    ifra_category_9: item.ifra_category_9 !== undefined ? parseFloat(item.ifra_category_9) : null,
+                    ifra_category_10a: ifra10A,
+                    ifra_category_10b: ifra10B,
+                    ifra_category_11a: ifra11A,
+                    ifra_category_11b: ifra11B,
+                    ifra_category_12: item.ifra_category_12 !== undefined ? parseFloat(item.ifra_category_12) : 100,
                     
                     // Additional fields - commented out as these columns don't exist in database
                     // categories: item.categories || null,
