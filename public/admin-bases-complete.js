@@ -556,6 +556,7 @@
                     <td title="${base.id}" style="font-family: monospace; font-size: 12px;">${displayId}</td>
                     <td style="font-weight: 500;">${displayName}</td>
                     <td>${supplierName}</td>
+                    <td style="white-space: nowrap; text-align: center;">
                         <button class="btn-small" onclick="editBase(${baseId})" title="Edit" style="margin-right: 5px;">✏️</button>
                         <button class="btn-small btn-danger" onclick="deleteBase(${baseId})" title="Delete">🗑️</button>
                     </td>
