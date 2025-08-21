@@ -33,21 +33,15 @@
                 <table id="basesTable">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th style="width: 100px;">ID</th>
                             <th>NAME</th>
                             <th>SUPPLIER</th>
-                            <th>TYPE</th>
-                            <th>MAX LOAD %</th>
-                            <th>UNIT MODE</th>
-                            <th>IFRA CAT</th>
-                            <th>RATING</th>
-                            <th>LIBRARY</th>
-                            <th>ACTIONS</th>
+                            <th style="width: 150px;">ACTIONS</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td colspan="10" style="text-align: center;">
+                            <td colspan="4" style="text-align: center;">
                                 <div class="loading"></div>
                             </td>
                         </tr>
@@ -528,7 +522,7 @@
         if (bases.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="10" style="text-align: center;">No base products found</td>
+                    <td colspan="4" style="text-align: center;">No base products found</td>
                 </tr>
             `;
             return;
@@ -536,30 +530,34 @@
 
         tbody.innerHTML = bases.map(base => {
             const baseId = typeof base.id === 'string' ? `'${base.id}'` : base.id;
-            const ifraDisplay = base.is_dual_purpose && base.ifra_category_2 ? 
-                `${base.ifra_category || '-'}/${base.ifra_category_2}` : 
-                (base.ifra_category || '-');
-            const rating = base.performance_rating ? parseFloat(base.performance_rating).toFixed(1) : '-';
+            
+            // Get supplier name - check multiple possible fields
+            let supplierName = base.supplier_name || base.supplier?.name || '';
+            if (!supplierName && base.supplier_id) {
+                // Try to find supplier from the suppliers list
+                const suppliers = AdminCore.getSuppliers();
+                const supplier = suppliers.find(s => s.id === base.supplier_id);
+                supplierName = supplier ? supplier.name : 'Unknown Supplier';
+            }
+            if (!supplierName) {
+                supplierName = 'No Supplier';
+            }
+            
+            // Get the display name
+            const displayName = base.name || 'Unnamed Base';
+            
+            // Truncate ID if it's too long (UUIDs)
+            const displayId = base.id && base.id.length > 8 ? 
+                base.id.substring(0, 8) + '...' : 
+                base.id || '-';
             
             return `
                 <tr>
-                    <td>${base.id}</td>
-                    <td>${base.name}</td>
-                    <td>${base.supplier_name || '-'}</td>
-                    <td>${base.base_type || '-'}</td>
-                    <td>${base.max_load_pct}%</td>
-                    <td>${base.unit_mode}</td>
-                    <td>${ifraDisplay}</td>
-                    <td>${rating}</td>
-                    <td>
-                        <span class="library-toggle ${base.is_in_library ? 'in-library' : ''}" 
-                              onclick="toggleBaseLibrary(${baseId}, ${!base.is_in_library})">
-                            ${base.is_in_library ? '✓ In Library' : '✗ Not in Library'}
-                        </span>
-                    </td>
-                    <td class="actions">
-                        <button class="btn-small" onclick="editBase(${baseId})">✏️</button>
-                        <button class="btn-small btn-danger" onclick="deleteBase(${baseId})">🗑️</button>
+                    <td title="${base.id}" style="font-family: monospace; font-size: 12px;">${displayId}</td>
+                    <td style="font-weight: 500;">${displayName}</td>
+                    <td>${supplierName}</td>
+                        <button class="btn-small" onclick="editBase(${baseId})" title="Edit" style="margin-right: 5px;">✏️</button>
+                        <button class="btn-small btn-danger" onclick="deleteBase(${baseId})" title="Delete">🗑️</button>
                     </td>
                 </tr>
             `;

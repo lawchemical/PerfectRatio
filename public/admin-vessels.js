@@ -49,23 +49,15 @@
                 <table id="vesselsTable">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th style="width: 100px;">ID</th>
                             <th>NAME</th>
                             <th>SUPPLIER</th>
-                            <th>TYPE</th>
-                            <th>SIZE</th>
-                            <th>MATERIAL</th>
-                            <th>COLOR</th>
-                            <th>$/UNIT</th>
-                            <th>CASE</th>
-                            <th>STOCK</th>
-                            <th>LIBRARY</th>
-                            <th>ACTIONS</th>
+                            <th style="width: 150px;">ACTIONS</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td colspan="12" style="text-align: center;">
+                            <td colspan="4" style="text-align: center;">
                                 <div class="loading"></div>
                             </td>
                         </tr>
@@ -468,7 +460,7 @@
         if (!vessels || vessels.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="12" style="text-align: center; color: #6c757d;">
+                    <td colspan="4" style="text-align: center; color: #6c757d;">
                         No vessels found. Add your first vessel to get started.
                     </td>
                 </tr>
@@ -476,29 +468,40 @@
             return;
         }
         
-        tbody.innerHTML = vessels.map(vessel => `
-            <tr data-id="${vessel.id}">
-                <td class="mono">${vessel.id.substring(0, 8)}</td>
-                <td><strong>${vessel.name}</strong></td>
-                <td>${vessel.supplier_name || 'N/A'}</td>
-                <td>${formatVesselType(vessel.vessel_type)}</td>
-                <td>${vessel.size} ${vessel.size_unit || 'oz'}</td>
-                <td>${vessel.material ? capitalizeFirst(vessel.material) : 'N/A'}</td>
-                <td>${vessel.color || 'N/A'}</td>
-                <td class="price">$${vessel.price_per_unit ? parseFloat(vessel.price_per_unit).toFixed(2) : '0.00'}</td>
-                <td>${vessel.case_count > 1 ? `${vessel.case_count} units` : 'Single'}</td>
-                <td>${vessel.quantity_on_hand || 0} ${vessel.quantity_unit || 'units'}</td>
-                <td>
-                    <span class="badge ${vessel.is_in_library ? 'badge-success' : 'badge-secondary'}">
-                        ${vessel.is_in_library ? '✓' : '✗'}
-                    </span>
-                </td>
-                <td>
-                    <button class="btn btn-sm btn-secondary" onclick="editVessel('${vessel.id}')">Edit</button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteVessel('${vessel.id}')">Delete</button>
-                </td>
-            </tr>
-        `).join('');
+        tbody.innerHTML = vessels.map(vessel => {`
+            const vesselId = typeof vessel.id === 'string' ? `'${vessel.id}'` : vessel.id;
+            
+            // Get supplier name - check multiple possible fields
+            let supplierName = vessel.supplier_name || vessel.supplier?.name || '';
+            if (!supplierName && vessel.supplier_id) {
+                // Try to find supplier from the suppliers list
+                const suppliers = AdminCore.getSuppliers();
+                const supplier = suppliers.find(s => s.id === vessel.supplier_id);
+                supplierName = supplier ? supplier.name : 'Unknown Supplier';
+            }
+            if (!supplierName) {
+                supplierName = 'No Supplier';
+            }
+            
+            // Get the display name
+            const displayName = vessel.name || 'Unnamed Vessel';
+            
+            // Truncate ID if it's too long (UUIDs)
+            const displayId = vessel.id && vessel.id.length > 8 ? 
+                vessel.id.substring(0, 8) + '...' : 
+                vessel.id || '-';
+            
+            return `
+                <tr data-id="${vessel.id}">
+                    <td title="${vessel.id}" style="font-family: monospace; font-size: 12px;">${displayId}</td>
+                    <td style="font-weight: 500;">${displayName}</td>
+                    <td>${supplierName}</td>
+                        <button class="btn-small" onclick="editVessel(${vesselId})" title="Edit" style="margin-right: 5px;">✏️</button>
+                        <button class="btn-small btn-danger" onclick="deleteVessel(${vesselId})" title="Delete">🗑️</button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
     }
 
     // Filter vessels
