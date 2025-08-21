@@ -21,7 +21,8 @@
         setTimeout(() => {
             enhanceTable('suppliers');
             enhanceTable('bases');
-            enhanceTable('oils');
+            // Skip oils - it has its own delete functionality
+            // enhanceTable('oils');
             enhanceTable('vessels');
         }, 1000);
     }
@@ -81,7 +82,8 @@
 
     // Add bulk delete controls to each tab
     function addBulkDeleteControls() {
-        const tabs = ['suppliers', 'bases', 'oils', 'vessels'];
+        // Skip oils - it has its own delete functionality
+        const tabs = ['suppliers', 'bases', 'vessels'];
         
         tabs.forEach(type => {
             const tabContent = document.getElementById(type);
