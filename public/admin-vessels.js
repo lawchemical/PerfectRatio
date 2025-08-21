@@ -468,7 +468,7 @@
             return;
         }
         
-        tbody.innerHTML = vessels.map(vessel => {`
+        tbody.innerHTML = vessels.map(vessel => {
             const vesselId = typeof vessel.id === 'string' ? `'${vessel.id}'` : vessel.id;
             
             // Get supplier name - check multiple possible fields
