@@ -567,8 +567,17 @@
             const oils = data;
             AdminCore.setOils(oils);
             
+            // Ensure table is properly initialized before rendering
+            const table = document.querySelector('#oilsTable');
+            if (!table) {
+                console.warn('[DEBUG] Table not found, reinitializing tab');
+                setupOilsTab();
+            }
+            
             // Force table re-render with a small delay to ensure DOM is ready
+            console.log('[DEBUG] Setting timeout for renderOils');
             setTimeout(() => {
+                console.log('[DEBUG] Timeout fired, calling renderOils');
                 renderOils();
                 updateSupplierFilter();
             }, 100);
@@ -630,16 +639,37 @@
             return;
         }
         
-        // Check header structure to detect duplicate columns
-        const headers = table.querySelectorAll('thead th');
-        console.log('[DEBUG] Table headers count:', headers.length);
-        if (headers.length > 4) {
-            console.warn('[DEBUG] Duplicate headers detected! Expected 4, found', headers.length);
-            // Remove duplicate headers
-            const thead = table.querySelector('thead tr');
-            while (thead.children.length > 4) {
-                thead.removeChild(thead.lastChild);
+        // Check and fix header structure
+        let thead = table.querySelector('thead tr');
+        if (!thead) {
+            console.error('[DEBUG] Table thead tr not found, recreating...');
+            const theadElement = table.querySelector('thead') || document.createElement('thead');
+            thead = document.createElement('tr');
+            thead.innerHTML = `
+                <th style="width: 100px;">ID</th>
+                <th>NAME</th>
+                <th>SUPPLIER</th>
+                <th style="width: 150px;">ACTIONS</th>
+            `;
+            theadElement.appendChild(thead);
+            if (!table.querySelector('thead')) {
+                table.insertBefore(theadElement, tbody.parentNode);
             }
+        }
+        
+        // Ensure we have exactly 4 headers
+        const headers = thead.querySelectorAll('th');
+        console.log('[DEBUG] Table headers count:', headers.length);
+        
+        if (headers.length !== 4) {
+            console.warn('[DEBUG] Incorrect header count! Expected 4, found', headers.length);
+            // Rebuild headers
+            thead.innerHTML = `
+                <th style="width: 100px;">ID</th>
+                <th>NAME</th>
+                <th>SUPPLIER</th>
+                <th style="width: 150px;">ACTIONS</th>
+            `;
         }
         
         if (oils.length === 0) {
@@ -679,8 +709,8 @@
                     <td title="${oil.id}" style="font-family: monospace; font-size: 12px;">${displayId}</td>
                     <td style="font-weight: 500;">${displayName}</td>
                     <td>${supplierName}</td>
-                    <td class="actions" style="white-space: nowrap;">
-                        <button class="btn-small" onclick="editOil(${oilId})" title="Edit">✏️</button>
+                    <td style="white-space: nowrap; text-align: center;">
+                        <button class="btn-small" onclick="editOil(${oilId})" title="Edit" style="margin-right: 5px;">✏️</button>
                         <button class="btn-small btn-danger" onclick="deleteOil(${oilId})" title="Delete">🗑️</button>
                     </td>
                 </tr>
