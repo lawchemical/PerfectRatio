@@ -27,17 +27,6 @@
         vesselsContent.innerHTML = `
             <div class="search-bar">
                 <input type="text" class="search-input" id="vesselSearch" placeholder="Search vessels...">
-                <select class="form-control" id="vesselTypeFilter" style="width: 200px;">
-                    <option value="">All Types</option>
-                    <option value="jar">Jars</option>
-                    <option value="bottle">Bottles</option>
-                    <option value="spray_bottle">Spray Bottles</option>
-                    <option value="roller_bottle">Roller Bottles</option>
-                    <option value="tin">Tins</option>
-                    <option value="tube">Tubes</option>
-                    <option value="pouch">Pouches</option>
-                    <option value="other">Other</option>
-                </select>
                 <select class="form-control" id="vesselSupplierFilter" style="width: 200px;">
                     <option value="">All Suppliers</option>
                 </select>
@@ -71,9 +60,6 @@
         
         // Search functionality
         document.getElementById('vesselSearch').addEventListener('input', filterVessels);
-        
-        // Type filter
-        document.getElementById('vesselTypeFilter').addEventListener('change', filterVessels);
         
         // Supplier filter
         document.getElementById('vesselSupplierFilter').addEventListener('change', filterVessels);
@@ -507,7 +493,6 @@
     // Filter vessels
     function filterVessels() {
         const search = document.getElementById('vesselSearch').value.toLowerCase();
-        const typeFilter = document.getElementById('vesselTypeFilter').value;
         const supplierFilter = document.getElementById('vesselSupplierFilter').value;
         
         let filtered = AdminCore.getVessels();
@@ -518,10 +503,6 @@
                 (vessel.sku && vessel.sku.toLowerCase().includes(search)) ||
                 (vessel.supplier_name && vessel.supplier_name.toLowerCase().includes(search))
             );
-        }
-        
-        if (typeFilter) {
-            filtered = filtered.filter(vessel => vessel.vessel_type === typeFilter);
         }
         
         if (supplierFilter) {

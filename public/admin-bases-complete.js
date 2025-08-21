@@ -17,14 +17,6 @@
                 <select class="form-control" id="baseSupplierFilter" style="width: 200px;">
                     <option value="">All Suppliers</option>
                 </select>
-                <select class="form-control" id="baseTypeFilter" style="width: 150px;">
-                    <option value="">All Types</option>
-                    <option value="soap">Soap</option>
-                    <option value="lotion">Lotion</option>
-                    <option value="candle">Candle</option>
-                    <option value="spray">Spray</option>
-                    <option value="other">Other</option>
-                </select>
                 <button class="btn btn-primary" id="addBaseBtn">
                     ➕ Add Base Product
                 </button>
@@ -60,9 +52,6 @@
         
         // Filters
         document.getElementById('baseSupplierFilter').addEventListener('change', (e) => {
-            filterBases();
-        });
-        document.getElementById('baseTypeFilter').addEventListener('change', (e) => {
             filterBases();
         });
     }
@@ -569,7 +558,6 @@
     function filterBases() {
         const searchTerm = document.getElementById('baseSearch').value.toLowerCase();
         const supplierId = document.getElementById('baseSupplierFilter').value;
-        const baseType = document.getElementById('baseTypeFilter').value;
         
         const bases = AdminCore.getBases();
         const filtered = bases.filter(base => {
@@ -577,9 +565,7 @@
                 base.name.toLowerCase().includes(searchTerm) ||
                 (base.sku && base.sku.toLowerCase().includes(searchTerm));
             const matchesSupplier = !supplierId || base.supplier_id == supplierId;
-            const matchesType = !baseType || 
-                (base.base_type && base.base_type.toLowerCase().includes(baseType.toLowerCase()));
-            return matchesSearch && matchesSupplier && matchesType;
+            return matchesSearch && matchesSupplier;
         });
         
         renderBases(filtered);
