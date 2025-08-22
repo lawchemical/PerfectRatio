@@ -1,5 +1,9 @@
 // Complete Fragrance Oils Admin Module with All Fields
 (function() {
+<<<<<<< HEAD
+    // Module initialization
+    async function initOilsModule() {
+=======
     // Track if module is initialized
     let moduleInitialized = false;
     
@@ -12,6 +16,7 @@
         }
         moduleInitialized = true;
         
+>>>>>>> 8cfbca018be79bb8d4a8d54cf4d521324d941bb7
         setupOilsTab();
         setupOilModal();
         await loadOils();
@@ -20,6 +25,9 @@
 
     // Setup the oils tab content
     function setupOilsTab() {
+<<<<<<< HEAD
+        const oilsTab = document.getElementById('oils');
+=======
         console.log('[DEBUG] setupOilsTab called');
         const oilsTab = document.getElementById('oils');
         
@@ -30,6 +38,7 @@
         }
         
         console.log('[DEBUG] Setting up oils tab HTML');
+>>>>>>> 8cfbca018be79bb8d4a8d54cf4d521324d941bb7
         oilsTab.innerHTML = `
             <div class="search-bar">
                 <input type="text" class="search-input" id="oilSearch" placeholder="Search fragrance oils...">
@@ -44,15 +53,32 @@
                 <table id="oilsTable">
                     <thead>
                         <tr>
+<<<<<<< HEAD
+                            <th>ID</th>
+                            <th>NAME</th>
+                            <th>SUPPLIER</th>
+                            <th>SKU</th>
+                            <th>FLASH PT</th>
+                            <th>NOTES</th>
+                            <th>IFRA</th>
+                            <th>RATING</th>
+                            <th>LIBRARY</th>
+                            <th>ACTIONS</th>
+=======
                             <th style="width: 100px;">ID</th>
                             <th>NAME</th>
                             <th>SUPPLIER</th>
                             <th style="width: 150px;">ACTIONS</th>
+>>>>>>> 8cfbca018be79bb8d4a8d54cf4d521324d941bb7
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
+<<<<<<< HEAD
+                            <td colspan="10" style="text-align: center;">
+=======
                             <td colspan="4" style="text-align: center;">
+>>>>>>> 8cfbca018be79bb8d4a8d54cf4d521324d941bb7
                                 <div class="loading"></div>
                             </td>
                         </tr>
@@ -77,6 +103,9 @@
 
     // Setup comprehensive oil modal with all fields
     function setupOilModal() {
+<<<<<<< HEAD
+        const modalsContainer = document.getElementById('modals-container');
+=======
         console.log('[DEBUG] setupOilModal called');
         const modalsContainer = document.getElementById('modals-container');
         
@@ -87,6 +116,7 @@
         }
         
         console.log('[DEBUG] Creating oil modal');
+>>>>>>> 8cfbca018be79bb8d4a8d54cf4d521324d941bb7
         const modalHTML = `
             <div id="oilModal" class="modal">
                 <div class="modal-content">
@@ -128,6 +158,15 @@
                                     <input type="text" name="sku" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
                                 </div>
                                 <div style="margin-bottom: 16px;">
+<<<<<<< HEAD
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Categories</label>
+                                    <input type="text" name="categories" placeholder="e.g., Floral, Fresh, Woody" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Scent Description</label>
+                                    <textarea name="scent_description" rows="3" maxlength="500" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; resize: vertical;"></textarea>
+                                </div>
+=======
                                     <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Scent Description</label>
                                     <textarea name="scent_description" rows="3" maxlength="500" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; resize: vertical;"></textarea>
                                 </div>
@@ -141,6 +180,7 @@
                                         Is Discontinued
                                     </label>
                                 </div>
+>>>>>>> 8cfbca018be79bb8d4a8d54cf4d521324d941bb7
                             </div>
                             
                             <div id="tab-content-technical" style="display: none;">
@@ -163,6 +203,11 @@
                                 </div>
                                 <div style="margin-bottom: 16px;">
                                     <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Soap Acceleration</label>
+<<<<<<< HEAD
+                                    <textarea name="soap_acceleration" 
+                                        placeholder="Describe soap acceleration behavior (e.g., No acceleration, Slight trace acceleration at 2%, Moderate acceleration - work quickly, etc.)" 
+                                        style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; background: white; min-height: 100px; resize: vertical; font-family: inherit;"></textarea>
+=======
                                     <select name="soap_acceleration" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; background: white;">
                                         <option value="">Not Specified</option>
                                         <option value="none">No Acceleration</option>
@@ -170,6 +215,7 @@
                                         <option value="moderate">Moderate Acceleration</option>
                                         <option value="severe">Severe Acceleration</option>
                                     </select>
+>>>>>>> 8cfbca018be79bb8d4a8d54cf4d521324d941bb7
                                 </div>
                                 <div style="margin-bottom: 16px;">
                                     <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Product URL</label>
@@ -183,6 +229,20 @@
                                     <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Theme Family *</label>
                                     <select name="theme_family" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; background: white;">
                                         <option value="">Select theme family...</option>
+<<<<<<< HEAD
+                                        <option value="Fresh">Fresh</option>
+                                        <option value="Floral">Floral</option>
+                                        <option value="Oriental">Oriental</option>
+                                        <option value="Woody">Woody</option>
+                                        <option value="Gourmand">Gourmand</option>
+                                        <option value="Citrus">Citrus</option>
+                                        <option value="Green">Green</option>
+                                        <option value="Aquatic">Aquatic</option>
+                                        <option value="Spicy">Spicy</option>
+                                        <option value="Fruity">Fruity</option>
+                                        <option value="Herbal">Herbal</option>
+                                        <option value="Other">Other</option>
+=======
                                         <option value="Floral">Floral</option>
                                         <option value="Fruity">Fruity</option>
                                         <option value="Citrus">Citrus</option>
@@ -203,6 +263,7 @@
                                         <option value="Metallic / Mineral">Metallic / Mineral</option>
                                         <option value="Animalic">Animalic</option>
                                         <option value="Resinous / Balsamic">Resinous / Balsamic</option>
+>>>>>>> 8cfbca018be79bb8d4a8d54cf4d521324d941bb7
                                     </select>
                                 </div>
                                 <div style="margin-bottom: 16px;">
@@ -222,8 +283,13 @@
                                     <textarea name="blending_notes" rows="3" placeholder="Tips for blending this fragrance..." style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; resize: vertical;"></textarea>
                                 </div>
                                 <div style="margin-bottom: 16px;">
+<<<<<<< HEAD
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Usage Notes</label>
+                                    <textarea name="usage_notes" rows="3" placeholder="Special instructions, warnings, curing time, performance tips..." style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; resize: vertical;"></textarea>
+=======
                                     <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Soap Notes</label>
                                     <textarea name="usage_notes" rows="3" placeholder="How this oil performs in soap making..." style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; resize: vertical;"></textarea>
+>>>>>>> 8cfbca018be79bb8d4a8d54cf4d521324d941bb7
                                 </div>
                             </div>
                             
@@ -328,6 +394,8 @@
                                         </div>
                                     </div>
                                 </div>
+<<<<<<< HEAD
+=======
                                 
                                 <!-- Tier 4 -->
                                 <div style="padding: 16px; background: #F5F3F0; border-radius: 8px; margin-bottom: 16px;">
@@ -394,6 +462,7 @@
                                         </div>
                                     </div>
                                 </div>
+>>>>>>> 8cfbca018be79bb8d4a8d54cf4d521324d941bb7
                             </div>
                             
                             <div id="tab-content-ifra" style="display: none;">
@@ -406,6 +475,20 @@
                                     <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">IFRA Date</label>
                                     <input type="date" name="ifra_date" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
                                 </div>
+<<<<<<< HEAD
+                                <h4 style="color: #2E3033; margin: 16px 0 8px 0;">Maximum Percentages by Product Type</h4>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Candles (Cat 12)</label>
+                                    <input type="number" name="ifra_candles" step="0.01" min="0" max="100" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Body Lotion (Cat 5A)</label>
+                                    <input type="number" name="ifra_body_lotion" step="0.01" min="0" max="100" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Room Spray (Cat 10A)</label>
+                                    <input type="number" name="ifra_room_spray" step="0.01" min="0" max="100" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+=======
                                 <div style="margin-bottom: 16px;">
                                     <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">IFRA Certificate URL</label>
                                     <input type="url" name="ifra_url" placeholder="https://..." style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
@@ -482,6 +565,7 @@
                                 <div style="margin-bottom: 16px;">
                                     <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Category 12: Candles, Incense, Air Freshening Crystals, Liquids, Solids</label>
                                     <input type="number" name="ifra_category_12" step="0.01" min="0" max="100" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px;">
+>>>>>>> 8cfbca018be79bb8d4a8d54cf4d521324d941bb7
                                 </div>
                             </div>
                             
@@ -555,6 +639,15 @@
 
     // Load oils
     async function loadOils() {
+<<<<<<< HEAD
+        try {
+            const data = await AdminCore.apiRequest("/api/admin/oils");
+            const oils = data;
+            AdminCore.setOils(oils);
+            renderOils();
+            updateSupplierFilter();
+        } catch (error) {
+=======
         console.log('[DEBUG] loadOils called');
         try {
             // Ensure suppliers are loaded first for proper display
@@ -584,6 +677,7 @@
             
         } catch (error) {
             console.error('Error loading oils:', error);
+>>>>>>> 8cfbca018be79bb8d4a8d54cf4d521324d941bb7
             AdminCore.showToast('Failed to load fragrance oils', 'error');
         }
     }
@@ -621,6 +715,12 @@
         }
     }
 
+<<<<<<< HEAD
+    // Render oils table with more information
+    function renderOils(oilsToRender = null) {
+        const oils = oilsToRender || AdminCore.getOils();
+        const tbody = document.querySelector('#oilsTable tbody');
+=======
     // Render oils table - simplified to show only ID, Name, Supplier
     function renderOils(oilsToRender = null) {
         console.log('[DEBUG] renderOils called');
@@ -671,11 +771,16 @@
                 <th style="width: 150px;">ACTIONS</th>
             `;
         }
+>>>>>>> 8cfbca018be79bb8d4a8d54cf4d521324d941bb7
         
         if (oils.length === 0) {
             tbody.innerHTML = `
                 <tr>
+<<<<<<< HEAD
+                    <td colspan="10" style="text-align: center;">No fragrance oils found</td>
+=======
                     <td colspan="4" style="text-align: center;">No fragrance oils found</td>
+>>>>>>> 8cfbca018be79bb8d4a8d54cf4d521324d941bb7
                 </tr>
             `;
             return;
@@ -683,6 +788,32 @@
 
         tbody.innerHTML = oils.map(oil => {
             const oilId = typeof oil.id === 'string' ? `'${oil.id}'` : oil.id;
+<<<<<<< HEAD
+            const fragranceNotes = [];
+            if (oil.fragrance_notes_top) fragranceNotes.push('T');
+            if (oil.fragrance_notes_middle) fragranceNotes.push('M');
+            if (oil.fragrance_notes_base) fragranceNotes.push('B');
+            
+            return `
+                <tr>
+                    <td>${oil.id}</td>
+                    <td>${oil.product_name || oil.name || '-'}</td>
+                    <td>${oil.supplier_name || '-'}</td>
+                    <td>${oil.sku || '-'}</td>
+                    <td>${oil.flash_point_f ? oil.flash_point_f + '°F' : '-'}</td>
+                    <td>${fragranceNotes.length > 0 ? fragranceNotes.join(',') : '-'}</td>
+                    <td>${oil.ifra_version || '-'}</td>
+                    <td>${oil.overall_rating ? parseFloat(oil.overall_rating).toFixed(1) : '-'}</td>
+                    <td>
+                        <span class="library-toggle ${oil.is_in_library ? 'in-library' : ''}" 
+                              onclick="toggleOilLibrary(${oilId}, ${!oil.is_in_library})">
+                            ${oil.is_in_library ? '✓ In Library' : '✗ Not in Library'}
+                        </span>
+                    </td>
+                    <td class="actions">
+                        <button class="btn-small" onclick="editOil(${oilId})">✏️</button>
+                        <button class="btn-small btn-danger" onclick="deleteOil(${oilId})">🗑️</button>
+=======
             
             // Get supplier name - check multiple possible fields
             let supplierName = oil.supplier_name || oil.supplier?.name || '';
@@ -712,6 +843,7 @@
                     <td style="white-space: nowrap; text-align: center;">
                         <button class="btn-small" onclick="editOil(${oilId})" title="Edit" style="margin-right: 5px;">✏️</button>
                         <button class="btn-small btn-danger" onclick="deleteOil(${oilId})" title="Delete">🗑️</button>
+>>>>>>> 8cfbca018be79bb8d4a8d54cf4d521324d941bb7
                     </td>
                 </tr>
             `;
@@ -757,6 +889,16 @@
             form.elements['flash_point_f'].value = oil.flash_point_f || '';
             form.elements['ifra_version'].value = oil.ifra_version || '';
             form.elements['ifra_date'].value = oil.ifra_date || '';
+<<<<<<< HEAD
+            form.elements['solvent_note'].value = oil.solvent_note || '';
+            
+            // Load additional fields if they exist
+            if (oil.specific_gravity) form.elements['specific_gravity'].value = oil.specific_gravity;
+            if (oil.vanillin_pct) form.elements['vanillin_pct'].value = oil.vanillin_pct;
+            if (oil.categories) form.elements['categories'].value = oil.categories;
+            if (oil.scent_description) form.elements['scent_description'].value = oil.scent_description;
+            if (oil.theme_family) form.elements['theme_family'].value = oil.theme_family;
+=======
             form.elements['ifra_url'].value = oil.ifra_url || '';
             form.elements['solvent_note'].value = oil.solvent_note || '';
             
@@ -816,6 +958,7 @@
                 
                 console.log('Theme family dropdown value after setting:', themeSelect.value);
             }
+>>>>>>> 8cfbca018be79bb8d4a8d54cf4d521324d941bb7
             if (oil.fragrance_notes_top) form.elements['fragrance_notes_top'].value = oil.fragrance_notes_top;
             if (oil.fragrance_notes_middle) form.elements['fragrance_notes_middle'].value = oil.fragrance_notes_middle;
             if (oil.fragrance_notes_base) form.elements['fragrance_notes_base'].value = oil.fragrance_notes_base;
@@ -857,7 +1000,10 @@
                     form.elements['tier4_size'].value = tier.tier4_size;
                     form.elements['tier4_unit'].value = tier.tier4_unit || 'oz';
                     form.elements['tier4_price'].value = tier.tier4_price;
+<<<<<<< HEAD
+=======
                     if (tier.tier4_sku) form.elements['tier4_sku'].value = tier.tier4_sku;
+>>>>>>> 8cfbca018be79bb8d4a8d54cf4d521324d941bb7
                 }
                 // Tier 5
                 if (tier.tier5_size) {
@@ -865,7 +1011,10 @@
                     form.elements['tier5_size'].value = tier.tier5_size;
                     form.elements['tier5_unit'].value = tier.tier5_unit || 'oz';
                     form.elements['tier5_price'].value = tier.tier5_price;
+<<<<<<< HEAD
+=======
                     if (tier.tier5_sku) form.elements['tier5_sku'].value = tier.tier5_sku;
+>>>>>>> 8cfbca018be79bb8d4a8d54cf4d521324d941bb7
                 }
             }
             
@@ -885,10 +1034,13 @@
             if (oil.batch_count) form.elements['batch_count'].value = oil.batch_count;
         } else {
             title.textContent = 'Add Fragrance Oil';
+<<<<<<< HEAD
+=======
             // Explicitly clear the id field for new oils
             if (form.elements['id']) {
                 form.elements['id'].value = '';
             }
+>>>>>>> 8cfbca018be79bb8d4a8d54cf4d521324d941bb7
         }
         
         modal.classList.add('show');
@@ -952,6 +1104,9 @@
         const formData = new FormData(e.target);
         const data = Object.fromEntries(formData);
         
+<<<<<<< HEAD
+        // Convert checkboxes
+=======
         // Remove empty id field to ensure new items are created, not updated
         if (!data.id || data.id === '') {
             delete data.id;
@@ -959,6 +1114,7 @@
         
         // Convert checkboxes
         data.is_active = formData.get('is_active') === 'on';
+>>>>>>> 8cfbca018be79bb8d4a8d54cf4d521324d941bb7
         data.is_in_library = formData.get('is_in_library') ? true : false;
         data.is_favorite = formData.get('is_favorite') ? true : false;
         data.is_custom = formData.get('is_custom') ? true : false;
@@ -994,8 +1150,11 @@
             const price = formData.get(`${tier}_price`);
             const sku = formData.get(`${tier}_sku`);
             
+<<<<<<< HEAD
+=======
             console.log(`${tier}: name=${name}, size=${size}, unit=${unit}, price=${price}, sku=${sku}`);
             
+>>>>>>> 8cfbca018be79bb8d4a8d54cf4d521324d941bb7
             if (size && price) {
                 priceTiers[`${tier}_name`] = name || '';
                 priceTiers[`${tier}_size`] = parseFloat(size);
@@ -1005,16 +1164,40 @@
             }
         });
         
+<<<<<<< HEAD
+=======
         console.log('Collected price tiers:', priceTiers);
         
+>>>>>>> 8cfbca018be79bb8d4a8d54cf4d521324d941bb7
         if (Object.keys(priceTiers).length > 0) {
             data.price_tiers = priceTiers;
         }
         
+<<<<<<< HEAD
+        // Clean up fields not directly in fragrance_oils table
+        const fieldsToMove = [
+            'fragrance_notes_top', 'fragrance_notes_middle', 'fragrance_notes_base',
+            'theme_family', 'scent_description', 'soap_acceleration',
+            'product_url', 'blending_notes', 'usage_notes'
+        ];
+        
+        const productDetails = {};
+        fieldsToMove.forEach(field => {
+            if (data[field]) {
+                productDetails[field] = data[field];
+                delete data[field];
+            }
+        });
+        
+        if (Object.keys(productDetails).length > 0) {
+            data.product_details = productDetails;
+        }
+=======
         console.log('Final data being sent:', data);
         
         // All fields are now directly in fragrance_oils table
         // No need to move anything to product_details
+>>>>>>> 8cfbca018be79bb8d4a8d54cf4d521324d941bb7
         
         try {
             const isEdit = !!data.id;
@@ -1031,6 +1214,10 @@
             });
             
             AdminCore.showToast('Fragrance oil saved successfully', 'success');
+<<<<<<< HEAD
+            closeOilModal();
+            await loadOils();
+=======
             
             // Close modal and reset form
             closeOilModal();
@@ -1040,6 +1227,7 @@
             setTimeout(async () => {
                 await loadOils();
             }, 500);
+>>>>>>> 8cfbca018be79bb8d4a8d54cf4d521324d941bb7
         } catch (error) {
             AdminCore.showToast(`Failed to save fragrance oil: ${error.message}`, 'error');
         }
@@ -1083,11 +1271,14 @@
         // Map form fields to database schema and filter out unsupported fields
         const data = {};
         
+<<<<<<< HEAD
+=======
         // IMPORTANT: Include ID for updates
         if (rawData.id && rawData.id !== '') {
             data.id = rawData.id;
         }
         
+>>>>>>> 8cfbca018be79bb8d4a8d54cf4d521324d941bb7
         // Basic fields that exist in the database schema
         if (rawData.supplier_id && rawData.supplier_id !== '') data.supplier_id = rawData.supplier_id;
         if (rawData.product_name && rawData.product_name !== '') data.product_name = rawData.product_name;
@@ -1128,6 +1319,8 @@
             data.notes = rawData.notes;
         }
         
+<<<<<<< HEAD
+=======
         // Fragrance note fields - These are ALL direct database fields now
         if (rawData.theme_family && rawData.theme_family !== '') {
             data.theme_family = rawData.theme_family;
@@ -1159,6 +1352,7 @@
             data.scent_description = rawData.scent_description;
         }
         
+>>>>>>> 8cfbca018be79bb8d4a8d54cf4d521324d941bb7
         // Rating fields
         if (rawData.price_rating && rawData.price_rating !== '') {
             data.price_rating = parseInt(rawData.price_rating);
@@ -1169,16 +1363,24 @@
         if (rawData.performance_rating && rawData.performance_rating !== '') {
             data.performance_rating = parseFloat(rawData.performance_rating);
         }
+<<<<<<< HEAD
+=======
         if (rawData.intensity_rating && rawData.intensity_rating !== '') {
             data.intensity_rating = parseFloat(rawData.intensity_rating);
         }
         if (rawData.overall_rating && rawData.overall_rating !== '') {
             data.overall_rating = parseFloat(rawData.overall_rating);
         }
+>>>>>>> 8cfbca018be79bb8d4a8d54cf4d521324d941bb7
         if (rawData.total_ratings && rawData.total_ratings !== '') {
             data.total_ratings = parseInt(rawData.total_ratings);
         }
         
+<<<<<<< HEAD
+        // Note: Additional fields for iOS app (theme_family, fragrance_notes, etc.) 
+        // will need to be saved to the ProductDetails table separately
+        // For now, we're only saving core fragrance_oils table fields
+=======
         // IFRA fields
         if (rawData.ifra_url && rawData.ifra_url !== '') {
             data.ifra_url = rawData.ifra_url;
@@ -1230,6 +1432,7 @@
         if (Object.keys(priceTiers).length > 0) {
             data.price_tiers = priceTiers;
         }
+>>>>>>> 8cfbca018be79bb8d4a8d54cf4d521324d941bb7
 
         console.log('Cleaned data for database:', data);
 
@@ -1249,6 +1452,10 @@
 
             console.log('Save response:', response);
             AdminCore.showToast('Fragrance oil saved successfully', 'success');
+<<<<<<< HEAD
+            closeOilModal();
+            await loadOils();
+=======
             
             // Close modal and reset form
             closeOilModal();
@@ -1258,6 +1465,7 @@
             setTimeout(async () => {
                 await loadOils();
             }, 500);
+>>>>>>> 8cfbca018be79bb8d4a8d54cf4d521324d941bb7
         } catch (error) {
             console.error('Error saving oil:', error);
             AdminCore.showToast(`Failed to save fragrance oil: ${error.message}`, 'error');
