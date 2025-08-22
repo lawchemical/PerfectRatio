@@ -1103,7 +1103,7 @@
             data.specific_gravity = parseFloat(rawData.specific_gravity);
         }
         if (rawData.vanillin_pct && rawData.vanillin_pct !== '') {
-            data.vanilla_content = parseFloat(rawData.vanillin_pct);
+            data.vanillin_pct = parseFloat(rawData.vanillin_pct);
         }
         if (rawData.recommended_load_pct && rawData.recommended_load_pct !== '') {
             data.recommended_load_pct = parseFloat(rawData.recommended_load_pct);
