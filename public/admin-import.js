@@ -492,14 +492,14 @@
                     'tier4_name', 'tier4_size', 'tier4_unit', 'tier4_price', 'tier4_sku',
                     // Price tier 5
                     'tier5_name', 'tier5_size', 'tier5_unit', 'tier5_price', 'tier5_sku',
-                    // IFRA categories with subcategories
+                    // IFRA categories with subcategories (removed base categories 5, 7, 10, 11)
                     'ifra_category_1', 'ifra_category_2', 'ifra_category_3', 'ifra_category_4',
-                    'ifra_category_5', 'ifra_category_5A', 'ifra_category_5B', 'ifra_category_5C', 'ifra_category_5D',
+                    'ifra_category_5A', 'ifra_category_5B', 'ifra_category_5C', 'ifra_category_5D',
                     'ifra_category_6', 
-                    'ifra_category_7', 'ifra_category_7A', 'ifra_category_7B',
+                    'ifra_category_7A', 'ifra_category_7B',
                     'ifra_category_8', 'ifra_category_9',
-                    'ifra_category_10', 'ifra_category_10A', 'ifra_category_10B',
-                    'ifra_category_11', 'ifra_category_11A', 'ifra_category_11B',
+                    'ifra_category_10A', 'ifra_category_10B',
+                    'ifra_category_11A', 'ifra_category_11B',
                     'ifra_category_12',
                     // Additional fields
                     'categories', 'scent_description', 'is_favorite',
@@ -518,15 +518,15 @@
                     'Medium', '8', 'oz', '17.99', 'VB001-8',
                     'Large', '16', 'oz', '29.99', 'VB001-16',
                     'Bulk', '32', 'oz', '52.99', 'VB001-32',
-                    // IFRA values
-                    '2', '4', '5', '10',
-                    '8', '8', '8', '8', '8',
-                    '5',
-                    '6', '6', '6',
-                    '5', '25',
-                    '10', '10', '10',
-                    '15', '15', '15',
-                    '100',
+                    // IFRA values - removed main categories 5, 7, 10, 11 but kept subcategories
+                    '2', '4', '5', '10',  // categories 1-4
+                    '8', '8', '8', '8',   // categories 5A-5D
+                    '5',                  // category 6
+                    '6', '6',             // categories 7A-7B
+                    '5', '25',            // categories 8-9
+                    '10', '10',           // categories 10A-10B
+                    '15', '15',           // categories 11A-11B
+                    '100',                // category 12
                     // Additional info
                     'Gourmand,Sweet', 'Rich vanilla with caramel notes', 'false',
                     '4.5', '4.2', '4.8',

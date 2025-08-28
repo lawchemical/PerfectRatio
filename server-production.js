@@ -2006,15 +2006,16 @@ app.post('/api/admin/import/oils', async (req, res) => {
                     .single();
 
                 // Parse IFRA subcategories - handle both uppercase and lowercase field names
-                const ifra5A = parseFloat(item.ifra_category_5A || item.ifra_category_5a) || parseFloat(item.ifra_category_5) || null;
+                // Note: Main categories 5, 7, 10, 11 are no longer in the CSV template
+                const ifra5A = parseFloat(item.ifra_category_5A || item.ifra_category_5a) || null;
                 const ifra5B = parseFloat(item.ifra_category_5B || item.ifra_category_5b) || null;
                 const ifra5C = parseFloat(item.ifra_category_5C || item.ifra_category_5c) || null;
                 const ifra5D = parseFloat(item.ifra_category_5D || item.ifra_category_5d) || null;
-                const ifra7A = parseFloat(item.ifra_category_7A || item.ifra_category_7a) || parseFloat(item.ifra_category_7) || null;
+                const ifra7A = parseFloat(item.ifra_category_7A || item.ifra_category_7a) || null;
                 const ifra7B = parseFloat(item.ifra_category_7B || item.ifra_category_7b) || null;
-                const ifra10A = parseFloat(item.ifra_category_10A || item.ifra_category_10a) || parseFloat(item.ifra_category_10) || null;
+                const ifra10A = parseFloat(item.ifra_category_10A || item.ifra_category_10a) || null;
                 const ifra10B = parseFloat(item.ifra_category_10B || item.ifra_category_10b) || null;
-                const ifra11A = parseFloat(item.ifra_category_11A || item.ifra_category_11a) || parseFloat(item.ifra_category_11) || null;
+                const ifra11A = parseFloat(item.ifra_category_11A || item.ifra_category_11a) || null;
                 const ifra11B = parseFloat(item.ifra_category_11B || item.ifra_category_11b) || null;
 
                 // Build oil data - using 'name' field and including all IFRA categories
