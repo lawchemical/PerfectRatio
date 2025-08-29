@@ -1001,6 +1001,10 @@
             data.scent_profile = rawData.scent_description;
         }
         
+        // Convert checkboxes
+        data.skin_safe = formData.get('skin_safe') ? true : false;
+        data.phthalate_free = formData.get('phthalate_free') ? true : false;
+        
         // Convert numeric fields
         if (rawData.flash_point_f && rawData.flash_point_f !== '') {
             data.flash_point_f = parseFloat(rawData.flash_point_f);
