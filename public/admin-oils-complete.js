@@ -1,17 +1,7 @@
 // Complete Fragrance Oils Admin Module with All Fields
 (function() {
-    // Track if module is initialized
-    let moduleInitialized = false;
-    
     // Module initialization
     async function initOilsModule() {
-        console.log('[DEBUG] initOilsModule called, initialized:', moduleInitialized);
-        if (moduleInitialized) {
-            console.log('[DEBUG] Module already initialized, skipping');
-            return;
-        }
-        moduleInitialized = true;
-        
         setupOilsTab();
         setupOilModal();
         await loadOils();
@@ -20,16 +10,7 @@
 
     // Setup the oils tab content
     function setupOilsTab() {
-        console.log('[DEBUG] setupOilsTab called');
         const oilsTab = document.getElementById('oils');
-        
-        // Check if already initialized
-        if (oilsTab.querySelector('#oilsTable')) {
-            console.log('[DEBUG] Oils tab already initialized, skipping setup');
-            return;
-        }
-        
-        console.log('[DEBUG] Setting up oils tab HTML');
         oilsTab.innerHTML = `
             <div class="search-bar">
                 <input type="text" class="search-input" id="oilSearch" placeholder="Search fragrance oils...">
@@ -44,15 +25,22 @@
                 <table id="oilsTable">
                     <thead>
                         <tr>
-                            <th style="width: 100px;">ID</th>
+                            <th>ID</th>
                             <th>NAME</th>
                             <th>SUPPLIER</th>
-                            <th style="width: 150px;">ACTIONS</th>
+                            <th>SKU</th>
+                            <th>FLASH PT</th>
+                            <th>NOTES</th>
+                            <th>IFRA</th>
+                            <th>SAFETY</th>
+                            <th>RATING</th>
+                            <th>LIBRARY</th>
+                            <th>ACTIONS</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td colspan="4" style="text-align: center;">
+                            <td colspan="10" style="text-align: center;">
                                 <div class="loading"></div>
                             </td>
                         </tr>
@@ -77,16 +65,7 @@
 
     // Setup comprehensive oil modal with all fields
     function setupOilModal() {
-        console.log('[DEBUG] setupOilModal called');
         const modalsContainer = document.getElementById('modals-container');
-        
-        // Check if modal already exists
-        if (document.getElementById('oilModal')) {
-            console.log('[DEBUG] Oil modal already exists, skipping setup');
-            return;
-        }
-        
-        console.log('[DEBUG] Creating oil modal');
         const modalHTML = `
             <div id="oilModal" class="modal">
                 <div class="modal-content">
@@ -141,6 +120,16 @@
                                         Is Discontinued
                                     </label>
                                 </div>
+                                <div style="display: flex; gap: 24px; margin-bottom: 16px;">
+                                    <label style="display: flex; align-items: center; gap: 8px; font-weight: 500; color: #2E3033; font-size: 14px;">
+                                        <input type="checkbox" name="skin_safe" style="width: 16px; height: 16px;">
+                                        Skin Safe
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; font-weight: 500; color: #2E3033; font-size: 14px;">
+                                        <input type="checkbox" name="phthalate_free" style="width: 16px; height: 16px;">
+                                        Phthalate Free
+                                    </label>
+                                </div>
                             </div>
                             
                             <div id="tab-content-technical" style="display: none;">
@@ -163,9 +152,13 @@
                                 </div>
                                 <div style="margin-bottom: 16px;">
                                     <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Soap Acceleration</label>
-                                    <textarea name="soap_acceleration" 
-                                        placeholder="Describe soap acceleration behavior (e.g., No acceleration, Slight trace acceleration at 2%, Moderate acceleration - work quickly, etc.)" 
-                                        style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; background: white; min-height: 100px; resize: vertical; font-family: inherit;"></textarea>
+                                    <select name="soap_acceleration" style="width: 100%; padding: 12px; border: 1px solid #D9D3CC; border-radius: 8px; font-size: 16px; background: white;">
+                                        <option value="">Not Specified</option>
+                                        <option value="none">No Acceleration</option>
+                                        <option value="slight">Slight Acceleration</option>
+                                        <option value="moderate">Moderate Acceleration</option>
+                                        <option value="severe">Severe Acceleration</option>
+                                    </select>
                                 </div>
                                 <div style="margin-bottom: 16px;">
                                     <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #2E3033; font-size: 14px;">Product URL</label>
@@ -551,35 +544,13 @@
 
     // Load oils
     async function loadOils() {
-        console.log('[DEBUG] loadOils called');
         try {
-            // Ensure suppliers are loaded first for proper display
-            if (!AdminCore.getSuppliers() || AdminCore.getSuppliers().length === 0) {
-                await loadSuppliers();
-            }
-            
             const data = await AdminCore.apiRequest("/api/admin/oils");
-            console.log('[DEBUG] Loaded', data.length, 'oils from server');
             const oils = data;
             AdminCore.setOils(oils);
-            
-            // Ensure table is properly initialized before rendering
-            const table = document.querySelector('#oilsTable');
-            if (!table) {
-                console.warn('[DEBUG] Table not found, reinitializing tab');
-                setupOilsTab();
-            }
-            
-            // Force table re-render with a small delay to ensure DOM is ready
-            console.log('[DEBUG] Setting timeout for renderOils');
-            setTimeout(() => {
-                console.log('[DEBUG] Timeout fired, calling renderOils');
-                renderOils();
-                updateSupplierFilter();
-            }, 100);
-            
+            renderOils();
+            updateSupplierFilter();
         } catch (error) {
-            console.error('Error loading oils:', error);
             AdminCore.showToast('Failed to load fragrance oils', 'error');
         }
     }
@@ -617,61 +588,15 @@
         }
     }
 
-    // Render oils table - simplified to show only ID, Name, Supplier
+    // Render oils table with more information
     function renderOils(oilsToRender = null) {
-        console.log('[DEBUG] renderOils called');
         const oils = oilsToRender || AdminCore.getOils();
-        
-        // Check if table exists
-        const table = document.querySelector('#oilsTable');
-        if (!table) {
-            console.error('[DEBUG] Oils table not found! Tab may not be initialized');
-            return;
-        }
-        
         const tbody = document.querySelector('#oilsTable tbody');
-        if (!tbody) {
-            console.error('[DEBUG] Table tbody not found!');
-            return;
-        }
-        
-        // Check and fix header structure
-        let thead = table.querySelector('thead tr');
-        if (!thead) {
-            console.error('[DEBUG] Table thead tr not found, recreating...');
-            const theadElement = table.querySelector('thead') || document.createElement('thead');
-            thead = document.createElement('tr');
-            thead.innerHTML = `
-                <th style="width: 100px;">ID</th>
-                <th>NAME</th>
-                <th>SUPPLIER</th>
-                <th style="width: 150px;">ACTIONS</th>
-            `;
-            theadElement.appendChild(thead);
-            if (!table.querySelector('thead')) {
-                table.insertBefore(theadElement, tbody.parentNode);
-            }
-        }
-        
-        // Ensure we have exactly 4 headers
-        const headers = thead.querySelectorAll('th');
-        console.log('[DEBUG] Table headers count:', headers.length);
-        
-        if (headers.length !== 4) {
-            console.warn('[DEBUG] Incorrect header count! Expected 4, found', headers.length);
-            // Rebuild headers
-            thead.innerHTML = `
-                <th style="width: 100px;">ID</th>
-                <th>NAME</th>
-                <th>SUPPLIER</th>
-                <th style="width: 150px;">ACTIONS</th>
-            `;
-        }
         
         if (oils.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="4" style="text-align: center;">No fragrance oils found</td>
+                    <td colspan="11" style="text-align: center;">No fragrance oils found</td>
                 </tr>
             `;
             return;
@@ -679,35 +604,35 @@
 
         tbody.innerHTML = oils.map(oil => {
             const oilId = typeof oil.id === 'string' ? `'${oil.id}'` : oil.id;
+            const fragranceNotes = [];
+            if (oil.fragrance_notes_top) fragranceNotes.push('T');
+            if (oil.fragrance_notes_middle) fragranceNotes.push('M');
+            if (oil.fragrance_notes_base) fragranceNotes.push('B');
             
-            // Get supplier name - check multiple possible fields
-            let supplierName = oil.supplier_name || oil.supplier?.name || '';
-            if (!supplierName && oil.supplier_id) {
-                // Try to find supplier from the suppliers list
-                const suppliers = AdminCore.getSuppliers();
-                const supplier = suppliers.find(s => s.id === oil.supplier_id);
-                supplierName = supplier ? supplier.name : 'Unknown Supplier';
-            }
-            if (!supplierName) {
-                supplierName = 'No Supplier';
-            }
-            
-            // Get the display name - prioritize name over product_name
-            const displayName = oil.name || oil.product_name || 'Unnamed Oil';
-            
-            // Truncate ID if it's too long (UUIDs)
-            const displayId = oil.id && oil.id.length > 8 ? 
-                oil.id.substring(0, 8) + '...' : 
-                oil.id || '-';
+            const safetyBadges = [];
+            if (oil.skin_safe) safetyBadges.push('🧴');
+            if (oil.phthalate_free) safetyBadges.push('✓');
             
             return `
                 <tr>
-                    <td title="${oil.id}" style="font-family: monospace; font-size: 12px;">${displayId}</td>
-                    <td style="font-weight: 500;">${displayName}</td>
-                    <td>${supplierName}</td>
-                    <td style="white-space: nowrap; text-align: center;">
-                        <button class="btn-small" onclick="editOil(${oilId})" title="Edit" style="margin-right: 5px;">✏️</button>
-                        <button class="btn-small btn-danger" onclick="deleteOil(${oilId})" title="Delete">🗑️</button>
+                    <td>${oil.id}</td>
+                    <td>${oil.product_name || oil.name || '-'}</td>
+                    <td>${oil.supplier_name || '-'}</td>
+                    <td>${oil.sku || '-'}</td>
+                    <td>${oil.flash_point_f ? oil.flash_point_f + '°F' : '-'}</td>
+                    <td>${fragranceNotes.length > 0 ? fragranceNotes.join(',') : '-'}</td>
+                    <td>${oil.ifra_version || '-'}</td>
+                    <td title="${oil.skin_safe ? 'Skin Safe ' : ''}${oil.phthalate_free ? 'Phthalate Free' : ''}">${safetyBadges.length > 0 ? safetyBadges.join(' ') : '-'}</td>
+                    <td>${oil.overall_rating ? parseFloat(oil.overall_rating).toFixed(1) : '-'}</td>
+                    <td>
+                        <span class="library-toggle ${oil.is_in_library ? 'in-library' : ''}" 
+                              onclick="toggleOilLibrary(${oilId}, ${!oil.is_in_library})">
+                            ${oil.is_in_library ? '✓ In Library' : '✗ Not in Library'}
+                        </span>
+                    </td>
+                    <td class="actions">
+                        <button class="btn-small" onclick="editOil(${oilId})">✏️</button>
+                        <button class="btn-small btn-danger" onclick="deleteOil(${oilId})">🗑️</button>
                     </td>
                 </tr>
             `;
@@ -756,8 +681,9 @@
             form.elements['ifra_url'].value = oil.ifra_url || '';
             form.elements['solvent_note'].value = oil.solvent_note || '';
             
-            // Set checkbox states
-            form.elements['is_active'].checked = oil.is_active !== false;
+            // Load safety checkboxes
+            if (oil.skin_safe) form.elements['skin_safe'].checked = true;
+            if (oil.phthalate_free) form.elements['phthalate_free'].checked = true;
             
             // Load IFRA category fields
             const ifraCategories = ['1', '2', '3', '4', '5a', '5b', '5c', '5d', '6', '7a', '7b', '8', '9', '10a', '10b', '11a', '11b', '12'];
@@ -881,10 +807,6 @@
             if (oil.batch_count) form.elements['batch_count'].value = oil.batch_count;
         } else {
             title.textContent = 'Add Fragrance Oil';
-            // Explicitly clear the id field for new oils
-            if (form.elements['id']) {
-                form.elements['id'].value = '';
-            }
         }
         
         modal.classList.add('show');
@@ -948,16 +870,12 @@
         const formData = new FormData(e.target);
         const data = Object.fromEntries(formData);
         
-        // Remove empty id field to ensure new items are created, not updated
-        if (!data.id || data.id === '') {
-            delete data.id;
-        }
-        
         // Convert checkboxes
-        data.is_active = formData.get('is_active') === 'on';
         data.is_in_library = formData.get('is_in_library') ? true : false;
         data.is_favorite = formData.get('is_favorite') ? true : false;
         data.is_custom = formData.get('is_custom') ? true : false;
+        data.skin_safe = formData.get('skin_safe') ? true : false;
+        data.phthalate_free = formData.get('phthalate_free') ? true : false;
         
         // Prepare IFRA entries
         const ifraEntries = [];
@@ -1027,15 +945,8 @@
             });
             
             AdminCore.showToast('Fragrance oil saved successfully', 'success');
-            
-            // Close modal and reset form
             closeOilModal();
-            document.getElementById('oilForm').reset();
-            
-            // Reload oils with a small delay to ensure server has processed the new oil
-            setTimeout(async () => {
-                await loadOils();
-            }, 500);
+            await loadOils();
         } catch (error) {
             AdminCore.showToast(`Failed to save fragrance oil: ${error.message}`, 'error');
         }
@@ -1079,11 +990,6 @@
         // Map form fields to database schema and filter out unsupported fields
         const data = {};
         
-        // IMPORTANT: Include ID for updates
-        if (rawData.id && rawData.id !== '') {
-            data.id = rawData.id;
-        }
-        
         // Basic fields that exist in the database schema
         if (rawData.supplier_id && rawData.supplier_id !== '') data.supplier_id = rawData.supplier_id;
         if (rawData.product_name && rawData.product_name !== '') data.product_name = rawData.product_name;
@@ -1103,7 +1009,7 @@
             data.specific_gravity = parseFloat(rawData.specific_gravity);
         }
         if (rawData.vanillin_pct && rawData.vanillin_pct !== '') {
-            data.vanillin_pct = parseFloat(rawData.vanillin_pct);
+            data.vanilla_content = parseFloat(rawData.vanillin_pct);
         }
         if (rawData.recommended_load_pct && rawData.recommended_load_pct !== '') {
             data.recommended_load_pct = parseFloat(rawData.recommended_load_pct);
@@ -1245,15 +1151,8 @@
 
             console.log('Save response:', response);
             AdminCore.showToast('Fragrance oil saved successfully', 'success');
-            
-            // Close modal and reset form
             closeOilModal();
-            document.getElementById('oilForm').reset();
-            
-            // Reload oils with a small delay to ensure server has processed the new oil
-            setTimeout(async () => {
-                await loadOils();
-            }, 500);
+            await loadOils();
         } catch (error) {
             console.error('Error saving oil:', error);
             AdminCore.showToast(`Failed to save fragrance oil: ${error.message}`, 'error');
